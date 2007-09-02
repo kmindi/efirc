@@ -1,4 +1,4 @@
-CPP=D:\Fabian\codes\c++\efirc\svn\rewrite\sys\bin\g++.exe
+CPP=g++.exe
 DEF=-DWINDOWS
 INCDIR=-Iinclude
 LIBDIR=-Llib
