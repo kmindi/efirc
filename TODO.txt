@@ -1,0 +1,11 @@
+- keine leeren eingabefelder per button senden bestaetigen
+- pfeiltaste nach oben und history bitte
+- ^AVERSION^A ignorieren und separat behandeln (CTCP)
+- das fenster zieht hier schlieren. wird nicht verdoppelt. ist aber an den stellen noch sichtbar
+- Ops kommen ganz nach oben in der benutzerliste
+- benutzerliste-buffer ist zu gross (scrollbar)
+- standardtext (hinweis) in eingabefeld sollte man nicht senden koennen und diese auch verschwinden, wenn man reinklickt
+- gescheiter log
+- hinweise (nicht nachrichten anders markieren/andere schrift...irgendwie
+- private nachrichten muessen gehen
+- wenn du dann noch zeit hast, kuemmer dich bitte um das thread problem
