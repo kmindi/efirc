@@ -114,30 +114,32 @@ UserInterface::CreateGUIControls()
                                     FALSE, wxT(
        parsecfgvalue("font_button"))));
 
-    string clientinfotext_deutsch = "Das hier ist efirc ("
-        + config->efirc_version_string + "version)."
-        "efirc steht unter keiner Lizenz. Wir(die Programmierer)"
-        "koennen nicht fuer das Verantwortlich gemacht werden was es"
-        "macht oder auf irgendeine Weise hervorruft."
-        "Wenn du mehr wissen willst hilft dir vielleicht diese Seite"
-        "weiter: \"http://efirc.sourceforge.net/\"."
-        "Mit /hilfe oder /befehle kannst du eine Liste mit allen"
-        "verfügbaren Befehlen anzeigen lassen.\n\n"
-        "Server: " + parsecfgvalue("irc_server")
+    string clientinfotext_deutsch = "Das hier ist efirc (v. "
+        + config->efirc_version_string
+        + "). \n"
+        + "efirc steht unter keiner Lizenz. Wir (die Programmierer)"
+        + "koennen nicht fuer das Verantwortlich gemacht werden was es "
+        + "macht oder auf irgendeine Weise hervorruft. \n"
+        + "Wenn du mehr wissen willst hilft dir vielleicht diese Seite "
+        + "weiter: \"http://efirc.sourceforge.net/\".\n"
+        + "Mit /hilfe oder /befehle kannst du eine Liste mit allen "
+        + "verfügbaren Befehlen anzeigen lassen.\n\n"
+        + "Server: " + parsecfgvalue("irc_server")
         + "\nRaum: " + parsecfgvalue("irc_channel")
         + "\nDu bist bekannt als: " + parsecfgvalue("irc_nickname")
         + "\n\n";
 
-    string clientinfotext_englisch = "This is efirc ("
-        + config->efirc_version_string + "version)."
-        "efirc is not released under any license. We (the people who"
-        "made efirc) can not be held responsible for anything it does"
-        "or causes."
-        "If you want to get further information then have a look at:"
-        "\"http://efirc.sourceforge.net/\"."
-        "With /hilfe or /befehle you get a list of supportet commands."
-        "\n\n"
-        "Server: " + parsecfgvalue("irc_server")
+    string clientinfotext_englisch = "This is efirc (v. "
+        + config->efirc_version_string
+        + "). \n"
+        + "efirc is not released under any license. We (the people who "
+        + "made efirc) can not be held responsible for anything it does "
+        + "or causes. \n"
+        + "If you want to get further information then have a look at:"
+        + "\"http://efirc.sourceforge.net/\".\n"
+        + "With /hilfe or /befehle you get a list of supported commands."
+        + "\n\n"
+        + "Server: " + parsecfgvalue("irc_server")
         + "\nChannel: " + parsecfgvalue("irc_channel")
         + "\nYou are known as: " + parsecfgvalue("irc_nickname")
         + "\n\n";
@@ -271,15 +273,15 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
     // TODO nick nicht aktuell
     std::string nick = irc->_IRCNICK;
     text = WxEdit_input_messages->GetValue();
-
-    add_message("<" + nick + "> " + text);
-
-    WxEdit_input_messages->Clear();
-
-    // Text Senden
-    // TODO channel nicht aktuell
-    irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
-                      text.c_str());
+    if(text != "")
+    {
+        add_message("<" + nick + "> " + text);
+        WxEdit_input_messages->Clear();
+        // Text Senden
+        // TODO channel nicht aktuell
+        irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
+                          text.c_str());
+    }
 }
 
 // Programm Ende

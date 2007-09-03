@@ -10,5 +10,5 @@ rem make wird fuer das aktuelle Makefile
 rem aufgerufen
 echo calling make
 mingw32-make.exe all
-
-pause
+cd bin
+start efirc.exe
