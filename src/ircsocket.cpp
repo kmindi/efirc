@@ -7,7 +7,7 @@
  *
  * see it for more information ;)
  */
-#include <ircsocket.h>
+#include "ircsocket.h"
 
 // TODO errorhandler for ^C
 // TODO malloc()-use
@@ -48,8 +48,8 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 
       /* now connect, auth */
 // TODO need call_cmd()
-      connect_server(_IRCPORT, _IRCSERV);
-      auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+      //connect_server(_IRCPORT, _IRCSERV);
+      //auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
 }
 
 /* Destructor (disconnect from server) */
@@ -156,41 +156,42 @@ void IRCSocket::call_cmd(void)
       int (IRCSocket::*function)(const char *buf), status;
       const char *buf;
 
-      debug("[.=call_cmd] Calling command.\n");
-
-      /* any commands left in queue? */
-      if(cmds > 0)
+      while(1)
       {
-            buf = cbp->buf;
-            function = cbp->function;
+            debug("[.=call_cmd] Calling command.\n");
 
-            /* actual call, preserve return code */
-            status = (this->*function)(buf);
-
-            /* now, after successfull run, remove it from the queue */
-            if(status > -1)
+            /* any commands left in queue? */
+            if(cmds > 0)
             {
-                  debug("[i=call_cmd] Called. (%s, %i)\n",
-                     buf, function);
+                  buf = cbp->buf;
+                  function = cbp->function;
 
-                  del_cmd();
+                  /* actual call, preserve return code */
+                  status = (this->*function)(buf);
+
+                  /* now, after successfull run, remove it from the queue */
+                  if(status > -1)
+                  {
+                        debug("[i=call_cmd] Called. (%s, %i)\n",
+                           buf, function);
+
+                        del_cmd();
+                  }
+                  /* trying reconnect */
+                  else
+                        reconnect();
             }
-            /* trying reconnect */
             else
-            {
-                  reconnect();
-            }
-      }
-      else
             debug("[!=call_cmd] No more command in"
                " queue.\n");
 
-      /* don't hurry */
-      #ifdef WINDOWS
-      Sleep(1000);
-      #else
-      sleep(1);
-      #endif
+            /* don't hurry */
+            #ifdef WINDOWS
+            Sleep(1000);
+            #else
+            sleep(1);
+            #endif
+      }
 }
 
 /*
@@ -1119,6 +1120,7 @@ void
 IRCSocket::auth(const char *nick, const char *user, const char *real,
    const char *pass)
 {
+// TODO you aren't allowed to call when already done?
       /*
        * User authentifaction is needed on every connect.
        * First we need a session password, then a specific

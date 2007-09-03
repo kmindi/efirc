@@ -53,8 +53,8 @@ class IRCSocket
       struct
       irc_act_link
       {
-	    char *cmd;
-	    void (*function)(const irc_msg_data*, void*);
+            char *cmd;
+            void (*function)(const irc_msg_data*, void*);
             irc_act_link *next;
       };
 
