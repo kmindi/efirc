@@ -7,7 +7,7 @@
  *
  * see it for more information ;)
  */
-#include "ircsocket.h"
+#include <ircsocket.h>
 
 // TODO errorhandler for ^C
 // TODO malloc()-use
@@ -65,9 +65,6 @@ IRCSocket::~IRCSocket()
       #else
       close(sock);
       #endif
-
-      /* close file */
-      fclose(_DBGSTR);
 }
 
 /*

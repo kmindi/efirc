@@ -269,7 +269,7 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
     char text_char[1024];
     std::string text;
     // TODO nick nicht aktuell
-    std::string nick = "efirc";
+    std::string nick = irc->_IRCNICK;
     text = WxEdit_input_messages->GetValue();
 
     add_message("<" + nick + "> " + text);
@@ -278,7 +278,8 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
 
     // Text Senden
     // TODO channel nicht aktuell
-    irc->send_privmsg("#efirc", text.c_str());
+    irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
+                      text.c_str());
 }
 
 // Programm Ende

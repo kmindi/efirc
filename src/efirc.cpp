@@ -118,7 +118,12 @@ Efirc::OnInit()
         frame->add_message("Failed to initialise winsock!\n");
 
     config = new ConfigInterface();
-    irc = new IRCInterface();
+    irc = new IRCInterface(config->parsecfgvalue("irc_port"),
+                           config->parsecfgvalue("irc_server"),
+                           config->parsecfgvalue("irc_nickname"),
+                           config->parsecfgvalue("irc_username"),
+                           config->parsecfgvalue("irc_realname"),
+                           "pass");
     frame->irc = irc;
 
     // Ereignisverknüpfung
