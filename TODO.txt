@@ -1,11 +1,9 @@
 (gemacht) - keine leeren eingabefelder per button senden bestaetigen
 - Pfeiltaste nach oben und history bitte
 - ^AVERSION^A ignorieren und separat behandeln (CTCP)
-- Das fenster zieht hier schlieren. wird nicht verdoppelt. 
-  ist aber an den stellen noch sichtbar
 - Ops kommen ganz nach oben in der benutzerliste
 - Benutzerliste-buffer ist zu gross (scrollbar)
-- Standardtext (hinweis) in eingabefeld sollte man nicht senden koennen und 
+- Standardtext (hinweis) in eingabefeld sollte man nicht senden koennen und
   diese auch verschwinden, wenn man reinklickt
 - Gescheiter log
 - Hinweise (nicht nachrichten anders markieren/andere schrift...irgendwie

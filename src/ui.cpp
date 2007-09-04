@@ -116,32 +116,33 @@ UserInterface::CreateGUIControls()
 
     string clientinfotext_deutsch = "Das hier ist efirc (v. "
         + config->efirc_version_string
-        + "). \n"
-        + "efirc steht unter keiner Lizenz. Wir (die Programmierer)"
+        + ").\n"
+        + "efirc steht unter keiner Lizenz. Wir (die Programmierer) "
         + "koennen nicht fuer das Verantwortlich gemacht werden was es "
-        + "macht oder auf irgendeine Weise hervorruft. \n"
+        + "macht oder auf irgendeine Weise hervorruft.\n"
         + "Wenn du mehr wissen willst hilft dir vielleicht diese Seite "
         + "weiter: \"http://efirc.sourceforge.net/\".\n"
         + "Mit /hilfe oder /befehle kannst du eine Liste mit allen "
-        + "verfügbaren Befehlen anzeigen lassen.\n\n"
-        + "Server: " + parsecfgvalue("irc_server")
-        + "\nRaum: " + parsecfgvalue("irc_channel")
-        + "\nDu bist bekannt als: " + parsecfgvalue("irc_nickname")
+        + "verfügbaren Befehlen anzeigen lassen."
+        + "\n\n"
+        + "Server: " + parsecfgvalue("irc_server") + "\n"
+        + "Raum: " + parsecfgvalue("irc_channel") + "\n"
+        + "Du bist bekannt als: " + parsecfgvalue("irc_nickname")
         + "\n\n";
 
     string clientinfotext_englisch = "This is efirc (v. "
         + config->efirc_version_string
-        + "). \n"
+        + ").\n"
         + "efirc is not released under any license. We (the people who "
         + "made efirc) can not be held responsible for anything it does "
-        + "or causes. \n"
-        + "If you want to get further information then have a look at:"
+        + "or causes.\n"
+        + "If you want to get further information then have a look at: "
         + "\"http://efirc.sourceforge.net/\".\n"
         + "With /hilfe or /befehle you get a list of supported commands."
         + "\n\n"
-        + "Server: " + parsecfgvalue("irc_server")
-        + "\nChannel: " + parsecfgvalue("irc_channel")
-        + "\nYou are known as: " + parsecfgvalue("irc_nickname")
+        + "Server: " + parsecfgvalue("irc_server") + "\n"
+        + "Channel: " + parsecfgvalue("irc_channel") + "\n"
+        + "You are known as: " + parsecfgvalue("irc_nickname")
         + "\n\n";
 
     if (parsecfgvalue("text_language") == "de")
