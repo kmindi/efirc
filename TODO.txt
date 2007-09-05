@@ -9,3 +9,15 @@
 - Hinweise (nicht nachrichten anders markieren/andere schrift...irgendwie
 - Private nachrichten muessen gehen
 - Wenn du dann noch Zeit hast, kuemmer dich bitte um das thread problem
+- Folgende Raum Aktivitaeten noch hinzufuegen
+  (/ kick/ban/etc)
+- Eintrag für optionale entfernte Konfigurationsdatei in der (lokalen) 
+  Konfigurationsdatei hinzufügen.
+  (Die entfernte Konfigurationsdatei überschreibt die Einstellungen der 
+  lokalen Konfigurationsdatei, und muss somit im Gegensatz zur lokalen 
+  Konfigurationsdatei nicht alle nicht optionalen Optionen enthalten)
+- Falls die lokale Konfigurationsdatei nicht vorhanden ist werden 
+  voreingestellte Werte verwendet und eine Konfigurationsdatei wird erstellt.
+- Überprüfung ob die nötigen Verbindungsangaben in der Konfigurationsdatei 
+  eingetragen sind hinzufügen
+- Virus_!FEHL!_Alarm mit NOD32 entfernen
