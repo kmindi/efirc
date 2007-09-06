@@ -4,11 +4,13 @@ using namespace std;
 
 // Eventzuweisung
 BEGIN_EVENT_TABLE(UserInterface, wxFrame)
-    EVT_CLOSE(UserInterface::OnClose)
-    EVT_TEXT_ENTER(ID_WXEDIT_TOPIC, UserInterface::WxButton_submitClick)
-    EVT_BUTTON(ID_WXBUTTON_SUBMIT, UserInterface::WxButton_submitClick)
-    EVT_TEXT_ENTER(ID_WXEDIT_INPUT_MESSAGES,
-                   UserInterface::WxButton_submitClick)
+    EVT_CLOSE      (UserInterface::OnClose)
+    EVT_TEXT_ENTER (ID_WXEDIT_TOPIC,
+                    UserInterface::WxButton_submitClick)
+    EVT_BUTTON     (ID_WXBUTTON_SUBMIT,
+                    UserInterface::WxButton_submitClick)
+    EVT_TEXT_ENTER (ID_WXEDIT_INPUT_MESSAGES,
+                    UserInterface::WxButton_submitClick)
 END_EVENT_TABLE()
 
 UserInterface::UserInterface(wxWindow *parent, wxWindowID id,
@@ -16,11 +18,25 @@ UserInterface::UserInterface(wxWindow *parent, wxWindowID id,
                    const wxSize& size, long style)
          : wxFrame(parent, id, title, position, size, style)
 {
+    // History ist leer
+    for (int i = 0; i < HISTORY_SIZE; i++)
+        history[i] = "";
+
+    hindex = 0;
+    hpos = 0;
+
     // Unsere Konfiguration
     config = new ConfigInterface();
 
     // Erstellen der grafischen Oberfläche (Objekte, Attribute,...)
     CreateGUIControls();
+
+    // Eine getrueckte Taste bei Fokus im Eingabefeld
+    // loest das Ereignis aus, welches die festgelegte
+    // Methode aufruft
+    WxEdit_input_messages->Connect(wxEVT_KEY_DOWN,
+       wxKeyEventHandler(UserInterface::WxEdit_input_messagesKeyDown),
+       NULL, this);
 }
 
 void
@@ -271,18 +287,77 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
 {
     char text_char[1024];
     std::string text;
+
     // TODO nick nicht aktuell
     std::string nick = irc->_IRCNICK;
     text = WxEdit_input_messages->GetValue();
+
     if(text != "")
     {
         add_message("<" + nick + "> " + text);
         WxEdit_input_messages->Clear();
+
         // Text Senden
         // TODO channel nicht aktuell
         irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
                           text.c_str());
+
+        hpos++;
+
+        if (hpos > HISTORY_SIZE - 1)
+            hpos = HISTORY_SIZE - 1;
+
+        for(int i = hpos; i > 1; i--)
+            history[i] = history[i - 1];
+
+        history[1] = text;
     }
+}
+
+void
+UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
+{
+    // Der Wert der gedrueckten Taste
+    int myPressedKey;
+    // Der History-Eintrag
+    string myCommand;
+
+    myPressedKey = event.GetKeyCode();
+
+    // Wir warten auf die Pfeiltaste nach oben
+    if (myPressedKey == WXK_UP)
+    {
+        // History-Up
+        hindex++;
+
+        // Ignorieren der oberen leeren Felder
+        // und Bereich einhalten
+        if (hindex > hpos)
+            hindex = hpos;
+    }
+    else if (myPressedKey == WXK_DOWN)
+    {
+        // History-Down
+        hindex--;
+
+        if (hindex < 0)
+            hindex = 0;
+    }
+    else
+    {
+        // Ereignis weiterleiten
+        // und Ende ueberspringen
+        event.Skip();
+        return;
+    }
+
+    // Befehl aus History an festgelegter Stelle
+    // lesen
+    myCommand = history[hindex];
+
+    // History-Eintrag ins Eingabefeld kopieren
+    WxEdit_input_messages->Clear();
+    WxEdit_input_messages->WriteText(myCommand);
 }
 
 // Programm Ende

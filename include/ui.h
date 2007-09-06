@@ -11,6 +11,9 @@
 
 #include <icon.xpm>
 
+// fester Grenzwert der History-Eintraege
+#define HISTORY_SIZE 512
+
 using namespace std;
 
 class UserInterface : public wxFrame
@@ -22,8 +25,8 @@ class UserInterface : public wxFrame
                  const wxString &title = wxT("efirc"),
                  const wxPoint& pos = wxDefaultPosition,
                  const wxSize& size = wxDefaultSize,
-                 long style = wxCAPTION | wxSYSTEM_MENU |
-                              wxMINIMIZE_BOX | wxCLOSE_BOX); // TODO wat das jetzt?
+                 long  style        = wxCAPTION | wxSYSTEM_MENU |
+                                      wxMINIMIZE_BOX | wxCLOSE_BOX); // TODO wat das jetzt?
 
         void add_message(string);
 
@@ -34,6 +37,15 @@ class UserInterface : public wxFrame
 
     private:
         ConfigInterface *config;
+
+        // Position in der History
+        int hindex;
+        // Aktueller History-Index
+        int hpos;
+
+        // Die History wird durch ein Array repraesentiert
+        // und ist begrenzt in den moeglichen Eintraegen
+        string history[HISTORY_SIZE];
 
         // TODO wozu das denn???
         enum
@@ -50,7 +62,7 @@ class UserInterface : public wxFrame
 
         // grafische Objekte auf dem Frame
         wxListCtrl *WxEdit_channel_users;
-        wxButton *WxButton_submit;
+        wxButton   *WxButton_submit;
         wxTextCtrl *WxEdit_topic;
         wxTextCtrl *WxEdit_input_messages;
         wxTextCtrl *WxEdit_output_messages;
@@ -61,6 +73,7 @@ class UserInterface : public wxFrame
         void CreateGUIControls();
 
         void WxButton_submitClick(wxCommandEvent& event);
+        void WxEdit_input_messagesKeyDown(wxKeyEvent& event);
 
         void OnClose(wxCloseEvent& event);
 };
