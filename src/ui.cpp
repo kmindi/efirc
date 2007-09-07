@@ -207,7 +207,7 @@ UserInterface::add_message(string message)
 void
 UserInterface::add_user(string usersinastring)
 {
-    // Entweder EINBenutzer
+    // Entweder EIN Benutzer
     if(usersinastring.find(" ", 0) == string::npos)
     {
         if(WxEdit_channel_users->FindItem(-1,usersinastring) == -1)
@@ -229,9 +229,9 @@ UserInterface::add_user(string usersinastring)
                                                    usersinastring.length()
                                                    - user.length() - 1);
 
-            if(WxEdit_channel_users->FindItem(-1,user) == -1)
+            if(WxEdit_channel_users->FindItem(-1, user) == -1)
                 WxEdit_channel_users->InsertItem(
-                   WxEdit_channel_users->GetItemCount()+1,user);
+                   WxEdit_channel_users->GetItemCount() + 1,user);
         }
     }
 }
@@ -302,15 +302,22 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
         irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
                           text.c_str());
 
+        // Platz für neuen Eintrag schaffen
         hpos++;
 
+        // den begrenzten Speicher nicht verlassen
         if (hpos > HISTORY_SIZE - 1)
             hpos = HISTORY_SIZE - 1;
 
+        // Alle Eintraege Feld nach oben schieben
         for(int i = hpos; i > 1; i--)
             history[i] = history[i - 1];
 
+        // Neuer Eintrag hinzufuegen und
+        // Position in der History auf den
+        // ersten Eintrag setzen
         history[1] = text;
+        hindex = 0;
     }
 }
 
