@@ -1,5 +1,13 @@
 #include <ui.h>
 
+int
+wxCALLBACK
+sortUserlist(long item1, long item2, long sortData)
+{
+    // beide Strings vergleichen (Zeichen fuer Zeichen)
+    return ((string *)item1)->compare(*(string *)item2);
+}
+
 using namespace std;
 
 // Eventzuweisung
@@ -207,33 +215,38 @@ UserInterface::add_message(string message)
 void
 UserInterface::add_user(string usersinastring)
 {
-    // Entweder EIN Benutzer
-    if(usersinastring.find(" ", 0) == string::npos)
-    {
-        if(WxEdit_channel_users->FindItem(-1,usersinastring) == -1)
-            WxEdit_channel_users->InsertItem(
-               WxEdit_channel_users->GetItemCount()+1,usersinastring);
-    }
-    // oder MEHRERE durch Leerzeichen getrennt
-    else
-    {
-        int position = 0;
-        string user = "";
+    int item;
+    string user;
+    // Zeiger auf den im Speicher hinterlegten
+    // Item-Bezeichner
+    string *itemData;
 
-        while(usersinastring.find(" ", position) != string::npos)
+    // es wird dem String ein Stream
+    // zugewiesen
+    stringstream ss(usersinastring);
+
+    // Bis zum naechsten Leerzeichen aus
+    // dem Stream lesen und eingelesene
+    // Zeichenkette in user schreiben
+    while (ss >> user)
+        // noch nicht in der Liste?
+        if(WxEdit_channel_users->FindItem(-1, user) == -1)
         {
-            user = usersinastring.substr(position,
-                                         usersinastring.find(" ",
-                                                             position));
-            usersinastring = usersinastring.substr(user.length() + 1,
-                                                   usersinastring.length()
-                                                   - user.length() - 1);
+            // Am Ende hinzufuegen
+            item = WxEdit_channel_users->InsertItem(
+               WxEdit_channel_users->GetItemCount() + 1, user);
 
-            if(WxEdit_channel_users->FindItem(-1, user) == -1)
-                WxEdit_channel_users->InsertItem(
-                   WxEdit_channel_users->GetItemCount() + 1,user);
+            // UserData ist ein Pointer auf
+            // den Bezeichner
+            itemData = new string(WxEdit_channel_users->GetItemText(item));
+
+            // die Speicheradresse des
+            // Bezeichners
+            WxEdit_channel_users->SetItemData(item, (long)itemData);
         }
-    }
+
+    // Liste sortieren
+    WxEdit_channel_users->SortItems(sortUserlist, 0);
 }
 
 // Loescht einen Benutzer aus der Benutzerliste

@@ -6,6 +6,7 @@
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/colour.h>
+#include <sstream>
 #include <conf.h>
 #include <irc.h>
 

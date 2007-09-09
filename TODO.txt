@@ -1,7 +1,7 @@
 done - keine leeren eingabefelder per button senden bestaetigen
-do   - Pfeiltaste nach oben und history bitte
+done - Pfeiltaste nach oben und history bitte
 do   - VERSION ignorieren und separat behandeln (CTCP)
-     - Ops kommen ganz nach oben in der benutzerliste
+done - Ops kommen ganz nach oben in der benutzerliste
      - Benutzerliste-buffer ist zu gross (scrollbar)
      - Standardtext (hinweis) in eingabefeld sollte man nicht senden
        koennen und diese auch verschwinden, wenn man reinklickt
