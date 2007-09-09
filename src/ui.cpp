@@ -26,12 +26,16 @@ UserInterface::UserInterface(wxWindow *parent, wxWindowID id,
                    const wxSize& size, long style)
          : wxFrame(parent, id, title, position, size, style)
 {
+    hindex = 0;
+    hpos = 0;
+
+    // Eingabefeld wurde noch nicht
+    // "fokusiert"
+    entered = false;
+
     // History ist leer
     for (int i = 0; i < HISTORY_SIZE; i++)
         history[i] = "";
-
-    hindex = 0;
-    hpos = 0;
 
     // Unsere Konfiguration
     config = new ConfigInterface();
@@ -39,11 +43,16 @@ UserInterface::UserInterface(wxWindow *parent, wxWindowID id,
     // Erstellen der grafischen Oberfläche (Objekte, Attribute,...)
     CreateGUIControls();
 
-    // Eine getrueckte Taste bei Fokus im Eingabefeld
+    // Eine gedrueckte Taste bei Fokus im Eingabefeld
     // loest das Ereignis aus, welches die festgelegte
     // Methode aufruft
     WxEdit_input_messages->Connect(wxEVT_KEY_DOWN,
        wxKeyEventHandler(UserInterface::WxEdit_input_messagesKeyDown),
+       NULL, this);
+
+    // Bei Fokus ggf. den Text im Eingabefeld loeschen
+    WxEdit_input_messages->Connect(wxEVT_SET_FOCUS,
+       wxKeyEventHandler(UserInterface::WxEdit_input_messagesFocus),
        NULL, this);
 }
 
@@ -65,7 +74,7 @@ UserInterface::CreateGUIControls()
                                              wxLC_ALIGN_LEFT |
                                              wxLC_NO_HEADER);
     WxEdit_channel_users->InsertColumn(0, wxT("Userlist"),
-                                       wxLIST_FORMAT_LEFT,150 );
+                                       wxLIST_FORMAT_LEFT, -1);
     WxEdit_topic = new wxTextCtrl(this, ID_WXEDIT_TOPIC,
                                   wxT("TOPIC: testtopic ["
                                       "http://www.testtopic.com/]"),
@@ -299,13 +308,13 @@ void
 UserInterface::WxButton_submitClick(wxCommandEvent& event)
 {
     char text_char[1024];
-    std::string text;
+    string text;
 
     // TODO nick nicht aktuell
     std::string nick = irc->_IRCNICK;
     text = WxEdit_input_messages->GetValue();
 
-    if(text != "")
+    if(text != "" && entered)
     {
         add_message("<" + nick + "> " + text);
         WxEdit_input_messages->Clear();
@@ -334,6 +343,9 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
     }
 }
 
+// TODO name change
+//      vector use
+// Historywanderung
 void
 UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
 {
@@ -368,6 +380,7 @@ UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
         // Ereignis weiterleiten
         // und Ende ueberspringen
         event.Skip();
+
         return;
     }
 
@@ -378,6 +391,18 @@ UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
     // History-Eintrag ins Eingabefeld kopieren
     WxEdit_input_messages->Clear();
     WxEdit_input_messages->WriteText(myCommand);
+}
+
+// Bei Fokuserhalt Standardtext loeschen
+void
+UserInterface::WxEdit_input_messagesFocus(wxKeyEvent& event)
+{
+    if (!entered)
+    {
+        WxEdit_input_messages->Clear();
+
+        entered = true;
+    }
 }
 
 // Programm Ende

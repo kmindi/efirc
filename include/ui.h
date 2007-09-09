@@ -44,6 +44,10 @@ class UserInterface : public wxFrame
         // Aktueller History-Index
         int hpos;
 
+        // Legt fest, ob das Eingabefeld
+        // geleert wird oder nicht
+        bool entered;
+
         // Die History wird durch ein Array repraesentiert
         // und ist begrenzt in den moeglichen Eintraegen
         string history[HISTORY_SIZE];
@@ -75,6 +79,7 @@ class UserInterface : public wxFrame
 
         void WxButton_submitClick(wxCommandEvent& event);
         void WxEdit_input_messagesKeyDown(wxKeyEvent& event);
+        void WxEdit_input_messagesFocus(wxKeyEvent& event);
 
         void OnClose(wxCloseEvent& event);
 };

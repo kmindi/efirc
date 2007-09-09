@@ -2,8 +2,8 @@ done - keine leeren eingabefelder per button senden bestaetigen
 done - Pfeiltaste nach oben und history bitte
 do   - VERSION ignorieren und separat behandeln (CTCP)
 done - Ops kommen ganz nach oben in der benutzerliste
-     - Benutzerliste-buffer ist zu gross (scrollbar)
-     - Standardtext (hinweis) in eingabefeld sollte man nicht senden
+done - Benutzerliste-buffer ist zu gross (scrollbar)
+done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
        koennen und diese auch verschwinden, wenn man reinklickt
      - Gescheiter log
      - Hinweise (nicht nachrichten anders markieren/andere schrift)
