@@ -74,6 +74,7 @@ class UserInterface : public wxFrame
 
         // wrapper
         string parsecfgvalue(string);
+        void ParseClientCmd(string);
 
         void CreateGUIControls();
 

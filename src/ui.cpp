@@ -304,15 +304,61 @@ UserInterface::parsecfgvalue(string cfgvalue)
     return config->parsecfgvalue(cfgvalue);
 }
 
+
+void 
+UserInterface::ParseClientCmd(string text)
+{
+    string cmd = text.substr(0,text.find(" ",0));
+    string param = text.substr(text.find(" ",0)+1);
+    
+    if(cmd == "nick")
+    {
+        irc->send_nick(param.c_str());
+    }
+    
+    if(cmd == "join")
+    {
+        //irc->send_part(irc->curr_channel());
+        WxEdit_channel_users->DeleteAllItems();
+        WxEdit_topic->Clear();
+        irc->send_join(param.c_str());
+    }
+    
+    if(cmd == "quit")
+    {
+        irc->send_quit(param.c_str());
+        add_message("Du hast das IRC Netzwerk verlassen");
+        WxEdit_channel_users->DeleteAllItems();
+        WxEdit_topic->Clear();
+    }
+    
+    if(cmd == "leave" || cmd == "part")
+    {
+        irc->send_part(param.c_str());
+        WxEdit_channel_users->DeleteAllItems();
+        WxEdit_topic->Clear();
+    }
+    
+}
+
 void
 UserInterface::WxButton_submitClick(wxCommandEvent& event)
 {
-    char text_char[1024];
     string text;
 
     // TODO nick nicht aktuell
     std::string nick = irc->_IRCNICK;
+    //std::string nick = irc->curr_nick();
     text = WxEdit_input_messages->GetValue();
+    // Falls / als Angabe fuer einen folgenden Befehl eingegeben wurde
+    // den Nachfolgenden Text als Befehl(mit parametern)
+    // an Befehlsuntersuchungsfunktion uebergeben
+    if(text.substr(0,1) == "/")
+    {
+        ParseClientCmd(text.substr(1));
+        WxEdit_input_messages->Clear();
+        text = "";
+    }
 
     if(text != "" && entered)
     {
@@ -323,6 +369,9 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
         // TODO channel nicht aktuell
         irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
                           text.c_str());
+                          
+        // irc->send_privmsg(irc->curr_channel(),
+        //                text.c_str());
 
         // Platz für neuen Eintrag schaffen
         hpos++;
