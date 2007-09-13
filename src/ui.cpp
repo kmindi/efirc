@@ -339,6 +339,22 @@ UserInterface::ParseClientCmd(string text)
         WxEdit_topic->Clear();
     }
     
+    if(cmd == "kick")
+    {
+        //kick 
+    }
+    
+    
+    if(cmd == "whois")
+    {
+        // whois 
+    }
+    
+    if(cmd == "clear")
+    {
+        WxEdit_output_messages->Clear();
+    }
+    
 }
 
 void

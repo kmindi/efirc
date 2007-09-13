@@ -5,7 +5,7 @@ done - Ops kommen ganz nach oben in der benutzerliste
 done - Benutzerliste-buffer ist zu gross (scrollbar)
 done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
        koennen und diese auch verschwinden, wenn man reinklickt
-do(km)   - Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
+do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
      - (fr) Gescheiter log (nur noetige angaben)
      - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
      - (km) Hinweise (nicht nachrichten) anders markieren und/oder andere Schrift
