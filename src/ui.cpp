@@ -383,7 +383,6 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
         {
             ParseClientCmd(text.substr(1));
             WxEdit_input_messages->Clear();
-            text = "";
         }
         else
         {
