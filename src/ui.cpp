@@ -373,27 +373,26 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
     channel = irc->CurrentChannel;
     text = WxEdit_input_messages->GetValue();
 
-    // Falls / als Angabe fuer einen folgenden Befehl eingegeben wurde
-    // den Nachfolgenden Text als Befehl(mit parametern)
-    // an Befehlsuntersuchungsfunktion uebergeben
-    if(text.substr(0,1) == "/")
-    {
-        ParseClientCmd(text.substr(1));
-        WxEdit_input_messages->Clear();
-        text = "";
-    }
-
     if(text != "" && entered)
     {
-        add_message("<" + nick + "> " + text);
-        WxEdit_input_messages->Clear();
 
-        // Text Senden
-        // TODO channel nicht aktuell
-        irc->send_privmsg(channel.c_str(), text.c_str());
+        // Falls / als Angabe fuer einen folgenden Befehl eingegeben
+        // wurde den Nachfolgenden Text als Befehl(mit Parametern)
+        // an Befehlsuntersuchungsfunktion uebergeben
+        if(text.substr(0,1) == "/")
+        {
+            ParseClientCmd(text.substr(1));
+            WxEdit_input_messages->Clear();
+            text = "";
+        }
+        else
+        {
+            add_message("<" + nick + "> " + text);
+            WxEdit_input_messages->Clear();
 
-        // irc->send_privmsg(irc->curr_channel(),
-        //                text.c_str());
+            // Text Senden
+            irc->send_privmsg(channel.c_str(), text.c_str());
+        }
 
         // Platz für neuen Eintrag schaffen
         hpos++;
