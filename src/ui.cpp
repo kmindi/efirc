@@ -321,7 +321,6 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "join")
     {
-        //irc->send_part(irc->curr_channel());
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
 
@@ -343,7 +342,7 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "leave" || cmd == "part")
     {
-        irc->send_part(irc->CurrentChannel.c_str());
+        irc->send_part(channel.c_str());
 
         channel = "";
 
