@@ -305,25 +305,29 @@ UserInterface::parsecfgvalue(string cfgvalue)
 }
 
 
-void 
+void
 UserInterface::ParseClientCmd(string text)
 {
     string cmd = text.substr(0,text.find(" ",0));
     string param = text.substr(text.find(" ",0)+1);
-    
+
     if(cmd == "nick")
     {
         irc->send_nick(param.c_str());
     }
-    
+
     if(cmd == "join")
     {
         //irc->send_part(irc->curr_channel());
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
+
+        if (irc->CurrentChannel != "")
+            irc->send_part(irc->CurrentChannel.c_str());
+
         irc->send_join(param.c_str());
     }
-    
+
     if(cmd == "quit")
     {
         irc->send_quit(param.c_str());
@@ -331,41 +335,44 @@ UserInterface::ParseClientCmd(string text)
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
     }
-    
+
     if(cmd == "leave" || cmd == "part")
     {
-        irc->send_part(param.c_str());
+        irc->send_part(irc->CurrentChannel.c_str());
+        irc->CurrentChannel = "";
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
     }
-    
+
     if(cmd == "kick")
     {
-        //kick 
+        //kick
     }
-    
-    
+
+
     if(cmd == "whois")
     {
-        // whois 
+        // whois
     }
-    
+
     if(cmd == "clear")
     {
         WxEdit_output_messages->Clear();
     }
-    
+
 }
 
 void
 UserInterface::WxButton_submitClick(wxCommandEvent& event)
 {
     string text;
+    string nick;
+    string channel;
 
-    // TODO nick nicht aktuell
-    std::string nick = irc->_IRCNICK;
-    //std::string nick = irc->curr_nick();
+    nick = irc->CurrentNick;
+    channel = irc->CurrentChannel;
     text = WxEdit_input_messages->GetValue();
+
     // Falls / als Angabe fuer einen folgenden Befehl eingegeben wurde
     // den Nachfolgenden Text als Befehl(mit parametern)
     // an Befehlsuntersuchungsfunktion uebergeben
@@ -383,9 +390,8 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
 
         // Text Senden
         // TODO channel nicht aktuell
-        irc->send_privmsg(parsecfgvalue("irc_channel").c_str(),
-                          text.c_str());
-                          
+        irc->send_privmsg(channel.c_str(), text.c_str());
+
         // irc->send_privmsg(irc->curr_channel(),
         //                text.c_str());
 

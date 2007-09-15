@@ -71,6 +71,9 @@ irc_join(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->nick;
     frame->add_user(benutzer);
     frame->add_message("<i> " + benutzer + " hat den Raum betreten");
+
+    if (benutzer == irc->CurrentNick)
+        irc->CurrentChannel = msg_data->text;
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum
@@ -106,6 +109,9 @@ irc_changenick(const irc_msg_data *msg_data, void *cp)
     alternick = msg_data->nick;
     neuernick = msg_data->text;
     frame->change_nick(alternick + " -> " + neuernick);
+
+    if (alternick == irc->CurrentNick)
+        irc->CurrentNick = neuernick;
 }
 
 bool
@@ -127,6 +133,11 @@ Efirc::OnInit()
                            config->parsecfgvalue("irc_username"),
                            config->parsecfgvalue("irc_realname"),
                            "pass");
+
+    // Wer sagt mir, dass der Nick verfuegbar ist???
+    irc->CurrentNick = config->parsecfgvalue("irc_nickname");
+    irc->CurrentChannel = config->parsecfgvalue("irc_channel");
+
     frame->irc = irc;
 
     // Ereignisverknüpfung

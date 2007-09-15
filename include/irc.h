@@ -8,6 +8,9 @@ using namespace std;
 class IRCInterface : public IRCSocket
 {
     public:
+        string CurrentNick;
+        string CurrentChannel;
+
         IRCInterface(string, string, string, string, string, string);
         ~IRCInterface();
 };

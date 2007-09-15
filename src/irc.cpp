@@ -16,6 +16,6 @@ IRCInterface::IRCInterface(string port, string server,
 
 IRCInterface::~IRCInterface()
 {
-    // Logdate schliessen
+    // Logdatei schliessen
     fclose(_DBGSTR);
 }
