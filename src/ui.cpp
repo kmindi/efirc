@@ -308,13 +308,16 @@ UserInterface::parsecfgvalue(string cfgvalue)
 void
 UserInterface::ParseClientCmd(string text)
 {
-    string cmd = text.substr(0,text.find(" ",0));
-    string param = text.substr(text.find(" ",0)+1);
+    string cmd;
+    string param;
+    string channel;
+
+    cmd = text.substr(0,text.find(" ",0));
+    param = text.substr(text.find(" ",0)+1);
+    channel = irc->CurrentChannel;
 
     if(cmd == "nick")
-    {
         irc->send_nick(param.c_str());
-    }
 
     if(cmd == "join")
     {
@@ -322,8 +325,8 @@ UserInterface::ParseClientCmd(string text)
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
 
-        if (irc->CurrentChannel != "")
-            irc->send_part(irc->CurrentChannel.c_str());
+        if (channel != "")
+            irc->send_part(channel.c_str());
 
         irc->send_join(param.c_str());
     }
@@ -331,7 +334,9 @@ UserInterface::ParseClientCmd(string text)
     if(cmd == "quit")
     {
         irc->send_quit(param.c_str());
+
         add_message("Du hast das IRC Netzwerk verlassen");
+
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
     }
@@ -339,26 +344,21 @@ UserInterface::ParseClientCmd(string text)
     if(cmd == "leave" || cmd == "part")
     {
         irc->send_part(irc->CurrentChannel.c_str());
-        irc->CurrentChannel = "";
+
+        channel = "";
+
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
     }
 
     if(cmd == "kick")
-    {
         //kick
-    }
-
 
     if(cmd == "whois")
-    {
         // whois
-    }
 
     if(cmd == "clear")
-    {
         WxEdit_output_messages->Clear();
-    }
 
 }
 
@@ -375,19 +375,16 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
 
     if(text != "" && entered)
     {
+        WxEdit_input_messages->Clear();
 
         // Falls / als Angabe fuer einen folgenden Befehl eingegeben
         // wurde den Nachfolgenden Text als Befehl(mit Parametern)
         // an Befehlsuntersuchungsfunktion uebergeben
         if(text.substr(0,1) == "/")
-        {
             ParseClientCmd(text.substr(1));
-            WxEdit_input_messages->Clear();
-        }
         else
         {
             add_message("<" + nick + "> " + text);
-            WxEdit_input_messages->Clear();
 
             // Text Senden
             irc->send_privmsg(channel.c_str(), text.c_str());
