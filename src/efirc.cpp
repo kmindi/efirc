@@ -114,6 +114,12 @@ irc_changenick(const irc_msg_data *msg_data, void *cp)
         irc->CurrentNick = neuernick;
 }
 
+void
+irc_pong(const irc_msg_data *msg_data, void *cp)
+{
+    irc->send_pong(msg_data->text);
+}
+
 bool
 Efirc::OnInit()
 {
@@ -150,6 +156,7 @@ Efirc::OnInit()
     irc->add_link("PART", &irc_leave);
     irc->add_link("QUIT", &irc_quit);
     irc->add_link("NICK", &irc_changenick);
+    irc->add_link("PING", &irc_pong);
 
     _beginthread(recv_thread,0,irc);
     _beginthread(call_thread,0,irc);
