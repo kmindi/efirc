@@ -184,7 +184,7 @@ void IRCSocket::call_cmd(void)
 
             /* don't hurry */
             #ifdef WINDOWS
-            Sleep(1000);
+            Sleep(10);
             #else
             sleep(1);
             #endif
@@ -969,7 +969,7 @@ IRCSocket::recv_raw(void)
 
             /* don't hurry */
             #ifdef WINDOWS
-            Sleep(1000);
+            Sleep(10);
             #else
             sleep(1);
             #endif
