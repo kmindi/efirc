@@ -1,6 +1,6 @@
 done - keine leeren eingabefelder per button senden bestaetigen
 done - Pfeiltaste nach oben und history bitte
-do(fr)   - VERSION ignorieren und separat behandeln (CTCP)
+do   - VERSION ignorieren und separat behandeln (CTCP)
 done - Ops kommen ganz nach oben in der benutzerliste
 done - Benutzerliste-buffer ist zu gross (scrollbar)
 done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
@@ -8,7 +8,8 @@ done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
 do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
      - (fr) Gescheiter log (nur noetige angaben)
      - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
-     - (km) Hinweise (nicht nachrichten) anders markieren und/oder andere Schrift
+     - (km) Hinweise (nicht nachrichten) anders markieren und/oder
+       andere Schrift
      - (km) Private nachrichten muessen gehen
      - Thread "Problem" bearbeiten
      - (km) Folgende Raum Aktivitaeten noch beachten
@@ -19,9 +20,9 @@ do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
        der lokalen Konfigurationsdatei, und muss somit im Gegensatz zur
        lokalen Konfigurationsdatei nicht alle nicht optionalen Optionen
        enthalten)
-     - (km) Falls die lokale Konfigurationsdatei nicht vorhanden ist werden 
-       voreingestellte Werte verwendet und eine Konfigurationsdatei wird
-       erstellt.
+     - (km) Falls die lokale Konfigurationsdatei nicht vorhanden ist
+       werden voreingestellte Werte verwendet und eine
+       Konfigurationsdatei wird erstellt.
      - (km) Überprüfung ob die nötigen Verbindungsangaben in der
        Konfigurationsdatei eingetragen sind hinzufügen
      - Virus_!FEHL!_Alarm mit NOD32 entfernen
