@@ -287,7 +287,7 @@ UserInterface::change_nick(string nickchangeinput)
     // Alten Nickname entfernen und neuen an die Liste anhaengen
     delete_user(alternick);
     // Operator-Status beachten
-    if(WxEdit_channel_users->FindItem(-1, "@" + alternick))
+    if(WxEdit_channel_users->FindItem(-1, "@" + alternick) > -1)
         add_user("@" + neuernick);
     else
         add_user(neuernick);
