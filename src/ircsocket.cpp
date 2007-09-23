@@ -596,6 +596,9 @@ IRCSocket::parse_msg(const char *raw_msg)
                   params++;
                   wstr = sstr + 1;
             }
+            /* only one paramter */
+            else if(params == 0)
+                  params++;
       } while(sstr != NULL);
 
       /* allocate memory for array with index fields */
@@ -611,7 +614,10 @@ IRCSocket::parse_msg(const char *raw_msg)
             if(*wstr != ':')
             {
                    sstr = strstr(wstr, " ");
-                   *sstr = '\0';
+
+                   /* only one paramter */
+                   if(sstr != NULL)
+                         *sstr = '\0';
             }
             /* string - skip ':' */
             else

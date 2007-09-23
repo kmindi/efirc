@@ -262,8 +262,12 @@ UserInterface::add_user(string usersinastring)
 void
 UserInterface::delete_user(string user)
 {
+    // TODO angemessenere Loesung, um eventuellen Operator aus
+    //      der Liste zu nehmen
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
                                      user));
+    WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
+                                     "@" + user));
 }
 
 // Aendert einen Nickname und zeigt die Aenderung an
@@ -281,10 +285,12 @@ UserInterface::change_nick(string nickchangeinput)
 
     // !!!UEBERARBEITEN!!!! TODO oh ja :D
     // Alten Nickname entfernen und neuen an die Liste anhaengen
-    WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
-                                        alternick));
-    WxEdit_channel_users->InsertItem(WxEdit_channel_users->GetItemCount()
-                                     + 1, neuernick);
+    delete_user(alternick);
+    // Operator-Status beachten
+    if(WxEdit_channel_users->FindItem(-1, "@" + alternick))
+        add_user("@" + neuernick);
+    else
+        add_user(neuernick);
 
     // Nachricht anzeigen das jemand seinen Nickname geaendert hat
     add_message(alternick + "'s neuer Nickname ist: " + neuernick);
@@ -294,7 +300,7 @@ UserInterface::change_nick(string nickchangeinput)
 void
 UserInterface::set_topic(string topic)
 {
-    WxEdit_topic->SetValue(parsecfgvalue("text_prefix_topic") + topic);
+    WxEdit_topic->SetValue("Thema: " + topic);
     add_message("Thema: " + topic);
 }
 

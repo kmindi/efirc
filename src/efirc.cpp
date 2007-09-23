@@ -69,11 +69,14 @@ irc_join(const irc_msg_data *msg_data, void *cp)
 {
     string benutzer;
     benutzer = msg_data->nick;
-    frame->add_user(benutzer);
     frame->add_message("<i> " + benutzer + " hat den Raum betreten");
 
     if (benutzer == irc->CurrentNick)
         irc->CurrentChannel = msg_data->params_a[0];
+    else
+        // wenn selber, reicht irc_userlist() aus, da
+        // neuer Channel und eventuell Operator
+        frame->add_user(benutzer);
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum
