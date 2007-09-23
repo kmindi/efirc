@@ -344,6 +344,7 @@ UserInterface::ParseClientCmd(string text)
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
+        SetTitle(wxT(parsecfgvalue("text_title")));
     }
 
     if(cmd == "leave" || cmd == "part")
@@ -361,6 +362,9 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "whois")
         // whois
+        
+    if(cmd == "me")
+        // me
 
     if(cmd == "clear")
         WxEdit_output_messages->Clear();

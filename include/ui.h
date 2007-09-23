@@ -35,7 +35,16 @@ class UserInterface : public wxFrame
         void change_nick(string);
         void delete_user(string);
         void set_topic(string);
+        
+        string parsecfgvalue(string);
 
+        // grafische Objekte auf dem Frame
+        wxListCtrl *WxEdit_channel_users;
+        wxButton   *WxButton_submit;
+        wxTextCtrl *WxEdit_topic;
+        wxTextCtrl *WxEdit_input_messages;
+        wxTextCtrl *WxEdit_output_messages;
+        
     private:
         ConfigInterface *config;
 
@@ -65,15 +74,9 @@ class UserInterface : public wxFrame
 
         DECLARE_EVENT_TABLE();
 
-        // grafische Objekte auf dem Frame
-        wxListCtrl *WxEdit_channel_users;
-        wxButton   *WxButton_submit;
-        wxTextCtrl *WxEdit_topic;
-        wxTextCtrl *WxEdit_input_messages;
-        wxTextCtrl *WxEdit_output_messages;
+        
 
         // wrapper
-        string parsecfgvalue(string);
         void ParseClientCmd(string);
 
         void CreateGUIControls();

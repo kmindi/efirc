@@ -72,7 +72,12 @@ irc_join(const irc_msg_data *msg_data, void *cp)
     frame->add_message("<i> " + benutzer + " hat den Raum betreten");
 
     if (benutzer == irc->CurrentNick)
+    {
         irc->CurrentChannel = msg_data->params_a[0];
+        frame->SetTitle(wxT(frame->parsecfgvalue("text_title")
+                               + " - [ "
+                               + irc->CurrentChannel + " ]"));
+    }
     else
         // wenn selber, reicht irc_userlist() aus, da
         // neuer Channel und eventuell Operator
@@ -88,6 +93,7 @@ irc_leave(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->nick;
     frame->delete_user(benutzer);
     frame->add_message("<i> " + benutzer + " hat den Raum verlassen");
+    frame->SetTitle(wxT(frame->parsecfgvalue("text_title")));
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum und
@@ -98,6 +104,7 @@ irc_quit(const irc_msg_data *msg_data, void *cp)
     string benutzer, nachricht;
     benutzer = msg_data->nick;
     nachricht = msg_data->params_a[0];
+    
     frame->delete_user(benutzer);
     frame->add_message("<i> " + benutzer + " ist gegangen: "
                        + nachricht);
@@ -121,6 +128,29 @@ void
 irc_pong(const irc_msg_data *msg_data, void *cp)
 {
     irc->send_pong(msg_data->params_a[0]);
+}
+
+void
+irc_kick(const irc_msg_data *msg_data, void *cp)
+{
+    string benutzer,sender;
+    sender = msg_data->nick;
+    benutzer = msg_data->params_a[1];
+    if(benutzer == irc->CurrentNick)
+    {
+        frame->add_message("Sie wurden von " 
+        + sender + "aus dem Raum geworfen");
+
+        frame->WxEdit_channel_users->DeleteAllItems();
+        frame->WxEdit_topic->Clear();
+        frame->SetTitle(wxT(frame->parsecfgvalue("text_title")));
+    }
+    else
+    {
+        frame->delete_user(benutzer);
+        frame->add_message("<i> " + benutzer + " wurde von " 
+        + sender + " aus dem Raum geworfen");
+    }
 }
 
 bool
@@ -160,6 +190,7 @@ Efirc::OnInit()
     irc->add_link("QUIT", &irc_quit);
     irc->add_link("NICK", &irc_changenick);
     irc->add_link("PING", &irc_pong);
+    irc->add_link("KICK", &irc_kick);
 
     _beginthread(recv_thread, 0, irc);
     _beginthread(call_thread, 0, irc);
