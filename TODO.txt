@@ -5,6 +5,8 @@ done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
        koennen und diese auch verschwinden, wenn man reinklickt
 done - (fr) Gescheiter log (nur noetige angaben)
 done - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
+done - (km) Folgende Raum Aktivitaeten noch beachten
+       (kick)
 
 do   - (km) VERSION ignorieren und separat behandeln (CTCP)
 do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
@@ -13,6 +15,7 @@ do   - (km) Benutzerliste-buffer ist zu gross (scrollbar)
 !!!  - Thread-"Problem" loesen
 !!!  - Verbindungsabbruch beim Beenden
 
+     - (km) Raum Modi anzeigen 
      - (km) Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...)
        beachten
      - (km) Statuswechsel eines Benutzers in Benutzerliste kenntlich
@@ -22,8 +25,6 @@ do   - (km) Benutzerliste-buffer ist zu gross (scrollbar)
      - (km) Hinweise (nicht nachrichten) anders markieren und/oder
        andere Schrift / allgemein Uebersichtlichkeit
      - (km) Private nachrichten muessen gehen
-     - (km) Folgende Raum Aktivitaeten noch beachten
-       (/ kick/ban/etc)
      - (km) Eintrag für optionale entfernte Konfigurationsdatei in der
        (lokalen) Konfigurationsdatei hinzufügen.
        (Die entfernte Konfigurationsdatei überschreibt die Einstellungen
