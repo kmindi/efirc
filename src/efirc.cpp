@@ -117,7 +117,7 @@ irc_changenick(const irc_msg_data *msg_data, void *cp)
 void
 irc_pong(const irc_msg_data *msg_data, void *cp)
 {
-    irc->send_pong(msg_data->text);
+    irc->send_pong(msg_data->params_a[0]);
 }
 
 bool
