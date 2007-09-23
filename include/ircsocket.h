@@ -34,8 +34,7 @@ irc_msg_data
       char *host;
       char *nick;
       char *user;
-      char *text;
-      char **notext;
+      char **params_a;
 };
 
 /*
@@ -79,6 +78,8 @@ class IRCSocket
 
              unsigned int connected;
              FILE *_DBGSTR;
+             unsigned int _DBGSPACE;
+             unsigned int _DBGLEVEL;
              unsigned int _IRCPORT;
              char _IRCSERV[W_BUFSIZE];
              char _IRCNICK[W_BUFSIZE];
@@ -124,12 +125,15 @@ class IRCSocket
              unsigned int links;
              unsigned int cmds;
              unsigned int reconnecting;
+             unsigned int connecting;
+             unsigned int authed;
+             unsigned int sleep_time;
              irc_act_link *abp;
              irc_act_link *atp;
              irc_queue_cmd *cbp;
              irc_queue_cmd *ctp;
 
-             int debug(const char *, ...);
+             int debug(unsigned int, const char *, const char *, ...);
              int sock_send(const char *);
              int sock_recv(char *);
 

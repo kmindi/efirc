@@ -7,10 +7,14 @@
  *
  * see it for more information ;)
  */
-#include <ircsocket.h>
+#include "ircsocket.h"
 
 // TODO errorhandler for ^C
-// TODO malloc()-use
+//      malloc()-use
+//      strtok()
+//      strncpy
+//      split
+//      start function
 
 /****************************
  *
@@ -36,8 +40,14 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
       /* yet no */
       connected = 0;
       reconnecting = 0;
+      connecting = 0;
+      /* be careful! just telling wheter auth() has been called */
+      authed = 0;
 
-      /* set the defaults */
+      /* no sleep_time needed */
+      sleep_time = 0;
+
+      /* set defaults */
       _IRCPORT = port;
       strcpy(_IRCSERV, server);
       strcpy(_IRCNICK, nick);
@@ -45,11 +55,8 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
       strcpy(_IRCREAL, real);
       strcpy(_IRCPASS, pass);
       _DBGSTR = log;
-
-      /* now connect, auth */
-// TODO need call_cmd()
-      //connect_server(_IRCPORT, _IRCSERV);
-      //auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+      _DBGSPACE = 15;
+      _DBGLEVEL = 1;
 }
 
 /* Destructor (disconnect from server) */
@@ -101,7 +108,7 @@ IRCSocket::add_cmd(int (IRCSocket::*function)(const char *buf),
       }
 
       /* print notice (command and args) */
-      debug("[i=add_cmd] New command in queue."
+      debug(1, "add_cmd", "New command in queue."
          "(%i, %s, %i)\n", cmds, buf, function);
 
       /* one more */
@@ -116,7 +123,7 @@ void IRCSocket::del_cmd(void)
       /* NEW botton item */
       irc_queue_cmd *nbp;
 
-      debug("[.=del_cmd] Removing command.\n");
+      debug(0, "del_cmd", "Removing command.\n");
 
       /*
        * DOES command exist? (already checked when called by
@@ -128,7 +135,7 @@ void IRCSocket::del_cmd(void)
             buf = cbp->buf;
             function = cbp->function;
 
-            debug("[i=del_cmd] Will be removed. (%s, %i)\n",
+            debug(1, "del_cmd", "Will be removed. (%s, %i)\n",
                buf, function);
 
             /* NOW removing command in queue (1.) */
@@ -143,7 +150,7 @@ void IRCSocket::del_cmd(void)
       }
       else
             /* no match found */
-            debug("[!=del_cmd] No more command in"
+            debug(1, "del_cmd", "No more command in"
                " queue.\n");
 }
 
@@ -155,38 +162,52 @@ void IRCSocket::call_cmd(void)
 
       while(1)
       {
-            debug("[.=call_cmd] Calling command.\n");
+            debug(0, "call_cmd", "Calling command.\n");
 
             /* any commands left in queue? */
             if(cmds > 0)
             {
-                  buf = cbp->buf;
-                  function = cbp->function;
-
-                  /* actual call, preserve return code */
-                  status = (this->*function)(buf);
-
-                  /* now, after successfull run, remove it from the queue */
-                  if(status > -1)
+                  /*
+                   * if we do NOT care called function
+                   * will call reconnect() every single
+                   * time
+                   */
+                  if(!reconnecting)
                   {
-                        debug("[i=call_cmd] Called. (%s, %i)\n",
-                           buf, function);
+                          buf = cbp->buf;
+                          function = cbp->function;
 
-                        del_cmd();
+                          /* actual call, preserve return code */
+                          status = (this->*function)(buf);
+
+                          /* now, after successfull run, remove it from the queue */
+                          if(status > -1)
+                          {
+                                debug(1, "call_cmd", "Called. (%s, %i)\n",
+                                   buf, function);
+
+                                del_cmd();
+                          }
+                          /* trying reconnect */
+                          else
+                          {
+                                debug(3, "call_cmd", "Requesting "
+                                   "reconnect.\n");
+
+                                reconnect();
+                          }
                   }
-                  /* trying reconnect */
-                  else
-                        reconnect();
             }
             else
-            debug("[!=call_cmd] No more command in"
-               " queue.\n");
+                  /* minor log-level */
+                  debug(0, "call_cmd", "No more command in"
+                     " queue.\n");
 
             /* don't hurry */
             #ifdef WINDOWS
             Sleep(10);
             #else
-            sleep(1);
+            usleep(10);
             #endif
       }
 }
@@ -225,7 +246,7 @@ IRCSocket::add_link(const char *cmd,
       }
 
       /* maybe some debugging needed...this time we trust you */
-      debug("[i=add_link] New link added. (%i, %s, %i)\n",
+      debug(1, "add_link", "New link added. (%i, %s, %i)\n",
          links, cmd, function);
 
       /* one more link */
@@ -242,7 +263,7 @@ IRCSocket::del_link(const char *cmd,
       irc_act_link *pp;
       irc_act_link *np;
 
-      debug("[.=del_link] Deleting link. (%s, %i)\n",
+      debug(0, "del_link", "Deleting link. (%s, %i)\n",
          cmd, function);
 
       /* start at botton */
@@ -255,7 +276,7 @@ IRCSocket::del_link(const char *cmd,
              {
                     np = cp->next;
 
-                    debug("[i=del_link] Will be deleted. (%i)\n", i);
+                    debug(1, "del_link", "Will be deleted. (%i)\n", i);
 
                     delete cp->cmd;
                     delete cp;
@@ -278,7 +299,7 @@ IRCSocket::del_link(const char *cmd,
       }
 
       /* no match found */
-      debug("[!=del_link] No such link.\n");
+      debug(3, "del_link", "No such link.\n");
 }
 
 /* call function for event */
@@ -288,7 +309,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
       unsigned int i;
       irc_act_link *cp;
 
-      debug("[.=act_link] Activating link. (%s)\n",
+      debug(0, "act_link", "Activating link. (%s)\n",
          msg_data->cmd);
 
       /* beginning at bottom */
@@ -305,7 +326,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
                      */
                     cp->function(msg_data, this);
 
-                    debug("[i=act_link] Activated. (%i)\n",
+                    debug(1, "act_link", "Activated. (%i)\n",
                        cp->function);
              }
 
@@ -314,7 +335,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
       }
 
       /* carefully */
-      debug("[!=act_link] No (more?) links.\n");
+      debug(1, "act_link", "No (more?) links.\n");
 }
 
 /* cut IRC reply */
@@ -328,7 +349,7 @@ IRCSocket::parse(const char *raw_msg)
 
       wstr = (char *)raw_msg;
 
-      debug("[.=parse] Splitting reply into messages.\n");
+      debug(0, "parse", "Splitting reply into messages.\n");
 
       do
       {
@@ -344,7 +365,7 @@ IRCSocket::parse(const char *raw_msg)
                      */
                     *sstr = '\0';
 
-                    debug("[i=parse] Found relevant"
+                    debug(1, "parse", "Found relevant"
                        " messagepart.\n");
 
                     parse_msg(wstr);
@@ -353,7 +374,7 @@ IRCSocket::parse(const char *raw_msg)
                     wstr = sstr + 2;
              }
              else
-                    debug("[!=parse] No (further?) relevant"
+                    debug(1, "parse", "No (further?) relevant"
                        " messagepart.\n");
       } while(sstr != NULL);
 
@@ -365,7 +386,7 @@ IRCSocket::parse(const char *raw_msg)
 void
 IRCSocket::parse_msg(const char *raw_msg)
 {
-      int i, params, length;
+      int i, params, length, text;
       /* se substring */
       char *sstr;
       char *wstr;
@@ -374,17 +395,19 @@ IRCSocket::parse_msg(const char *raw_msg)
       params = 0;
       /* length of resulting parameters join */
       length = 0;
+      /* specifies wheter a string is found in parameters-list */
+      text = 0;
 
       /* struct containing sender, command and parameters */
       irc_msg_data *msg_data = new irc_msg_data;
 
-      debug("[.=parse_msg] Parsing message. (%s)\n",
+      debug(0, "parse_msg", "Parsing message. (%s)\n",
          raw_msg);
 
       /* found user/server command */
       if(raw_msg[0] == ':')
       {
-             debug("[i=parse_msg] Is server or user"
+             debug(1, "parse_msg", "Is server or user"
                 " command.\n");
 
              raw_msg++;
@@ -398,7 +421,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->sender = new char[strlen(raw_msg) + 1];
                     strcpy(msg_data->sender, raw_msg);
 
-                    debug("[i=parse_msg] Found sender."
+                    debug(1, "parse_msg", "Found sender."
                        " (%s)\n", msg_data->sender);
 
                     raw_msg = sstr + 1;
@@ -408,7 +431,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->sender = new char[strlen("No sender") + 1];
                     strcpy(msg_data->sender, "No sender");
 
-                    debug("[!=parse_msg] No sender.\n");
+                    debug(1, "parse_msg", "No sender.\n");
              }
 
              /* command */
@@ -420,7 +443,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->cmd = new char[strlen(raw_msg) + 1];
                     strcpy(msg_data->cmd, raw_msg);
 
-                    debug("[i=parse_msg] Found command."
+                    debug(1, "parse_msg", "Found command."
                        " (%s)\n", msg_data->cmd);
 
                     raw_msg = sstr + 1;
@@ -430,21 +453,21 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->cmd = new char[strlen("No command") + 1];
                     strcpy(msg_data->cmd, "No command");
 
-                    debug("[!=parse_msg] No command.\n");
+                    debug(1, "parse_msg", "No command.\n");
              }
 
              /* parameters */
              msg_data->params = new char[strlen(raw_msg) + 1];
              strcpy(msg_data->params, raw_msg);
 
-             debug("[i=parse_msg] Found parameters."
+             debug(1, "parse_msg", "Found parameters."
                 " (%s)\n", msg_data->params);
 
              /* nice format */
              /* for sender */
              wstr = msg_data->sender;
 
-             debug("[.=parse_msg] Parsing sender."
+             debug(1, "parse_msg", "Parsing sender."
                 " (%s)\n", wstr);
 
              sstr = strstr(wstr, "!");
@@ -456,7 +479,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     strcpy(msg_data->nick, wstr);
                     wstr = sstr + 1;
 
-                    debug("[i=parse_msg] Found nickname."
+                    debug(1, "parse_msg", "Found nickname."
                        " (%s)\n", msg_data->nick);
 
                     sstr += 1;
@@ -466,7 +489,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->nick = new char[strlen("No nick") + 1];
                     strcpy(msg_data->nick, "No nick");
 
-                    debug("[!=parse_msg] No nick.\n");
+                    debug(1, "parse_msg", "No nick.\n");
              }
 
              sstr = strstr(wstr, "@");
@@ -478,7 +501,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     strcpy(msg_data->user, wstr);
                     wstr = sstr + 1;
 
-                    debug("[i=parse_msg] Found username."
+                    debug(1, "parse_msg", "Found username."
                        " (%s)\n", msg_data->user);
 
                     sstr += 1;
@@ -488,13 +511,13 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->user = new char[strlen("No user") + 1];
                     strcpy(msg_data->user, "No user");
 
-                    debug("[!=parse_msg] No user.\n");
+                    debug(1, "parse_msg", "No user.\n");
              }
 
              msg_data->host = new char[strlen(wstr) + 1];
              strcpy(msg_data->host, wstr);
 
-             debug("[i=parse_msg] Found host."
+             debug(1, "parse_msg", "Found host."
                 " (%s)\n", msg_data->host);
 
              /* not usable anymore - set to "USER" */
@@ -507,7 +530,7 @@ IRCSocket::parse_msg(const char *raw_msg)
       /* we have a server message */
       else
       {
-             debug("[i=parse_msg] Is server message.\n");
+             debug(1, "parse_msg", "Is server message.\n");
 
 // TODO server we're really connected to
              msg_data->sender = new char[strlen("SERVER") + 1];
@@ -522,7 +545,7 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->cmd = new char[strlen(raw_msg) + 1];
                     strcpy(msg_data->cmd, raw_msg);
 
-                    debug("[i=parse_msg] Found command."
+                    debug(1, "parse_msg", "Found command."
                        " (%s)\n", msg_data->cmd);
 
                     raw_msg = sstr + 1;
@@ -532,14 +555,14 @@ IRCSocket::parse_msg(const char *raw_msg)
                     msg_data->cmd = new char[strlen("No command") + 1];
                     strcpy(msg_data->cmd, "No command");
 
-                    debug("[!=parse_msg] No command.\n");
+                    debug(1, "parse_msg", "No command.\n");
              }
 
              /* parameters */
              msg_data->params = new char[strlen(raw_msg) + 1];
              strcpy(msg_data->params, raw_msg);
 
-             debug("[i=parse_msg] Found parameters."
+             debug(1, "parse_msg", "Found parameters."
                 " (%s)\n", msg_data->params);
 
              /* safely :/ */
@@ -554,39 +577,21 @@ IRCSocket::parse_msg(const char *raw_msg)
       /* for params */
       wstr = msg_data->params;
 
-      debug("[.=parse_msg] Parsing parameters."
+      debug(1, "parse_msg", "Parsing parameters."
          " (%s)\n", wstr);
-
-      /* exclude */
-      sstr = strstr(wstr, " :");
-      if(sstr != NULL)
-      {
-            msg_data->text = new char[strlen((char *)sstr + 2) + 1];
-            strcpy(msg_data->text, (char *)sstr + 2);
-
-            /* searching for ` ' later on */
-            *(sstr + 1) = '\0';
-      }
-      /* first character may also be a ':' */
-      else if(*wstr == ':')
-      {
-            msg_data->text = new char[strlen((char *)wstr + 1) + 1];
-            strcpy(msg_data->text, (char *)wstr + 1);
-
-            *wstr = '\0';
-      }
-      else
-      {
-            msg_data->text = new char[strlen("notext") + 1];
-            strcpy(msg_data->text, "notext");
-      }
 
       /* get number of nontext params */
       do
       {
-            sstr = strstr(wstr, " ");
             /* found parameter */
-            if(sstr != NULL)
+            if(*wstr == ':')
+            {
+                  /* for string set text-bit and stop here */
+                  params++;
+                  text = 1;
+                  break;
+            }
+            else if((sstr = strstr(wstr, " ")) != NULL)
             {
                   params++;
                   wstr = sstr + 1;
@@ -594,7 +599,7 @@ IRCSocket::parse_msg(const char *raw_msg)
       } while(sstr != NULL);
 
       /* allocate memory for array with index fields */
-      msg_data->notext = new char *[params];
+      msg_data->params_a = new char *[params];
 
       /* jump back */
       wstr = msg_data->params;
@@ -602,31 +607,52 @@ IRCSocket::parse_msg(const char *raw_msg)
       /* fill in array */
       for(i = 0; i < params; i++)
       {
-            sstr = strstr(wstr, " ");
-            *sstr = '\0';
+            /* no string */
+            if(*wstr != ':')
+            {
+                   sstr = strstr(wstr, " ");
+                   *sstr = '\0';
+            }
+            /* string - skip ':' */
+            else
+                   wstr++;
 
-            msg_data->notext[i] = new char[strlen(wstr) + 1];
-            strcpy(msg_data->notext[i], wstr);
+            msg_data->params_a[i] = new char[strlen(wstr) + 1];
+            strcpy(msg_data->params_a[i], wstr);
 
             wstr = sstr + 1;
       }
 
+      /* parameters are rebuilt */
       delete msg_data->params;
 
       /* get full length */
       for(i = 0; i < params; i++)
-            length += strlen(msg_data->notext[i]);
+            length += strlen(msg_data->params_a[i]);
 
       /* allocate and clear (?) */
-      msg_data->params = new char[length + strlen(msg_data->text) + 3];
-      memset(msg_data->params, '\0', length);
+      msg_data->params = new char[length + text + 1];
+      memset(msg_data->params, '\0', length + text + 1);
 
       /* join parameters */
       for(i = 0; i < params; i++)
-            strcat(msg_data->params, msg_data->notext[i]);
+      {
+            /*
+             * if last parameter is a string
+             * prefix it with a ':'
+             */
+            if(text && i == params - 1)
+                   strcat(msg_data->params, ":");
 
-      sprintf(msg_data->params, "%s :%s", msg_data->params,
-         msg_data->text);
+            strcat(msg_data->params, msg_data->params_a[i]);
+
+            /*
+             * if not last parameter cat space
+             * as seperator
+             */
+            if(i != params - 1)
+                   strcat(msg_data->params, " ");
+      }
 
       /* pass msg data and call event matching functions */
       act_link(msg_data);
@@ -635,10 +661,9 @@ IRCSocket::parse_msg(const char *raw_msg)
       delete msg_data->sender;
       delete msg_data->cmd;
       delete msg_data->params;
-      delete msg_data->text;
       for(i = 0; i < params; i++)
-            delete msg_data->notext[i];
-      delete[] msg_data->notext;
+            delete msg_data->params_a[i];
+      delete[] msg_data->params_a;
       delete msg_data->host;
       delete msg_data->nick;
       delete msg_data->user;
@@ -652,11 +677,17 @@ IRCSocket::parse_msg(const char *raw_msg)
  ****************************/
 
 int
-IRCSocket::debug(const char *fmt, ...)
+IRCSocket::debug(unsigned int level, const char *sender,
+   const char *fmt, ...)
 {
-      int status;
+      /* return if level is below wanted level */
+      if(level < _DBGLEVEL)
+             return 1;
+
+      int i, status, spaces;
+      char level_ind;
       char timestamp[9];
-      char *nfmt;
+      char *space, *nfmt;
       time_t raw_time;
       /* struct containing sec, min, hr,... */
       tm *local_time;
@@ -664,15 +695,43 @@ IRCSocket::debug(const char *fmt, ...)
       va_list ap;
       va_start(ap, fmt);
 
+      /* get local time */
       time(&raw_time);
       local_time = localtime(&raw_time);
+
+      /* set up level-indicator */
+      if(level == 0)
+             level_ind = '.';
+      else if(level == 1)
+             level_ind = 'i';
+      else if(level == 2)
+             level_ind = 'i';
+      else if(level == 3)
+             level_ind = '!';
+      else
+             level_ind = '?';
+
+      /* set up space */
+      spaces = _DBGSPACE - strlen(sender);
+
+      if(spaces < 0)
+                spaces = 0;
+
+      space = new char[spaces + 1];
+      memset(space, '\0', spaces + 1);
+
+      /* fill space with spaces :) */
+      for(i = 0; i < spaces; i++)
+             strcat(space, " ");
 
       /* set up timestamp (%H:%M:%S) */
       strftime(timestamp, 9, "%H:%M:%S", local_time);
 
       /* set up logline */
-      nfmt = new char[strlen(fmt) + strlen(timestamp) + 4];
-      sprintf(nfmt, "[%s] %s", timestamp, fmt);
+      nfmt = new char[strlen(space) + strlen(sender) + strlen(fmt) +
+         strlen(timestamp) + 4];
+      sprintf(nfmt, "%s|%c|%s%s%s", timestamp, level_ind, sender, space,
+         fmt);
 
       status = vfprintf(_DBGSTR, nfmt, ap);
 
@@ -680,6 +739,9 @@ IRCSocket::debug(const char *fmt, ...)
 
       /* flush stream */
       fflush(_DBGSTR);
+
+      delete nfmt;
+      delete space;
 
       return status;
 }
@@ -689,24 +751,54 @@ IRCSocket::reconnect(void)
 {
       if(reconnecting)
       {
-            debug("[!=call_cmd] Already reconnecting.\n");
+            debug(3, "reconnect", "Already reconnecting.\n");
             return;
       }
 
       reconnecting = 1;
 
-      debug("[!=call_cmd] Trying reconnect.\n");
+      /* when someone's connecting wait */
+      if(connecting)
+      {
+            debug(3, "reconnect", "Already connecting.\n");
+
+            while(connecting) { /* ... */ }
+
+            /* check wheter connect has been successfull */
+            if(connected)
+            {
+                  sleep_time = 0;
+                  reconnecting = 0;
+                  return;
+            }
+      }
+
+      /* sleep given time before another attempt */
+      #ifdef WINDOWS
+      Sleep(sleep_time * 1000);
+      #else
+      sleep(sleep_time);
+      #endif
+
+      debug(3, "reconnect", "Trying reconnect.\n");
 
       /* removing all */
       while(cmds > 0)
             del_cmd();
 
-      /* assuming we're no more connected */
+      /* assuming we're no more connected (new auth) */
       connected = 0;
+      authed = 0;
 
       /* reconnect using default values */
       connect_server(_IRCPORT, _IRCSERV);
       auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+
+      /* increment sleep time if connect failed */
+      if(!connected)
+            sleep_time++;
+      else
+            sleep_time = 0;
 
       reconnecting = 0;
 }
@@ -724,7 +816,12 @@ IRCSocket::connect_server(unsigned int port, const char *server)
       /* dont connect if already connected */
       if(connected)
       {
-            debug("[!=connect_server] Already connected.\n");
+            debug(3, "connect_server", "Already connected.\n");
+            return;
+      }
+      else if(connecting)
+      {
+            debug(3, "connect_server", "Already connecting.\n");
             return;
       }
 
@@ -738,10 +835,19 @@ IRCSocket::connect_server(unsigned int port, const char *server)
       hostent *host;
       char *h_name;
 
+      /* now connecting */
+      connecting = 1;
       /* probably we aren't connected yet */
       connected = 0;
 
-      debug("[.=connect_server] Creating socket."
+      /* close socket so that it isn't just overwritten */
+      #ifdef WINDOWS
+      shutdown(sock, 2);
+      #else
+      close(sock);
+      #endif
+
+      debug(0, "connect_server", "Creating socket."
          " (IPv4, Stream Socket)\n");
 
       /*
@@ -763,7 +869,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
        */
       if(sock > -1)
             /* socket created successfully */
-            debug("[i=connect_server] Created socket."
+            debug(1, "connect_server", "Created socket."
                " (%i)\n", sock);
       else
       {
@@ -772,12 +878,16 @@ IRCSocket::connect_server(unsigned int port, const char *server)
              * printed and the function exits with 1.
              */
             #ifdef WINDOWS
-            debug("[!=connect_server] Couldn't create"
+            debug(3, "connect_server", "Couldn't create"
                " socket. (%d)\n", WSAGetLastError());
             #else
-            debug("[!=connect_server] Couldn't create"
+            debug(3, "connect_server", "Couldn't create"
                " socket. (%s)\n", strerror(errno));
             #endif
+
+            /* leaving function before connecting would be set */
+            connecting = 0;
+
             return;
       }
 
@@ -801,17 +911,20 @@ IRCSocket::connect_server(unsigned int port, const char *server)
       /* check getaddr status */
       if(host != NULL)
             /* got response */
-            debug("[i=connect_server] Got address.\n");
+            debug(1, "connect_server", "Got address.\n");
       else
       {
             /* an error ocurred */
             #ifdef WINDOWS
-            debug("[!=connect_server] Failure while"
+            debug(3, "connect_server", "Failure while"
                " resolving host. (%d)\n", WSAGetLastError());
             #else
-            debug("[!=connect_server] Failure while"
+            debug(3, "connect_server", "Failure while"
                " resolving host. (%s)\n", strerror(errno));
             #endif
+
+            connecting = 0;
+
             return;
       }
 
@@ -831,23 +944,26 @@ IRCSocket::connect_server(unsigned int port, const char *server)
       /* check gethost status */
       if(host != NULL)
             /* got response */
-            debug("[i=connect_server] Got host.\n");
+            debug(1, "connect_server", "Got host.\n");
       else
       {
             /* an error ocurred */
             #ifdef WINDOWS
-            debug("[!=connect_server] Failure while"
+            debug(3, "connect_server", "Failure while"
                " resolving address. (%d)\n", WSAGetLastError());
             #else
-            debug("[!=connect_server] Failure while"
+            debug(3, "connect_server", "Failure while"
                " resolving address. (%s)\n", strerror(errno));
             #endif
+
+            connecting = 0;
+
             return;
       }
 
       h_name = host->h_name;
 
-      debug("[.=connect_server] Connecting server."
+      debug(0, "connect_server", "Connecting server."
          " [%s (%s):%i]\n", inet_ntoa(ip_addr), h_name, port);
 
       /*
@@ -863,23 +979,27 @@ IRCSocket::connect_server(unsigned int port, const char *server)
       /* same as above but only 0 on success */
       if(state == 0)
             /* connection attempt has been successfull */
-            debug("[i=connect_server] Connected to"
+            debug(1, "connect_server", "Connected to"
                " server.\n");
       else
       {
             /* the attempt hasn't been successfull */
             #ifdef WINDOWS
-            debug("[!=connect_server] Couldn't connect to"
+            debug(3, "connect_server", "Couldn't connect to"
                " server. (%d)\n", WSAGetLastError());
             #else
-            debug("[!=connect_server] Couldn't connect to"
+            debug(3, "connect_server", "Couldn't connect to"
                " server. (%s)\n", strerror(errno));
             #endif
+
+            connecting = 0;
+
             return;
       }
 
       /* have any error been missed? */
       connected = 1;
+      connecting = 0;
 }
 
 /* recveive messages from IRC server */
@@ -889,7 +1009,7 @@ IRCSocket::recv_raw(void)
       /* length of recvd buffer */
       int length;
       /* buffer to put raw message in */
-      char buf[R_BUFSIZE];
+      char buf[R_BUFSIZE + 1];
       char *cbuf;
       char *obuf = new char[0];
       char *nbuf;
@@ -897,13 +1017,13 @@ IRCSocket::recv_raw(void)
       /* does need to have a length of 0 */
       *obuf = '\0';
 
-      debug("[.=recv_raw] Receiving raw messages.\n");
+      debug(0, "recv_raw", "Receiving raw messages.\n");
 
       /* recv, recv, recv,... */
       while(1)
       {
             /* clear buffer */
-            memset(buf, '\0', R_BUFSIZE);
+            memset(buf, '\0', R_BUFSIZE + 1);
 
             /*
              * read() attempts to read bytes of data from
@@ -914,16 +1034,16 @@ IRCSocket::recv_raw(void)
              * BUFSIZE   : bytes to read
              */
             #ifdef WINDOWS
-            length = recv(sock, buf, R_BUFSIZE - 1, 0);
+            length = recv(sock, buf, R_BUFSIZE, 0);
             #else
-            length = read(sock, buf, R_BUFSIZE - 1);
+            length = read(sock, buf, R_BUFSIZE);
             #endif
 
             /* has server gone away? are we disconnected? */
-            if(length > -1)
+            if(length > 0)
             {
                     /* received message, tell length and parse */
-                    debug("[i=recv_raw] Received message."
+                    debug(1, "recv_raw", "Received message."
                        " [%s (%i)]\n", "...", length);
 
                     /*
@@ -956,23 +1076,18 @@ IRCSocket::recv_raw(void)
             else
             {
                     #ifdef WINDOWS
-                    debug("[!=recv_raw] Couldn't receive"
+                    debug(3, "recv_raw", "Couldn't receive"
                        " message. (%d)\n", WSAGetLastError());
                     #else
-                    debug("[!=recv_raw] Couldn't receive"
+                    debug(3, "recv_raw", "Couldn't receive"
                        " message. (%s)\n", strerror(errno));
                     #endif
+
+                    debug(3, "recv_raw", "Requesting reconnect.\n");
 
                     /* disconnected...reconnect ;) */
                     reconnect();
             }
-
-            /* don't hurry */
-            #ifdef WINDOWS
-            Sleep(10);
-            #else
-            sleep(1);
-            #endif
       }
 }
 
@@ -1024,12 +1139,12 @@ IRCSocket::sock_send(const char *buf)
       /* length of string to send */
       len = strlen(buf);
 
-      debug("[.=sock_send] Sending Message (%s)\n", buf);
+      debug(0, "sock_send", "Sending Message (%s)\n", buf);
 
       /* we have a size maximum in the IRC proto */
       if(len < W_BUFSIZE-3)
       {
-            debug("[i=sock_send] Message size ok."
+            debug(1, "sock_send", "Message size ok."
                " (%i/%i)\n", len, W_BUFSIZE);
 
             /* actual message, cat \r\n */
@@ -1038,7 +1153,7 @@ IRCSocket::sock_send(const char *buf)
       }
       else
       {
-            debug("[!=sock_send] Message too long."
+            debug(3, "sock_send", "Message too long."
                " (%i/%i)\n", len, W_BUFSIZE);
             return -1;
       }
@@ -1055,14 +1170,14 @@ IRCSocket::sock_send(const char *buf)
 
       /* check status and return send's return value */
       if(status > -1)
-            debug("[i=sock_send] Sent raw data."
+            debug(1, "sock_send", "Sent raw data."
                " (%i)\n", status);
       else
             #ifdef WINDOWS
-            debug("[!=sock_send] Couldn't send raw data."
+            debug(3, "sock_send", "Couldn't send raw data."
                " (%d)\n", WSAGetLastError());
             #else
-            debug("[!=sock_send] Couldn't send raw data."
+            debug(3, "sock_send", "Couldn't send raw data."
                " (%s)\n", strerror(errno));
             #endif
 
@@ -1085,14 +1200,14 @@ IRCSocket::sock_recv(char *buf)
       status = recv(sock, buf, R_BUFSIZE, 0);
 
       if(status > -1)
-            debug("[i=sock_recv] Received raw data."
+            debug(1, "sock_recv", "Received raw data."
                " (%i)\n", status);
       else
             #ifdef WINDOWS
-            debug("[!=sock_send] Couldn't receive raw data."
+            debug(3, "sock_send", "Couldn't receive raw data."
                " (%d)\n", WSAGetLastError());
             #else
-            debug("[!=sock_recv] Couldn't receive raw data."
+            debug(3, "sock_recv", "Couldn't receive raw data."
                " (%s)\n", strerror(errno));
             #endif
 
@@ -1118,6 +1233,14 @@ IRCSocket::auth(const char *nick, const char *user, const char *real,
    const char *pass)
 {
 // TODO you aren't allowed to call when already done?
+      if(authed)
+      {
+            debug(3, "auth", "Already authed.\n");
+            return;
+      }
+
+      authed = 1;
+
       /*
        * User authentifaction is needed on every connect.
        * First we need a session password, then a specific

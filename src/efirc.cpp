@@ -18,14 +18,14 @@ void
 call_thread(void *cp)
 {
     IRCSocket *ircsocket = (IRCSocket *)cp;
-    while(1) ircsocket->call_cmd();
+    ircsocket->call_cmd();
 }
 
 // Empfangene normale Nachrichten werden ausgegeben
 void
 irc_pmsg(const irc_msg_data *msg_data, void *cp)
 {
-    string text = msg_data->text;
+    string text = msg_data->params_a[1];
     string user = msg_data->nick;
 
     // CTCP vorerst ignorieren
@@ -47,7 +47,7 @@ void
 irc_topic(const irc_msg_data *msg_data, void *cp)
 {
     string topic;
-    topic = msg_data->text;
+    topic = msg_data->params_a[2];
     frame->set_topic(topic);
 }
 
@@ -56,7 +56,7 @@ void
 irc_userlist(const irc_msg_data *msg_data, void *cp)
 {
     string benutzerliste;
-    benutzerliste = msg_data->text;
+    benutzerliste = msg_data->params_a[3];
     frame->add_user(benutzerliste);
     frame->add_message("<i> Folgende Benutzer sind zur Zeit im Raum: \n"
                        + benutzerliste);
@@ -73,7 +73,7 @@ irc_join(const irc_msg_data *msg_data, void *cp)
     frame->add_message("<i> " + benutzer + " hat den Raum betreten");
 
     if (benutzer == irc->CurrentNick)
-        irc->CurrentChannel = msg_data->text;
+        irc->CurrentChannel = msg_data->params_a[0];
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum
@@ -94,7 +94,7 @@ irc_quit(const irc_msg_data *msg_data, void *cp)
 {
     string benutzer, nachricht;
     benutzer = msg_data->nick;
-    nachricht = msg_data->text;
+    nachricht = msg_data->params_a[0];
     frame->delete_user(benutzer);
     frame->add_message("<i> " + benutzer + " ist gegangen: "
                        + nachricht);
@@ -107,7 +107,7 @@ irc_changenick(const irc_msg_data *msg_data, void *cp)
 {
     string alternick, neuernick;
     alternick = msg_data->nick;
-    neuernick = msg_data->text;
+    neuernick = msg_data->params_a[0];
     frame->change_nick(alternick + " -> " + neuernick);
 
     if (alternick == irc->CurrentNick)
@@ -158,8 +158,8 @@ Efirc::OnInit()
     irc->add_link("NICK", &irc_changenick);
     irc->add_link("PING", &irc_pong);
 
-    _beginthread(recv_thread,0,irc);
-    _beginthread(call_thread,0,irc);
+    _beginthread(recv_thread, 0, irc);
+    _beginthread(call_thread, 0, irc);
 
     return true;
 }
