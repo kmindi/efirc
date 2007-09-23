@@ -1,17 +1,20 @@
 done - keine leeren eingabefelder per button senden bestaetigen
 done - Pfeiltaste nach oben und history bitte
-do   - VERSION ignorieren und separat behandeln (CTCP)
 done - Ops kommen ganz nach oben in der benutzerliste
 done - Benutzerliste-buffer ist zu gross (scrollbar)
 done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
        koennen und diese auch verschwinden, wenn man reinklickt
+done - (fr) Gescheiter log (nur noetige angaben)
+done - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
+
+do   - (km) VERSION ignorieren und separat behandeln (CTCP)
 do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
-done   - (fr) Gescheiter log (nur noetige angaben)
-done   - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
+
+!!!  - Thread-"Problem" loesen
+
      - (km) Hinweise (nicht nachrichten) anders markieren und/oder
-       andere Schrift
+       andere Schrift / allgemein Uebersichtlichkeit
      - (km) Private nachrichten muessen gehen
-     - Thread "Problem" bearbeiten
      - (km) Folgende Raum Aktivitaeten noch beachten
        (/ kick/ban/etc)
      - (km) Eintrag für optionale entfernte Konfigurationsdatei in der
