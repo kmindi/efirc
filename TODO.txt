@@ -11,6 +11,7 @@ do   - (km) VERSION ignorieren und separat behandeln (CTCP)
 do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
 
 !!!  - Thread-"Problem" loesen
+!!!  - Verbindungsabbruch beim Beenden
 
      - (km) Hinweise (nicht nachrichten) anders markieren und/oder
        andere Schrift / allgemein Uebersichtlichkeit

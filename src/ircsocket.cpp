@@ -626,13 +626,13 @@ IRCSocket::parse_msg(const char *raw_msg)
       /* parameters are rebuilt */
       delete msg_data->params;
 
-      /* get full length */
+      /* get full length including separators */
       for(i = 0; i < params; i++)
-            length += strlen(msg_data->params_a[i]);
+            length += strlen(msg_data->params_a[i]) + 1;
 
       /* allocate and clear (?) */
-      msg_data->params = new char[length + text + 1];
-      memset(msg_data->params, '\0', length + text + 1);
+      msg_data->params = new char[length + 1];
+      memset(msg_data->params, '\0', length + 1);
 
       /* join parameters */
       for(i = 0; i < params; i++)
