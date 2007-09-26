@@ -138,7 +138,7 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->params_a[1];
     if(benutzer == irc->CurrentNick)
     {
-        frame->add_message("Sie wurden von " 
+        frame->add_message("<i> Sie wurden von " 
         + sender + "aus dem Raum geworfen");
 
         frame->WxEdit_channel_users->DeleteAllItems();
