@@ -141,8 +141,8 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
         frame->add_message("<i> Sie wurden von " 
         + sender + "aus dem Raum geworfen");
 
-        frame->WxEdit_channel_users->DeleteAllItems();
-        frame->WxEdit_topic->Clear();
+        frame->clear_userlist();
+        frame->set_topic("");
         frame->SetTitle(wxT(frame->parsecfgvalue("text_title")));
     }
     else

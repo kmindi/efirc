@@ -304,6 +304,12 @@ UserInterface::set_topic(string topic)
     add_message("Thema: " + topic);
 }
 
+void
+UserInterface::clear_userlist()
+{
+    WxEdit_channel_users->DeleteAllItems();
+}
+
 string
 UserInterface::parsecfgvalue(string cfgvalue)
 {

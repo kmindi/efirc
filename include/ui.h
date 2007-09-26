@@ -35,15 +35,11 @@ class UserInterface : public wxFrame
         void change_nick(string);
         void delete_user(string);
         void set_topic(string);
+        void clear_userlist();
         
         string parsecfgvalue(string);
 
-        // grafische Objekte auf dem Frame
-        wxListCtrl *WxEdit_channel_users;
-        wxButton   *WxButton_submit;
-        wxTextCtrl *WxEdit_topic;
-        wxTextCtrl *WxEdit_input_messages;
-        wxTextCtrl *WxEdit_output_messages;
+        
         
     private:
         ConfigInterface *config;
@@ -60,7 +56,14 @@ class UserInterface : public wxFrame
         // Die History wird durch ein Array repraesentiert
         // und ist begrenzt in den moeglichen Eintraegen
         string history[HISTORY_SIZE];
-
+        
+        
+        // grafische Objekte auf dem Frame
+        wxListCtrl *WxEdit_channel_users;
+        wxButton   *WxButton_submit;
+        wxTextCtrl *WxEdit_topic;
+        wxTextCtrl *WxEdit_input_messages;
+        wxTextCtrl *WxEdit_output_messages;
         // TODO wozu das denn???
         enum
         {
