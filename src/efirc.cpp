@@ -104,7 +104,7 @@ irc_quit(const irc_msg_data *msg_data, void *cp)
     string benutzer, nachricht;
     benutzer = msg_data->nick;
     nachricht = msg_data->params_a[0];
-    
+
     frame->delete_user(benutzer);
     frame->add_message("<i> " + benutzer + " ist gegangen: "
                        + nachricht);
@@ -138,7 +138,7 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->params_a[1];
     if(benutzer == irc->CurrentNick)
     {
-        frame->add_message("<i> Sie wurden von " 
+        frame->add_message("<i> Sie wurden von "
         + sender + "aus dem Raum geworfen");
 
         frame->clear_userlist();
@@ -148,7 +148,7 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     else
     {
         frame->delete_user(benutzer);
-        frame->add_message("<i> " + benutzer + " wurde von " 
+        frame->add_message("<i> " + benutzer + " wurde von "
         + sender + " aus dem Raum geworfen");
     }
 }
@@ -157,15 +157,14 @@ void
 irc_nickinuse(const irc_msg_data *msg_data, void *cp)
 {
     frame->add_message("<i> Nickname wird bereits verwendet");
-    
+
     // Nickname erneuern
     config->reset_nickname();
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     frame->add_message("<i> Sie sind jetzt bekannt als "
                     + config->parsecfgvalue("irc_nickname"));
-                    
-    // Verbindung abbrechen
-    irc->disconnect_server("");    
+
+    irc->send_nick(config->parsecfgvalue("irc_nickname").c_str());
 }
 
 bool
