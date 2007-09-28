@@ -83,3 +83,13 @@ ConfigInterface::generaterndstring(int chars)
 
     return rndstring;
 }
+
+void
+ConfigInterface::reset_nickname()
+{
+    configtext = ReplaceString("[efirc_random_string]",
+                              generaterndstring(4), configtext);
+                               
+    //configtext = ReplaceString("irc_nickname = kmindi;",
+    //                           "irc_nickname = kmindi[2];", configtext);
+}

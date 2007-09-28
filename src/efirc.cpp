@@ -153,6 +153,21 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     }
 }
 
+void
+irc_nickinuse(const irc_msg_data *msg_data, void *cp)
+{
+    frame->add_message("<i> Nickname wird bereits verwendet");
+    
+    // Nickname erneuern
+    config->reset_nickname();
+    irc->CurrentNick = config->parsecfgvalue("irc_nickname");
+    frame->add_message("<i> Sie sind jetzt bekannt als "
+                    + config->parsecfgvalue("irc_nickname"));
+                    
+    // Verbindung abbrechen
+    irc->disconnect_server("");    
+}
+
 bool
 Efirc::OnInit()
 {
@@ -191,6 +206,7 @@ Efirc::OnInit()
     irc->add_link("NICK", &irc_changenick);
     irc->add_link("PING", &irc_pong);
     irc->add_link("KICK", &irc_kick);
+    irc->add_link("433", &irc_nickinuse);
 
     _beginthread(recv_thread, 0, irc);
     _beginthread(call_thread, 0, irc);
