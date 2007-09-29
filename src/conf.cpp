@@ -87,6 +87,6 @@ ConfigInterface::generaterndstring(int chars)
 void
 ConfigInterface::reset_nickname()
 {
-    configtext = ReplaceString("[efirc_random_string]",
+    configtext = ReplaceString("irc_nickname = [efirc_random_string];",
                                generaterndstring(4), configtext);
 }
