@@ -87,6 +87,21 @@ ConfigInterface::generaterndstring(int chars)
 void
 ConfigInterface::reset_nickname()
 {
-    configtext = ReplaceString("irc_nickname = [efirc_random_string];",
-                               generaterndstring(4), configtext);
+    // aktuellen nickname herausfinden
+    string alternick = parsecfgvalue("irc_nickname");
+    
+    
+    // option + wert in der konfiguration aendern
+    // mit anhaengen von zwei zufaelligen zeichen
+    // nick -> nickQP ; nick -> nickSG; oder so
+    
+    configtext = ReplaceString("irc_nickname = " + alternick + ";",
+                               "irc_nickname = " + alternick + 
+                               generaterndstring(2) + ";", configtext);
+                               
+    /*
+    configtext = ReplaceString("irc_nickname = kmindi;",
+                               "irc_nickname = kmindi" + 
+                               generaterndstring(2) + ";", configtext);
+    */
 }
