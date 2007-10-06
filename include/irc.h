@@ -1,7 +1,7 @@
 #ifndef __IRCInterface_Header__
 #define __IRCInterface_Header__
 #include <string>
-#include <ircsocket.h>
+#include <cppirc/ircsocket.h>
 
 using namespace std;
 

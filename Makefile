@@ -13,7 +13,7 @@ default:
 all: ircinterface userinterface configinterface default
 
 ircsocket:
-	${CPP} ${INCDIR} ${DEF} -c ${SRCDIR}/ircsocket.cpp -o ${OBJDIR}/ircsocket.o
+	${CPP} ${INCDIR} ${DEF} -c ${SRCDIR}/cppirc/ircsocket.cpp -o ${OBJDIR}/ircsocket.o
 
 ircinterface: ircsocket
 	${CPP} ${INCDIR} ${DEF} -c ${SRCDIR}/irc.cpp -o ${OBJDIR}/ircinterface.o
