@@ -155,7 +155,7 @@ UserInterface::CreateGUIControls()
         + "macht oder auf irgendeine Weise hervorruft.\n"
         + "Wenn du mehr wissen willst hilft dir vielleicht diese Seite "
         + "weiter: \"http://efirc.sourceforge.net/\".\n"
-        + "Mit /hilfe oder /befehle kannst du eine Liste mit allen "
+        + "Mit /hilfe kannst du dir eine Liste mit allen "
         + "verfügbaren Befehlen anzeigen lassen."
         + "\n\n"
         + "Server: " + parsecfgvalue("irc_server") + "\n"
@@ -171,7 +171,7 @@ UserInterface::CreateGUIControls()
         + "or causes.\n"
         + "If you want to get further information then have a look at: "
         + "\"http://efirc.sourceforge.net/\".\n"
-        + "With /hilfe or /befehle you get a list of supported commands."
+        + "With /help you get a list of supported commands."
         + "\n\n"
         + "Server: " + parsecfgvalue("irc_server") + "\n"
         + "Channel: " + parsecfgvalue("irc_channel") + "\n"
@@ -346,7 +346,7 @@ UserInterface::ParseClientCmd(string text)
     {
         irc->send_quit(param.c_str());
 
-        add_message("Du hast das IRC Netzwerk verlassen");
+        add_message("<i> Du hast das IRC Netzwerk verlassen");
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
@@ -361,19 +361,51 @@ UserInterface::ParseClientCmd(string text)
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
+        SetTitle(wxT(parsecfgvalue("text_title")));        
     }
 
+    if(cmd == "clear")
+    {
+        WxEdit_output_messages->Clear();
+    }
+    
     if(cmd == "kick")
+    {
         //kick
-
+    }
+        
     if(cmd == "whois")
+    {
         // whois
+    }
+
         
     if(cmd == "me")
+    {
         // me
+    }
 
-    if(cmd == "clear")
-        WxEdit_output_messages->Clear();
+    if(cmd == "help" || cmd == "hilfe")
+    {
+        if(parsecfgvalue("text_language") == "de")
+        {
+            add_message("<i> Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
+             "/nick Neuernick - ändert den Nickname zu Neuernick\n"
+             "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
+             "/leave - verlässt den aktuellen Raum"
+             "/quit - verlässt das IRC-Netzwerk\n"
+             "/clear - löscht das Ausgabefeld\n");
+        }
+        else
+        {
+            add_message("<i> Currently the following commands are supported by this client: \n"
+             "/nick newnick - changes the nickname to newnick\n"
+             "/join #channel - leaves the current channel and joins the channel #channel\n"
+             "/leave - leaves the current channel\n"
+             "/quit - quits the irc-network\n"
+             "/clear - removes all text from the output window\n");
+        }
+    }
 
 }
 

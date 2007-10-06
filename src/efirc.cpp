@@ -93,7 +93,6 @@ irc_leave(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->nick;
     frame->delete_user(benutzer);
     frame->add_message("<i> " + benutzer + " hat den Raum verlassen");
-    frame->SetTitle(wxT(frame->parsecfgvalue("text_title")));
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum und
