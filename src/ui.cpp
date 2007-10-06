@@ -301,7 +301,7 @@ void
 UserInterface::set_topic(string topic)
 {
     WxEdit_topic->SetValue("Thema: " + topic);
-    add_message("Thema: " + topic);
+    add_message("<i> Thema: " + topic);
 }
 
 void
@@ -394,7 +394,7 @@ UserInterface::ParseClientCmd(string text)
              "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
              "/leave - verlässt den aktuellen Raum"
              "/quit - verlässt das IRC-Netzwerk\n"
-             "/clear - löscht das Ausgabefeld\n");
+             "/clear - löscht das Ausgabefeld");
         }
         else
         {
@@ -403,7 +403,7 @@ UserInterface::ParseClientCmd(string text)
              "/join #channel - leaves the current channel and joins the channel #channel\n"
              "/leave - leaves the current channel\n"
              "/quit - quits the irc-network\n"
-             "/clear - removes all text from the output window\n");
+             "/clear - removes all text from the output window");
         }
     }
 
