@@ -9,9 +9,6 @@
 !   Benutzerlistenoperationen optimieren:
         - Voice/Operator-Status beachten (+nick/@nick)
         - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
-
-!   reset_nickname-Funktion soll aktuellen Nickname uebergeben
-    bekommen um damit arbeiten zu koennen        
     
 !   Raum Modi anzeigen 
 
@@ -49,6 +46,8 @@
 ?   Benutzerliste-buffer ist zu gross (scrollbar)     
 
 
+OK  reset_nickname-Funktion soll aktuellen Nickname uebergeben
+    bekommen um damit arbeiten zu koennen        
 OK  keine leeren eingabefelder per button senden bestaetigen
 OK  Pfeiltaste nach oben und history bitte
 OK  Ops kommen ganz nach oben in der benutzerliste
