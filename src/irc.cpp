@@ -9,6 +9,11 @@ IRCInterface::IRCInterface(string port, string server,
                          nick.c_str(), user.c_str(), real.c_str(),
                          pass.c_str(), fopen("cppirc.log", "w"))
 {
+}
+
+void
+IRCInterface::connect()
+{
     // Verbindung zum Server aufbauen und authentifizieren
     connect_server(_IRCPORT, _IRCSERV);
     auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);

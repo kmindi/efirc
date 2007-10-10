@@ -31,8 +31,8 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	/* be careful! just telling wheter auth() has been called */
 	authed = 0;
 
-	/* no sleep_time needed */
-	sleep_time = 0;
+	/* no great sleep_time needed */
+	sleep_time = 1;
 
 	/* set defaults */
 	_IRCPORT = port;
@@ -49,6 +49,7 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	_DBGSTR = log;
 	_DBGSPACE = 15;
 	_DBGLEVEL = 3;
+	_DBGRECON = 1;
 }
 
 /* Destructor (disconnect from server) */

@@ -13,5 +13,7 @@ class IRCInterface : public IRCSocket
 
         IRCInterface(string, string, string, string, string, string);
         ~IRCInterface();
+
+        void connect();
 };
 #endif

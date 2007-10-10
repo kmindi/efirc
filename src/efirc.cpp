@@ -5,22 +5,6 @@ IMPLEMENT_APP(Efirc)
 
 using namespace std;
 
-// Thread fuer recv_raw-Schleife
-void
-recv_thread(void *cp)
-{
-    IRCSocket *ircsocket = (IRCSocket *)cp;
-    ircsocket->recv_raw();
-}
-
-// Abarbeitung der Befehlsschlange
-void
-call_thread(void *cp)
-{
-    IRCSocket *ircsocket = (IRCSocket *)cp;
-    ircsocket->call_cmd();
-}
-
 // Empfangene normale Nachrichten werden ausgegeben
 void
 irc_pmsg(const irc_msg_data *msg_data, void *cp)
@@ -168,31 +152,30 @@ irc_nickinuse(const irc_msg_data *msg_data, void *cp)
     irc->send_nick(config->parsecfgvalue("irc_nickname").c_str());
 }
 
-bool
-Efirc::OnInit()
+// Thread fuer recv_raw-Schleife
+void
+recv_thread(void *cp)
 {
-    frame = new UserInterface(NULL);
-    frame->Show();
+    IRCSocket *ircsocket = (IRCSocket *)cp;
+    ircsocket->recv_raw();
+}
 
-    WSADATA wsaData;
+// Abarbeitung der Befehlsschlange
+void
+call_thread(void *cp)
+{
+    IRCSocket *ircsocket = (IRCSocket *)cp;
+    ircsocket->call_cmd();
+}
 
-    // TODO nach irc (class)
-    if (WSAStartup(MAKEWORD(1, 1), &wsaData))
-        frame->add_message("Failed to initialise winsock!\n");
-
-    config = new ConfigInterface();
-    irc = new IRCInterface(config->parsecfgvalue("irc_port"),
-                           config->parsecfgvalue("irc_server"),
-                           config->parsecfgvalue("irc_nickname"),
-                           config->parsecfgvalue("irc_username"),
-                           config->parsecfgvalue("irc_realname"),
-                           "pass");
+void
+connect_thread(void *cp)
+{
+    irc->connect();
 
     // Wer sagt mir, dass der Nick verfuegbar ist???
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     irc->CurrentChannel = config->parsecfgvalue("irc_channel");
-
-    frame->irc = irc;
 
     // Ereignisverknüpfung
     // TODO wirklich Ereignisse implementieren
@@ -210,6 +193,32 @@ Efirc::OnInit()
 
     _beginthread(recv_thread, 0, irc);
     _beginthread(call_thread, 0, irc);
+}
+
+bool
+Efirc::OnInit()
+{
+    frame = new UserInterface(NULL);
+    frame->Show();
+
+    config = new ConfigInterface();
+
+    WSADATA wsaData;
+
+    // TODO nach irc (class)
+    if (WSAStartup(MAKEWORD(1, 1), &wsaData))
+        frame->add_message("Failed to initialise winsock!\n");
+
+    irc = new IRCInterface(config->parsecfgvalue("irc_port"),
+                           config->parsecfgvalue("irc_server"),
+                           config->parsecfgvalue("irc_nickname"),
+                           config->parsecfgvalue("irc_username"),
+                           config->parsecfgvalue("irc_realname"),
+                           "pass");
+
+    _beginthread(connect_thread, 0, NULL);
+
+    frame->irc = irc;
 
     return true;
 }

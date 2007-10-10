@@ -332,8 +332,8 @@ UserInterface::ParseClientCmd(string text)
     {
         irc->send_nick(param.c_str());
         // Aktuellen Nick manuell veraendern
-        // damit die nickinuse-Funktion den 
-        // gewollten nick als aktuellen nickname 
+        // damit die nickinuse-Funktion den
+        // gewollten nick als aktuellen nickname
         // erhaelt
         irc->CurrentNick = param;
     }
@@ -368,25 +368,25 @@ UserInterface::ParseClientCmd(string text)
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
-        SetTitle(wxT(parsecfgvalue("text_title")));        
+        SetTitle(wxT(parsecfgvalue("text_title")));
     }
 
     if(cmd == "clear")
     {
         WxEdit_output_messages->Clear();
     }
-    
+
     if(cmd == "kick")
     {
         //kick
     }
-        
+
     if(cmd == "whois")
     {
         // whois
     }
 
-        
+
     if(cmd == "me")
     {
         // me

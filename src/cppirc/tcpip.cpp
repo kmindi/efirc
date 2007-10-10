@@ -425,29 +425,33 @@ IRCSocket::disconnect_server(const char *quit_msg)
 void
 IRCSocket::reconnect(void)
 {
-	if(reconnecting)
-	{
-		debug(3, "reconnect", "Already reconnecting.\n");
-		return;
-	}
-
-	reconnecting = 1;
-
 	/* when someone's connecting wait */
-	if(connecting)
+	if(connecting || reconnecting)
 	{
-		debug(3, "reconnect", "Already connecting.\n");
+		if(connecting)
+			debug(3, "reconnect", "Already connecting.\n");
+		else if(reconnecting)
+			debug(3, "reconnect", "Already reconnecting.\n");
 
-		while(connecting) { /* ... */ }
+		while(connecting || reconnecting) { /* ... */ }
 
 		/* check wheter connect has been successfull */
 		if(connected)
 		{
-			sleep_time = 0;
+			sleep_time = 1;
 			reconnecting = 0;
 			return;
 		}
 	}
+	else if(!_DBGRECON)
+	{
+		debug(3, "reconnect", "Reconnecting disabled.\n");
+		return;
+	}
+
+	debug(3, "reconnect", "Trying reconnect. (%i)\n", sleep_time);
+
+	reconnecting = 1;
 
 	/* sleep given time before another attempt */
 	#ifdef WINDOWS
@@ -455,8 +459,6 @@ IRCSocket::reconnect(void)
 	#else
 	sleep(sleep_time);
 	#endif
-
-	debug(3, "reconnect", "Trying reconnect.\n");
 
 	/* removing all */
 	while(cmds > 0)
@@ -472,11 +474,10 @@ IRCSocket::reconnect(void)
 
 	/* increment sleep time if connect failed */
 	if(!connected)
-		sleep_time++;
+		sleep_time = sleep_time * 2;
 	else
-		sleep_time = 0;
+		sleep_time = 1;
 
 	reconnecting = 0;
 }
-
 

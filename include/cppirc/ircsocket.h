@@ -90,6 +90,7 @@ class IRCSocket
 		FILE *_DBGSTR;
 		unsigned int _DBGSPACE;
 		unsigned int _DBGLEVEL;
+		unsigned int _DBGRECON;
 		unsigned int _IRCPORT;
 		char _IRCSERV[W_BUFSIZE];
 		char _IRCNICK[W_BUFSIZE];
