@@ -1,39 +1,59 @@
-done - keine leeren eingabefelder per button senden bestaetigen
-done - Pfeiltaste nach oben und history bitte
-done - Ops kommen ganz nach oben in der benutzerliste
-done - Standardtext (hinweis) in eingabefeld sollte man nicht senden
-       koennen und diese auch verschwinden, wenn man reinklickt
-done - (fr) Gescheiter log (nur noetige angaben)
-done - (fr) keine 1sekuendige pause sondern nur 20 ms oder so
-done - (km) Folgende Raum Aktivitaeten noch beachten
+!!! Thread-"Problem" loesen
+
+!!! Verbindungsabbruch beim Beenden
+
+!   Thema manuell abrufen bzw setzen mit "/topic [neuesthema]"
+
+!   /msg-Befehl muss unterstuetzt werden
+
+!   Benutzerlistenoperationen optimieren:
+        - Voice/Operator-Status beachten (+nick/@nick)
+        - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
+    
+!   Raum Modi anzeigen 
+
+!   Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...)
+    beachten
+    
+!   Hinweise (nicht nachrichten) anders markieren und/oder
+    andere Schrift / allgemein Uebersichtlichkeit
+    
+!   Private nachrichten muessen gehen
+
+!   (Entfernte) Konfigurationsdatei:
+        - Falls die lokale Konfigurationsdatei nicht vorhanden ist
+          werden voreingestellte Werte verwendet und eine
+          Konfigurationsdatei wird erstellt
+        - Optionaler Eintrag in der lokalen Konfigurationsdatei, 
+          welcher angibt, wo die Entfernte Konfigurationsdatei liegt
+        - Die Entfernte Konfigurationsdatei ueberschreibt die lokalen
+          Einstellungen
+        - Muss nicht alle Optionen enthalten mit Ausnahme der
+          IRC-Verbindungsdaten  
+          
+!   Falls die lokale Konfigurationsdatei nicht vorhanden ist
+    werden voreingestellte Werte verwendet und eine
+    Konfigurationsdatei wird erstellt.
+    
+!   Überprüfung ob die noetigen Verbindungsangaben in der
+    Konfigurationsdatei eingetragen sind hinzufügen
+    
+!   Virus_!FEHL!_Alarm mit NOD32 "entfernen"
+
+
+?   VERSION ignorieren und separat behandeln (CTCP)
+?   Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
+?   Benutzerliste-buffer ist zu gross (scrollbar)     
+
+
+OK  keine leeren eingabefelder per button senden bestaetigen
+OK  Pfeiltaste nach oben und history bitte
+OK  Ops kommen ganz nach oben in der benutzerliste
+OK  Standardtext (hinweis) in eingabefeld sollte man nicht senden
+    koennen und diese auch verschwinden, wenn man reinklickt
+    
+OK  (fr) Gescheiter log (nur noetige angaben)
+OK  (fr) keine 1sekuendige pause sondern nur 20 ms oder so
+OK  (km) Folgende Raum Aktivitaeten noch beachten
        (kick)
-
-do   - (km) VERSION ignorieren und separat behandeln (CTCP)
-do   - (km) Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
-do   - (km) Benutzerliste-buffer ist zu gross (scrollbar)
-
-!!!  - Thread-"Problem" loesen
-!!!  - Verbindungsabbruch beim Beenden
-
-     - (km) Raum Modi anzeigen 
-     - (km) Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...)
-       beachten
-     - (km) Statuswechsel eines Benutzers in Benutzerliste kenntlich
-       machen
-     - (km) allgemein bei Benutzerlisteoperationen Benutzerstatus
-       beachten
-     - (km) Hinweise (nicht nachrichten) anders markieren und/oder
-       andere Schrift / allgemein Uebersichtlichkeit
-     - (km) Private nachrichten muessen gehen
-     - (km) Eintrag für optionale entfernte Konfigurationsdatei in der
-       (lokalen) Konfigurationsdatei hinzufügen.
-       (Die entfernte Konfigurationsdatei überschreibt die Einstellungen
-       der lokalen Konfigurationsdatei, und muss somit im Gegensatz zur
-       lokalen Konfigurationsdatei nicht alle nicht optionalen Optionen
-       enthalten)
-     - (km) Falls die lokale Konfigurationsdatei nicht vorhanden ist
-       werden voreingestellte Werte verwendet und eine
-       Konfigurationsdatei wird erstellt.
-     - (km) Überprüfung ob die nötigen Verbindungsangaben in der
-       Konfigurationsdatei eingetragen sind hinzufügen
-     - Virus_!FEHL!_Alarm mit NOD32 entfernen
+       
