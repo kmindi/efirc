@@ -9,6 +9,9 @@
 !   Benutzerlistenoperationen optimieren:
         - Voice/Operator-Status beachten (+nick/@nick)
         - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
+
+!   reset_nickname-Funktion soll aktuellen Nickname uebergeben
+    bekommen um damit arbeiten zu koennen        
     
 !   Raum Modi anzeigen 
 
