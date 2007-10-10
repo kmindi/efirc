@@ -158,7 +158,9 @@ irc_nickinuse(const irc_msg_data *msg_data, void *cp)
     frame->add_message("<i> Nickname wird bereits verwendet");
 
     // Nickname erneuern
-    config->reset_nickname();
+    // aktuellen Nickname uebergeben
+    config->reset_nickname(irc->CurrentNick);
+    // neuen Nicknamen auslesen
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     frame->add_message("<i> Sie sind jetzt bekannt als "
                     + config->parsecfgvalue("irc_nickname"));

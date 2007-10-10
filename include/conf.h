@@ -11,7 +11,7 @@ class ConfigInterface
         ~ConfigInterface();
 
         string parsecfgvalue(string);
-        void reset_nickname();
+        void reset_nickname(string);
 
         // TODO wrapper (_alle_ public-vars)
         string efirc_version_string;
