@@ -329,12 +329,14 @@ UserInterface::ParseClientCmd(string text)
     channel = irc->CurrentChannel;
 
     if(cmd == "nick")
+    {
         irc->send_nick(param.c_str());
         // Aktuellen Nick manuell veraendern
         // damit die nickinuse-Funktion den 
         // gewollten nick als aktuellen nickname 
         // erhaelt
         irc->CurrentNick = param;
+    }
 
     if(cmd == "join")
     {
