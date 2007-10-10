@@ -30,8 +30,15 @@ irc_endofmotd(const irc_msg_data *msg_data, void *cp)
 void
 irc_topic(const irc_msg_data *msg_data, void *cp)
 {
-    string topic;
-    topic = msg_data->params_a[2];
+    string topic = msg_data->params_a[2];
+    frame->set_topic(topic);
+
+}
+
+void
+irc_requestedtopic(const irc_msg_data *msg_data, void *cp)
+{
+    string topic = msg_data->params_a[1];
     frame->set_topic(topic);
 }
 
@@ -182,6 +189,7 @@ connect_thread(void *cp)
     irc->add_link("PRIVMSG", &irc_pmsg);
     irc->add_link("376", &irc_endofmotd);
     irc->add_link("332", &irc_topic);
+    irc->add_link("TOPIC", &irc_requestedtopic);
     irc->add_link("353", &irc_userlist);
     irc->add_link("JOIN", &irc_join);
     irc->add_link("PART", &irc_leave);
@@ -190,6 +198,7 @@ connect_thread(void *cp)
     irc->add_link("PING", &irc_pong);
     irc->add_link("KICK", &irc_kick);
     irc->add_link("433", &irc_nickinuse);
+
 
     _beginthread(recv_thread, 0, irc);
     _beginthread(call_thread, 0, irc);

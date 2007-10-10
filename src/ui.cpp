@@ -325,7 +325,14 @@ UserInterface::ParseClientCmd(string text)
     string channel;
 
     cmd = text.substr(0,text.find(" ",0));
-    param = text.substr(text.find(" ",0)+1);
+    if(text.find(" ",0) != string::npos)
+    {
+        param = text.substr(text.find(" ",0)+1);
+    }
+    else
+    {
+        param = "";
+    }
     channel = irc->CurrentChannel;
 
     if(cmd == "nick")
@@ -391,6 +398,11 @@ UserInterface::ParseClientCmd(string text)
     {
         // me
     }
+    
+    if(cmd == "topic")
+    {
+        irc->send_topic(irc->CurrentChannel.c_str(),param.c_str());
+    }
 
     if(cmd == "help" || cmd == "hilfe")
     {
@@ -401,6 +413,7 @@ UserInterface::ParseClientCmd(string text)
              "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
              "/leave - verlässt den aktuellen Raum"
              "/quit - verlässt das IRC-Netzwerk\n"
+             "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es zu [Thema]\n"
              "/clear - löscht das Ausgabefeld");
         }
         else
@@ -410,6 +423,7 @@ UserInterface::ParseClientCmd(string text)
              "/join #channel - leaves the current channel and joins the channel #channel\n"
              "/leave - leaves the current channel\n"
              "/quit - quits the irc-network\n"
+             "/topic [topic] - shows the current topic or sets the topic to [topic]\n"
              "/clear - removes all text from the output window");
         }
     }
