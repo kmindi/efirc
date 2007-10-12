@@ -2,8 +2,6 @@
 
 !!! Verbindungsabbruch beim Beenden
 
-!   Thema manuell abrufen bzw setzen mit "/topic [neuesthema]"
-
 !   /msg-Befehl muss unterstuetzt werden
 
 !   Benutzerlistenoperationen optimieren:
@@ -17,8 +15,6 @@
     
 !   Hinweise (nicht nachrichten) anders markieren und/oder
     andere Schrift / allgemein Uebersichtlichkeit
-    
-!   Private nachrichten muessen gehen
 
 !   (Entfernte) Konfigurationsdatei:
         - Falls die lokale Konfigurationsdatei nicht vorhanden ist
@@ -46,6 +42,8 @@
 ?   Benutzerliste-buffer ist zu gross (scrollbar)     
 
 
+OK  Thema manuell abrufen bzw setzen mit "/topic [neuesthema]"
+OK  Private nachrichten muessen gehen
 OK  reset_nickname-Funktion soll aktuellen Nickname uebergeben
     bekommen um damit arbeiten zu koennen        
 OK  keine leeren eingabefelder per button senden bestaetigen
