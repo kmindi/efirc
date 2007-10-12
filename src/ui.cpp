@@ -401,7 +401,14 @@ UserInterface::ParseClientCmd(string text)
     
     if(cmd == "topic")
     {
-        irc->send_topic(irc->CurrentChannel.c_str(),param.c_str());
+        if(param == "")
+        {
+            irc->send_topic(irc->CurrentChannel.c_str());
+        }
+        else
+        {
+            irc->send_topic(irc->CurrentChannel.c_str(),param.c_str());
+        }
     }
 
     if(cmd == "help" || cmd == "hilfe")
