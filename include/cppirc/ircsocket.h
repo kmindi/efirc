@@ -83,7 +83,7 @@ class IRCSocket
 
 	public:
 		IRCSocket(unsigned int, const char *, const char *,
-               const char *, const char *, const char *, FILE *);
+		   const char *, const char *, const char *, FILE *);
 		~IRCSocket(void);
 
 		unsigned int connected;
@@ -99,13 +99,13 @@ class IRCSocket
 		char _IRCPASS[W_BUFSIZE];
 
 		void add_link(const char *,
-               void (*function)(const irc_msg_data*, void*));
+		   void (*function)(const irc_msg_data*, void*));
 		void del_link(const char *,
-               void (*function)(const irc_msg_data*, void*));
+		   void (*function)(const irc_msg_data*, void*));
 		void act_link(const irc_msg_data*);
 
 		void add_cmd(int (IRCSocket::*function)(const char *),
-               const char *);
+		   const char *);
 		void del_cmd(void);
 		void call_cmd(void);
 
@@ -117,7 +117,7 @@ class IRCSocket
 		void recv_raw(void);
 
 		void auth(const char *, const char *, const char *,
-               const char *);
+		   const char *);
 		void send_join(const char *);
 		void send_quit(const char *);
 		void send_pass(const char *);
@@ -127,6 +127,7 @@ class IRCSocket
 		void send_privmsg(const char *, const char *);
 		void send_pong(const char *);
 		void send_version(const char *);
+		void send_topic(const char *);
 		void send_topic(const char *, const char *);
 		void send_part(const char *);
 

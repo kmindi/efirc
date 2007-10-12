@@ -124,8 +124,16 @@ IRCSocket::send_privmsg(const char *recipient, const char *text)
 
 /* TOPIC */
 void
+IRCSocket::send_topic(const char *chan)
+{
+	/* requesting topic */
+	send_raw("TOPIC %s", chan);
+}
+
+void
 IRCSocket::send_topic(const char *chan, const char *text)
 {
+	/* sending new topic */
 	send_raw("TOPIC %s :%s", chan, text);
 }
 
