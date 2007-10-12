@@ -410,6 +410,15 @@ UserInterface::ParseClientCmd(string text)
             irc->send_topic(irc->CurrentChannel.c_str(),param.c_str());
         }
     }
+    
+    if(cmd == "query")
+    {
+        string recipient = param.substr(0,param.find(" ",0));
+        string text = param.substr(param.find(" ",0)+1);
+        add_message("<" + irc->CurrentNick + "> -> [" + recipient + "] " + text);
+        irc->send_privmsg(recipient.c_str(), text.c_str());
+    }
+    
 
     if(cmd == "help" || cmd == "hilfe")
     {
@@ -421,6 +430,7 @@ UserInterface::ParseClientCmd(string text)
              "/leave - verlässt den aktuellen Raum"
              "/quit - verlässt das IRC-Netzwerk\n"
              "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es zu [Thema]\n"
+             "/query Name Nachricht - sendet den text Nachricht an Name\n"
              "/clear - löscht das Ausgabefeld");
         }
         else
@@ -431,6 +441,7 @@ UserInterface::ParseClientCmd(string text)
              "/leave - leaves the current channel\n"
              "/quit - quits the irc-network\n"
              "/topic [topic] - shows the current topic or sets the topic to [topic]\n"
+             "/query nick message - sends the text message to nick\n"
              "/clear - removes all text from the output window");
         }
     }

@@ -10,11 +10,21 @@ void
 irc_pmsg(const irc_msg_data *msg_data, void *cp)
 {
     string text = msg_data->params_a[1];
+    string recipient = msg_data->params_a[0];
     string user = msg_data->nick;
 
     // CTCP vorerst ignorieren
     if (text[0] != '\001')
-        frame->add_message("<" + user + "> " + text);
+    {
+        if(recipient == irc->CurrentNick)
+        {
+            frame->add_message("[" + user + "] " + text);
+        }
+        else
+        {
+            frame->add_message("<" + user + "> " + text);
+        }
+    } 
 }
 
 // Am Ende der Nachricht des Tages automatisch den in
