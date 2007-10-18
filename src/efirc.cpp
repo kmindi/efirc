@@ -13,18 +13,54 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
     string recipient = msg_data->params_a[0];
     string user = msg_data->nick;
 
-    // CTCP vorerst ignorieren
-    if (text[0] != '\001')
+    // CTCP abfragen ("'\001'BEFEHL text'\001'")
+    //Falls kein CTCP:
+    if (text[0] != '\001' and text[text.length()-1] != '\001')
     {
-        if(recipient == irc->CurrentNick)
+        if(user != "No nick")
         {
-            frame->add_message("[" + user + "] " + text);
-        }
+            if(recipient == irc->CurrentNick)
+            {
+                frame->add_message("[" + user + "] " + text);
+            }
+            else
+            {
+                frame->add_message("<" + user + "> " + text);
+            }
+        }    
         else
         {
-            frame->add_message("<" + user + "> " + text);
+            frame->add_message(text);
         }
-    } 
+    }
+    //falls CTCP:
+    else
+    {
+        //CTCP behandeln
+        string ctcp = text.substr(1,text.length()-2);
+        string ctcp_befehl = ctcp.substr(0,ctcp.find(" ",0));
+        string ctcp_text = ctcp.substr(ctcp.find(" ",0)+1);
+        
+        if(ctcp_befehl == "version" || ctcp_befehl == "VERSION")
+        {
+            string answer;
+            answer = "\001VERSION efirc:"
+                + config->efirc_version_string + ":Windoofs\001";
+            irc->send_notice(user.c_str(), answer.c_str());
+        }
+        
+        if(ctcp_befehl == "ACTION")
+        {
+            if(recipient == irc->CurrentNick)
+            {
+                frame->add_message("[" + user + "]* " + ctcp_text);
+            }
+            else
+            {
+                frame->add_message("<" + user + ">* " + ctcp_text);
+            }
+        }
+    }
 }
 
 // Am Ende der Nachricht des Tages automatisch den in
@@ -163,7 +199,7 @@ irc_nickinuse(const irc_msg_data *msg_data, void *cp)
 
     // Nickname erneuern
     // aktuellen Nickname uebergeben
-    config->reset_nickname(irc->wantedNick);
+    config->reset_nickname(irc->WantedNick);
     // neuen Nicknamen auslesen
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     frame->add_message("(i) Sie sind jetzt bekannt als "
@@ -203,12 +239,13 @@ connect_thread(void *cp)
 
     // Wer sagt mir, dass der Nick verfuegbar ist???
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
-    irc->wantedNick = config->parsecfgvalue("irc_nickname");
+    irc->WantedNick = config->parsecfgvalue("irc_nickname");
     irc->CurrentChannel = config->parsecfgvalue("irc_channel");
 
     // Ereignisverknüpfung
     // TODO wirklich Ereignisse implementieren
     irc->add_link("PRIVMSG", &irc_pmsg);
+    irc->add_link("NOTICE", &irc_pmsg);
     irc->add_link("376", &irc_endofmotd);
     irc->add_link("332", &irc_topic);
     irc->add_link("TOPIC", &irc_requestedtopic);
@@ -283,7 +320,7 @@ Efirc::OnInit()
 
     // TODO nach irc (class)
     if (WSAStartup(MAKEWORD(1, 1), &wsaData))
-        frame->add_message("(i) Failed to initialise winsock!");
+        frame->add_message("(!) Failed to initialise winsock!");
 
     irc = new IRCInterface(config->parsecfgvalue("irc_port"),
                            config->parsecfgvalue("irc_server"),

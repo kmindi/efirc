@@ -335,6 +335,7 @@ UserInterface::ParseClientCmd(string text)
     string cmd;
     string param;
     string channel;
+    channel = irc->CurrentChannel;
 
     cmd = text.substr(0,text.find(" ",0));
     if(text.find(" ",0) != string::npos)
@@ -344,8 +345,7 @@ UserInterface::ParseClientCmd(string text)
     else
     {
         param = "";
-    }
-    channel = irc->CurrentChannel;
+    }    
 
     if(cmd == "nick")
     {
@@ -354,7 +354,7 @@ UserInterface::ParseClientCmd(string text)
         // damit die nickinuse-Funktion den
         // gewollten nick als aktuellen nickname
         // erhaelt
-        irc->wantedNick = param;
+        irc->WantedNick = param;
     }
 
     if(cmd == "join")
@@ -408,7 +408,11 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "me")
     {
-        // me
+        string me_text;
+        me_text = "\001ACTION " + param + "\001";
+        irc->send_privmsg(channel.c_str(), me_text.c_str());
+        //geht nicht im query/msg
+        add_message("<" + irc->CurrentNick + ">* " + param);
     }
     
     if(cmd == "topic")

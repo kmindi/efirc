@@ -405,7 +405,7 @@ IRCSocket::parse_msg(const char *raw_msg)
 	/* struct containing sender, command and parameters */
 	irc_msg_data *msg_data = new irc_msg_data;
 
-	debug(0, "parse_msg", "Parsing message. (%s)\n",
+	debug(3, "parse_msg", "Parsing message. (%s)\n",
 	   raw_msg);
 
 	/* found user/server command */
