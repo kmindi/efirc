@@ -218,7 +218,6 @@ connect_thread(void *cp)
     irc->add_link("NICK", &irc_changenick);
     irc->add_link("PING", &irc_pong);
     irc->add_link("KICK", &irc_kick);
-    irc->add_link("433", &irc_nickinuse);
     
     //Fehler Antworten
     irc->add_link("401", &irc_error);
@@ -239,7 +238,7 @@ connect_thread(void *cp)
     irc->add_link("424", &irc_error);
     irc->add_link("431", &irc_error);
     irc->add_link("432", &irc_error);
-    irc->add_link("433", &irc_error);
+    irc->add_link("433", &irc_nickinuse);
     irc->add_link("436", &irc_error);
     irc->add_link("441", &irc_error);
     irc->add_link("442", &irc_error);
