@@ -185,7 +185,7 @@ UserInterface::CreateGUIControls()
         WxEdit_input_messages->SetValue("Geben Sie hier ihre Nachricht "
                                         "ein");
         WxButton_submit->SetLabel("Senden");
-        add_message(clientinfotext_deutsch);
+        add_message("(i) " + clientinfotext_deutsch);
     }
 
     if (parsecfgvalue("text_language") == "en")
@@ -194,7 +194,7 @@ UserInterface::CreateGUIControls()
         WxEdit_output_messages->Clear();
         WxEdit_input_messages->SetValue("Put your message here");
         WxButton_submit->SetLabel("Submit");
-        add_message(clientinfotext_englisch);
+        add_message("(i) " + clientinfotext_englisch);
     }
 
     SetTitle(wxT(parsecfgvalue("text_title")
@@ -262,12 +262,14 @@ UserInterface::add_user(string usersinastring)
 void
 UserInterface::delete_user(string user)
 {
-    // TODO angemessenere Loesung, um eventuellen Operator aus
-    //      der Liste zu nehmen
+    // TODO angemessenere Loesung, um eventuellen Operator 
+    // oder Benutzer mit Voice Status aus der Liste zu nehmen
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
                                      user));
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
                                      "@" + user));
+    WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
+                                     "+" + user));
 }
 
 // Aendert einen Nickname und zeigt die Aenderung an
@@ -284,16 +286,26 @@ UserInterface::change_nick(string nickchangeinput)
                                        - 4 - alternick.length());
 
     // !!!UEBERARBEITEN!!!! TODO oh ja :D
-    // Alten Nickname entfernen und neuen an die Liste anhaengen
-    delete_user(alternick);
-    // Operator-Status beachten
+    
+    // Operator- und Voice-Status beachten
     if(WxEdit_channel_users->FindItem(-1, "@" + alternick) > -1)
+    {
         add_user("@" + neuernick);
+    }
+    else if(WxEdit_channel_users->FindItem(-1, "+" + alternick) > -1)
+    {
+    
+        add_user("+" + neuernick);
+    }
     else
+    {
         add_user(neuernick);
+    }
+    // Alten Nickname entfernen
+    delete_user(alternick);
 
     // Nachricht anzeigen das jemand seinen Nickname geaendert hat
-    add_message(alternick + "'s neuer Nickname ist: " + neuernick);
+    add_message("(i) " + alternick +"'s neuer Nickname ist: " + neuernick);
 }
 
 // Zeigt das Thema des Channels an
@@ -301,7 +313,7 @@ void
 UserInterface::set_topic(string topic)
 {
     WxEdit_topic->SetValue("Thema: " + topic);
-    add_message("<i> Thema: " + topic);
+    add_message("(i) Thema: " + topic);
 }
 
 void
@@ -360,7 +372,7 @@ UserInterface::ParseClientCmd(string text)
     {
         irc->send_quit(param.c_str());
 
-        add_message("<i> Du hast das IRC Netzwerk verlassen");
+        add_message("(i) Du hast das IRC Netzwerk verlassen");
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
@@ -411,7 +423,7 @@ UserInterface::ParseClientCmd(string text)
         }
     }
     
-    if(cmd == "query")
+    if(cmd == "query" || cmd == "msg")
     {
         string recipient = param.substr(0,param.find(" ",0));
         string text = param.substr(param.find(" ",0)+1);
@@ -424,24 +436,26 @@ UserInterface::ParseClientCmd(string text)
     {
         if(parsecfgvalue("text_language") == "de")
         {
-            add_message("<i> Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
+            add_message("(i) Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
              "/nick Neuernick - ändert den Nickname zu Neuernick\n"
              "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
              "/leave - verlässt den aktuellen Raum"
              "/quit - verlässt das IRC-Netzwerk\n"
              "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es zu [Thema]\n"
              "/query Name Nachricht - sendet den text Nachricht an Name\n"
+             "/msg Name Nachricht - sendet den text Nachricht an Name\n"
              "/clear - löscht das Ausgabefeld");
         }
         else
         {
-            add_message("<i> Currently the following commands are supported by this client: \n"
+            add_message("(i) Currently the following commands are supported by this client: \n"
              "/nick newnick - changes the nickname to newnick\n"
              "/join #channel - leaves the current channel and joins the channel #channel\n"
              "/leave - leaves the current channel\n"
              "/quit - quits the irc-network\n"
              "/topic [topic] - shows the current topic or sets the topic to [topic]\n"
              "/query nick message - sends the text message to nick\n"
+             "/msg nick message - sends the text message to nick\n"
              "/clear - removes all text from the output window");
         }
     }
