@@ -163,7 +163,7 @@ irc_nickinuse(const irc_msg_data *msg_data, void *cp)
 
     // Nickname erneuern
     // aktuellen Nickname uebergeben
-    config->reset_nickname(irc->CurrentNick);
+    config->reset_nickname(irc->wantedNick);
     // neuen Nicknamen auslesen
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     frame->add_message("(i) Sie sind jetzt bekannt als "
@@ -203,6 +203,7 @@ connect_thread(void *cp)
 
     // Wer sagt mir, dass der Nick verfuegbar ist???
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
+    irc->wantedNick = config->parsecfgvalue("irc_nickname");
     irc->CurrentChannel = config->parsecfgvalue("irc_channel");
 
     // Ereignisverknüpfung

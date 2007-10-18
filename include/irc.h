@@ -10,6 +10,7 @@ class IRCInterface : public IRCSocket
     public:
         string CurrentNick;
         string CurrentChannel;
+        string wantedNick;
 
         IRCInterface(string, string, string, string, string, string);
         ~IRCInterface();

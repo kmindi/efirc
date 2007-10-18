@@ -354,7 +354,7 @@ UserInterface::ParseClientCmd(string text)
         // damit die nickinuse-Funktion den
         // gewollten nick als aktuellen nickname
         // erhaelt
-        irc->CurrentNick = param;
+        irc->wantedNick = param;
     }
 
     if(cmd == "join")
