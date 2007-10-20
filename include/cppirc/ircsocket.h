@@ -130,6 +130,7 @@ class IRCSocket
 		void send_topic(const char *);
 		void send_topic(const char *, const char *);
 		void send_part(const char *);
+		void send_whois(const char *);
 
 	private:
 		int sock;

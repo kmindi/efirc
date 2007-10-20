@@ -144,3 +144,10 @@ IRCSocket::send_part(const char *chan)
 	send_raw("PART %s", chan);
 }
 
+/* WHOIS */
+void
+IRCSocket::send_whois(const char *nick)
+{
+	send_raw("WHOIS %s", nick);
+}
+

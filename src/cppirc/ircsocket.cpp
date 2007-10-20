@@ -434,10 +434,10 @@ IRCSocket::parse_msg(const char *raw_msg)
 		}
 		else
 		{
-			length = strlen("No sender");
+			length = strlen("");
 
 			msg_data->sender = new char[length + 1];
-			strncpy(msg_data->sender, "No sender", length + 1);
+			strncpy(msg_data->sender, "", length + 1);
 
 			debug(1, "parse_msg", "No sender.\n");
 		}
@@ -460,10 +460,10 @@ IRCSocket::parse_msg(const char *raw_msg)
 		}
 		else
 		{
-			length = strlen("No command");
+			length = strlen("");
 
 			msg_data->cmd = new char[length + 1];
-			strncpy(msg_data->cmd, "No command", length + 1);
+			strncpy(msg_data->cmd, "", length + 1);
 
 			debug(1, "parse_msg", "No command.\n");
 		}
@@ -502,10 +502,10 @@ IRCSocket::parse_msg(const char *raw_msg)
 		}
 		else
 		{
-			length = strlen("No nick");
+			length = strlen("");
 
 			msg_data->nick = new char[length + 1];
-			strncpy(msg_data->nick, "No nick", length + 1);
+			strncpy(msg_data->nick, "", length + 1);
 
 			debug(1, "parse_msg", "No nick.\n");
 		}
@@ -528,10 +528,10 @@ IRCSocket::parse_msg(const char *raw_msg)
 		}
 		else
 		{
-			length = strlen("No user");
+			length = strlen("");
 
 			msg_data->user = new char[length + 1];
-			strncpy(msg_data->user, "No user", length + 1);
+			strncpy(msg_data->user, "", length + 1);
 
 			debug(1, "parse_msg", "No user.\n");
 		}
@@ -581,10 +581,10 @@ IRCSocket::parse_msg(const char *raw_msg)
 		}
 		else
 		{
-			length = strlen("No command");
+			length = strlen("");
 
 			msg_data->cmd = new char[length + 1];
-			strncpy(msg_data->cmd, "No command", length + 1);
+			strncpy(msg_data->cmd, "", length + 1);
 
 			debug(1, "parse_msg", "No command.\n");
 		}
@@ -599,15 +599,15 @@ IRCSocket::parse_msg(const char *raw_msg)
 		   " (%s)\n", msg_data->params);
 
 		/* safely :/ */
-		length = strlen("No host.");
+		length = strlen("");
 		msg_data->host = new char[length + 1];
-		strncpy(msg_data->host, "No host", length + 1);
-		length = strlen("No nick.");
+		strncpy(msg_data->host, "", length + 1);
+		length = strlen("");
 		msg_data->nick = new char[length + 1];
-		strncpy(msg_data->nick, "No nick", length + 1);
-		length = strlen("No user.");
+		strncpy(msg_data->nick, "", length + 1);
+		length = strlen("");
 		msg_data->user = new char[length + 1];
-		strncpy(msg_data->user, "No user", length + 1);
+		strncpy(msg_data->user, "", length + 1);
 	}
 
 	/* for params */
