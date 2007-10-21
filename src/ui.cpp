@@ -76,8 +76,7 @@ UserInterface::CreateGUIControls()
     WxEdit_channel_users->InsertColumn(0, wxT("Userlist"),
                                        wxLIST_FORMAT_LEFT, -1);
     WxEdit_topic = new wxTextCtrl(this, ID_WXEDIT_TOPIC,
-                                  wxT("TOPIC: testtopic ["
-                                      "http://www.testtopic.com/]"),
+                                  wxT(""),
                                   wxPoint(4,4), wxSize(434,20),
                                   wxTE_READONLY, wxDefaultValidator,
                                   wxT("WxEdit_topic"));
@@ -161,7 +160,8 @@ UserInterface::CreateGUIControls()
         + "Server: " + parsecfgvalue("irc_server") + "\n"
         + "Raum: " + parsecfgvalue("irc_channel") + "\n"
         + "Du bist bekannt als: " + parsecfgvalue("irc_nickname")
-        + "\n\n";
+        // add_message() macht bereits einen Zeilenumbruch
+        + "\n\n------------------------------------------------\n";
 
     string clientinfotext_englisch = "This is efirc (v. "
         + config->efirc_version_string
@@ -176,30 +176,34 @@ UserInterface::CreateGUIControls()
         + "Server: " + parsecfgvalue("irc_server") + "\n"
         + "Channel: " + parsecfgvalue("irc_channel") + "\n"
         + "You are known as: " + parsecfgvalue("irc_nickname")
-        + "\n\n";
+        + "\n\n------------------------------------------------\n";
+
+    WxEdit_input_messages->SetFocus();
 
     if (parsecfgvalue("text_language") == "de")
     {
-        WxEdit_topic->SetValue("Thema: ");
+        //WxEdit_topic->SetValue("Thema: ");
         WxEdit_output_messages->Clear();
         WxEdit_input_messages->SetValue("Geben Sie hier ihre Nachricht "
                                         "ein");
+        WxEdit_input_messages->SetInsertionPoint(33);
         WxButton_submit->SetLabel("Senden");
         add_message("(i) " + clientinfotext_deutsch);
     }
-
-    if (parsecfgvalue("text_language") == "en")
+    // Englisch als Alternative
+    else
     {
-        WxEdit_topic->SetValue("Topic: ");
+        //WxEdit_topic->SetValue("Topic: ");
         WxEdit_output_messages->Clear();
         WxEdit_input_messages->SetValue("Put your message here");
+        WxEdit_input_messages->SetInsertionPoint(21);
         WxButton_submit->SetLabel("Submit");
         add_message("(i) " + clientinfotext_englisch);
     }
 
     SetTitle(wxT(parsecfgvalue("text_title")
-                               + " - [ "
-                               + parsecfgvalue("irc_channel") + " ]"));
+                 + " - [ "
+                 + parsecfgvalue("irc_channel") + " ]"));
 }
 
 // Fuegt eine Nachricht im Ausgabefeld an und setzt davor einen
@@ -207,17 +211,17 @@ UserInterface::CreateGUIControls()
 void
 UserInterface::add_message(string message)
 {
-    char timestamp[11];
+    char timestamp[12];
     time_t raw_time;
     tm *local_time;
 
     time(&raw_time);
     local_time = localtime(&raw_time);
 
-    strftime(timestamp, 11, "[%H:%M:%S]", local_time);
+    strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
 
     string prefix(timestamp);
-    WxEdit_output_messages->AppendText(prefix + " " + message + "\n");
+    WxEdit_output_messages->AppendText(prefix + message + "\n");
 }
 
 // Fuegt einen Benutzer der Benutzerliste hinzu
@@ -262,7 +266,7 @@ UserInterface::add_user(string usersinastring)
 void
 UserInterface::delete_user(string user)
 {
-    // TODO angemessenere Loesung, um eventuellen Operator 
+    // TODO angemessenere Loesung, um eventuellen Operator
     // oder Benutzer mit Voice Status aus der Liste zu nehmen
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
                                      user));
@@ -286,7 +290,7 @@ UserInterface::change_nick(string nickchangeinput)
                                        - 4 - alternick.length());
 
     // !!!UEBERARBEITEN!!!! TODO oh ja :D
-    
+
     // Operator- und Voice-Status beachten
     if(WxEdit_channel_users->FindItem(-1, "@" + alternick) > -1)
     {
@@ -294,7 +298,7 @@ UserInterface::change_nick(string nickchangeinput)
     }
     else if(WxEdit_channel_users->FindItem(-1, "+" + alternick) > -1)
     {
-    
+
         add_user("+" + neuernick);
     }
     else
@@ -312,7 +316,7 @@ UserInterface::change_nick(string nickchangeinput)
 void
 UserInterface::set_topic(string topic)
 {
-    WxEdit_topic->SetValue("Thema: " + topic);
+    WxEdit_topic->SetValue(topic);
     add_message("(i) Thema: " + topic);
 }
 
@@ -345,7 +349,7 @@ UserInterface::ParseClientCmd(string text)
     else
     {
         param = "";
-    }    
+    }
 
     if(cmd == "nick")
     {
@@ -402,7 +406,7 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "whois")
     {
-        // whois
+        irc->send_whois(param.c_str());
     }
 
 
@@ -414,7 +418,7 @@ UserInterface::ParseClientCmd(string text)
         //geht nicht im query/msg
         add_message("<" + irc->CurrentNick + ">* " + param);
     }
-    
+
     if(cmd == "topic")
     {
         if(param == "")
@@ -426,7 +430,7 @@ UserInterface::ParseClientCmd(string text)
             irc->send_topic(irc->CurrentChannel.c_str(),param.c_str());
         }
     }
-    
+
     if(cmd == "query" || cmd == "msg")
     {
         string recipient = param.substr(0,param.find(" ",0));
@@ -434,7 +438,7 @@ UserInterface::ParseClientCmd(string text)
         add_message("<" + irc->CurrentNick + "> -> [" + recipient + "] " + text);
         irc->send_privmsg(recipient.c_str(), text.c_str());
     }
-    
+
 
     if(cmd == "help" || cmd == "hilfe")
     {
@@ -547,6 +551,14 @@ UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
     }
     else
     {
+        // siehe WxEdit_input_messagesFocus()
+        if(!entered)
+        {
+            WxEdit_input_messages->Clear();
+
+            entered = true;
+        }
+
         // Ereignis weiterleiten
         // und Ende ueberspringen
         event.Skip();

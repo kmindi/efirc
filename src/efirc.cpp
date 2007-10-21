@@ -17,7 +17,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
     //Falls kein CTCP:
     if (text[0] != '\001' and text[text.length()-1] != '\001')
     {
-        if(user != "No nick")
+        if(user != "")
         {
             if(recipient == irc->CurrentNick)
             {
@@ -27,7 +27,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 frame->add_message("<" + user + "> " + text);
             }
-        }    
+        }
         else
         {
             frame->add_message(text);
@@ -40,7 +40,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
         string ctcp = text.substr(1,text.length()-2);
         string ctcp_befehl = ctcp.substr(0,ctcp.find(" ",0));
         string ctcp_text = ctcp.substr(ctcp.find(" ",0)+1);
-        
+
         if(ctcp_befehl == "version" || ctcp_befehl == "VERSION")
         {
             string answer;
@@ -48,7 +48,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 + config->efirc_version_string + ":Windoofs\001";
             irc->send_notice(user.c_str(), answer.c_str());
         }
-        
+
         if(ctcp_befehl == "ACTION")
         {
             if(recipient == irc->CurrentNick)
@@ -63,6 +63,12 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
     }
 }
 
+void
+irc_motd(const irc_msg_data *msg_data, void *cp)
+{
+    frame->add_message(msg_data->params_a[1]);
+}
+
 // Am Ende der Nachricht des Tages automatisch den in
 // der Konfigurationsdatei genannten Kanal betreten
 void
@@ -70,6 +76,7 @@ irc_endofmotd(const irc_msg_data *msg_data, void *cp)
 {
     IRCSocket *ircsocket = (IRCSocket *) cp;
     ircsocket->send_join(config->parsecfgvalue("irc_channel").c_str());
+    frame->add_message("------------------------------------------------");
 }
 
 // Thema des Raums anzeigen lassen
@@ -78,7 +85,6 @@ irc_topic(const irc_msg_data *msg_data, void *cp)
 {
     string topic = msg_data->params_a[2];
     frame->set_topic(topic);
-
 }
 
 void
@@ -95,7 +101,7 @@ irc_userlist(const irc_msg_data *msg_data, void *cp)
     string benutzerliste;
     benutzerliste = msg_data->params_a[3];
     frame->add_user(benutzerliste);
-    
+
     /*
     frame->add_message("(i) Folgende Benutzer sind zur Zeit im Raum: \n"
                        + benutzerliste);
@@ -109,7 +115,6 @@ irc_join(const irc_msg_data *msg_data, void *cp)
 {
     string benutzer;
     benutzer = msg_data->nick;
-    frame->add_message("(i) " + benutzer + " hat den Raum betreten");
 
     if (benutzer == irc->CurrentNick)
     {
@@ -117,11 +122,16 @@ irc_join(const irc_msg_data *msg_data, void *cp)
         frame->SetTitle(wxT(frame->parsecfgvalue("text_title")
                                + " - [ "
                                + irc->CurrentChannel + " ]"));
+        frame->add_message("(i) Sie haben den Raum betreten");
     }
     else
+    {
+        frame->add_message("(i) " + benutzer + " hat den Raum betreten");
+
         // wenn selber, reicht irc_userlist() aus, da
         // neuer Channel und eventuell Operator
         frame->add_user(benutzer);
+    }
 }
 
 // Benutzerliste aktualisieren / Benutzer hat den Raum
@@ -215,6 +225,59 @@ irc_error(const irc_msg_data *msg_data, void *cp)
     frame->add_message("(!) " + text);
 }
 
+//whois antworten
+void
+irc_whoisuser(const irc_msg_data *msg_data, void *cp)
+{
+    string nick = msg_data->params_a[1];
+    string user = msg_data->params_a[2];
+    string host = msg_data->params_a[3];
+    string name = msg_data->params_a[5];
+    frame->add_message("(i) " + nick
+                       + " (" + user + "@" + host + " - " + name + ")");
+}
+
+void
+irc_whoisaway(const irc_msg_data *msg_data, void *cp)
+{
+    string nick = msg_data->params_a[1];
+    string text = msg_data->params_a[2];
+    frame->add_message("(i) " 
+    + nick + " ist gerade nicht verfügbar (" + text + ")");
+}
+
+void
+irc_whoischan(const irc_msg_data *msg_data, void *cp)
+{
+    string nick = msg_data->params_a[1];
+    string chans = msg_data->params_a[2];
+
+    // Rechte noch beachten ([@|+]#channel)
+    frame->add_message("(i) " 
+    + nick + " befindet sich in " + chans);
+}
+
+void
+irc_whoisidle(const irc_msg_data *msg_data, void *cp)
+{
+    string nick = msg_data->params_a[1];
+    string seconds = msg_data->params_a[2];
+
+    frame->add_message("(i) " 
+    + nick + " ist inaktiv seit " + seconds + " Sekunden");
+}
+
+void
+irc_whoisserver(const irc_msg_data *msg_data, void *cp)
+{
+    string nick = msg_data->params_a[1];
+    string server = msg_data->params_a[2];
+    string servernachricht = msg_data->params_a[3];
+
+    frame->add_message("(i) " 
+    + nick + " " + server + " " + servernachricht);
+}
+
 
 // Thread fuer recv_raw-Schleife
 void
@@ -246,6 +309,12 @@ connect_thread(void *cp)
     // TODO wirklich Ereignisse implementieren
     irc->add_link("PRIVMSG", &irc_pmsg);
     irc->add_link("NOTICE", &irc_pmsg);
+    irc->add_link("301", &irc_whoisaway);
+    irc->add_link("311", &irc_whoisuser);
+    irc->add_link("312", &irc_whoisserver);
+    irc->add_link("317", &irc_whoisidle); 
+    irc->add_link("319", &irc_whoischan);
+    irc->add_link("372", &irc_motd);
     irc->add_link("376", &irc_endofmotd);
     irc->add_link("332", &irc_topic);
     irc->add_link("TOPIC", &irc_requestedtopic);
@@ -256,7 +325,7 @@ connect_thread(void *cp)
     irc->add_link("NICK", &irc_changenick);
     irc->add_link("PING", &irc_pong);
     irc->add_link("KICK", &irc_kick);
-    
+
     //Fehler Antworten
     irc->add_link("401", &irc_error);
     irc->add_link("402", &irc_error);
@@ -301,7 +370,7 @@ connect_thread(void *cp)
     irc->add_link("483", &irc_error);
     irc->add_link("491", &irc_error);
     irc->add_link("501", &irc_error);
-    irc->add_link("502", &irc_error);   
+    irc->add_link("502", &irc_error);
 
 
     _beginthread(recv_thread, 0, irc);
