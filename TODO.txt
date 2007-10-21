@@ -2,13 +2,10 @@
 
 !!! Verbindungsabbruch beim Beenden
 
-!   /msg-Befehl muss unterstuetzt werden
-
-!   Benutzerlistenoperationen optimieren:
-        - Voice/Operator-Status beachten (+nick/@nick)
-        - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
-    
 !   Raum Modi anzeigen 
+        - Benutzerlistenoperationen optimieren:
+            - Voice/Operator-Status beachten (+nick/@nick)
+            - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
 
 !   Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...)
     beachten
@@ -37,11 +34,11 @@
 !   Virus_!FEHL!_Alarm mit NOD32 "entfernen"
 
 
-?   VERSION ignorieren und separat behandeln (CTCP)
 ?   Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
 ?   Benutzerliste-buffer ist zu gross (scrollbar)     
 
-
+OK   VERSION ignorieren und separat behandeln (CTCP)
+OK  /msg-Befehl muss unterstuetzt werden
 OK  Thema manuell abrufen bzw setzen mit "/topic [neuesthema]"
 OK  Private nachrichten muessen gehen
 OK  reset_nickname-Funktion soll aktuellen Nickname uebergeben
