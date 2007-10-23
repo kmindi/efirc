@@ -408,6 +408,7 @@ Efirc::OnInit()
 int
 Efirc::OnExit()
 {
+    irc->disconnect_server(config->efirc_version_string.c_str());
     WSACleanup();
 
     return 0;

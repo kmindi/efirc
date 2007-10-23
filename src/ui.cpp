@@ -374,7 +374,7 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "quit")
     {
-        irc->send_quit(param.c_str());
+        irc->disconnect_server(config->efirc_version_string.c_str());
 
         add_message("(i) Du hast das IRC Netzwerk verlassen");
 
