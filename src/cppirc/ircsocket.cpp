@@ -166,35 +166,32 @@ void IRCSocket::call_cmd(void)
 		/* any commands left in queue? */
 		if(cmds > 0)
 		{
-			/*
-			 * if we do NOT care called function
-			 * will call reconnect() every single
-			 * time
-			 */
-			if(!reconnecting)
+			buf = cbp->buf;
+			function = cbp->function;
+
+			/* actual call, preserve return code */
+			status = (this->*function)(buf);
+
+			/* now, after successfull run, remove it from the queue */
+			if(status > -1)
 			{
-				buf = cbp->buf;
-				function = cbp->function;
+				debug(1, "call_cmd", "Called. (%s, %i)\n",
+				   buf, function);
 
-				/* actual call, preserve return code */
-				status = (this->*function)(buf);
-
-				/* now, after successfull run, remove it from the queue */
-				if(status > -1)
+				del_cmd();
+			}
+			/* trying reconnect */
+			else
+			{
+				if(!_DBGRECON)
 				{
-					debug(1, "call_cmd", "Called. (%s, %i)\n",
-					   buf, function);
-
-					del_cmd();
+					debug(3, "recv_raw", "Reconnecting disabled.\n");
+					break;
 				}
-				/* trying reconnect */
-				else
-				{
-					debug(3, "call_cmd", "Requesting "
-					   "reconnect.\n");
 
-					reconnect();
-				}
+				debug(3, "call_cmd", "Requesting reconnect.\n");
+
+				reconnect();
 			}
 		}
 		else

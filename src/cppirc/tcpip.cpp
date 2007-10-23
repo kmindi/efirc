@@ -281,6 +281,12 @@ IRCSocket::recv_raw(void)
 			   " message. (%s)\n", strerror(errno));
 			#endif
 
+			if(!_DBGRECON)
+			{
+				debug(3, "recv_raw", "Reconnecting disabled.\n");
+				break;
+			}
+
 			debug(3, "recv_raw", "Requesting reconnect.\n");
 
 			/* disconnected...reconnect ;) */
@@ -415,6 +421,11 @@ IRCSocket::sock_recv(char *buf)
 void
 IRCSocket::disconnect_server(const char *quit_msg)
 {
+	/* do not reconnect () */
+	_DBGRECON = 0;
+
+	debug(1, "disconnect_server", "Disconnecting.\n");
+
 	/* tell IRC server we're disconnecting */
 	send_quit(quit_msg);
 
@@ -442,11 +453,6 @@ IRCSocket::reconnect(void)
 			reconnecting = 0;
 			return;
 		}
-	}
-	else if(!_DBGRECON)
-	{
-		debug(3, "reconnect", "Reconnecting disabled.\n");
-		return;
 	}
 
 	debug(3, "reconnect", "Trying reconnect. (%i)\n", sleep_time);
