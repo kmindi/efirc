@@ -1,7 +1,5 @@
 !!! Thread-"Problem" loesen
 
-!!! Verbindungsabbruch beim Beenden
-
 !   Raum Modi anzeigen 
         - Benutzerlistenoperationen optimieren:
             - Voice/Operator-Status beachten (+nick/@nick)
@@ -33,7 +31,7 @@
     
 !   Virus_!FEHL!_Alarm mit NOD32 "entfernen"
 
-
+?   Verbindungsabbruch beim Beenden
 ?   Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
 ?   Benutzerliste-buffer ist zu gross (scrollbar)     
 
