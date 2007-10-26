@@ -10,7 +10,8 @@ class ConfigInterface
         ConfigInterface();
         ~ConfigInterface();
 
-        string parsecfgvalue(string);
+        string parsecfgvalue(string, string param1 = "", 
+                             string param2 = "", string param3 = "");
         void reset_nickname(string);
 
         // TODO wrapper (_alle_ public-vars)
@@ -18,6 +19,8 @@ class ConfigInterface
 
     private:
         string configtext;
+        //standardtexte
+        string locals_deutsch,locals_englisch;
 
         void opencfg();
 

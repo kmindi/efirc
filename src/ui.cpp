@@ -309,7 +309,8 @@ UserInterface::change_nick(string nickchangeinput)
     delete_user(alternick);
 
     // Nachricht anzeigen das jemand seinen Nickname geaendert hat
-    add_message("(i) " + alternick +"'s neuer Nickname ist: " + neuernick);
+    add_message("(i) " + parsecfgvalue("local_changenick", alternick, 
+                                    neuernick));
 }
 
 // Zeigt das Thema des Channels an
@@ -317,7 +318,7 @@ void
 UserInterface::set_topic(string topic)
 {
     WxEdit_topic->SetValue(topic);
-    add_message("(i) Thema: " + topic);
+    add_message("(i) " + parsecfgvalue("local_topic", topic));
 }
 
 void
@@ -327,9 +328,10 @@ UserInterface::clear_userlist()
 }
 
 string
-UserInterface::parsecfgvalue(string cfgvalue)
+UserInterface::parsecfgvalue(string searchstring, string param1, 
+                               string param2, string param3)
 {
-    return config->parsecfgvalue(cfgvalue);
+    return config->parsecfgvalue(searchstring, param1, param2, param3);
 }
 
 
@@ -376,7 +378,7 @@ UserInterface::ParseClientCmd(string text)
     {
         irc->disconnect_server(config->efirc_version_string.c_str());
 
-        add_message("(i) Du hast das IRC Netzwerk verlassen");
+        add_message("(i) " + parsecfgvalue("local_quitself"));
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
@@ -401,7 +403,8 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "kick")
     {
-        //kick
+        //irc->send_kick(param);
+        //Todo mit grund/trennungvon grund und nick
     }
 
     if(cmd == "whois")

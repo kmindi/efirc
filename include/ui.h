@@ -37,7 +37,8 @@ class UserInterface : public wxFrame
         void set_topic(string);
         void clear_userlist();
         
-        string parsecfgvalue(string);
+        string parsecfgvalue(string, string param1 = "", 
+                             string param2 = "", string param3 = "");
 
         
         
