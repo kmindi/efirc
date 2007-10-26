@@ -355,12 +355,19 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "nick")
     {
-        irc->send_nick(param.c_str());
-        // Aktuellen Nick manuell veraendern
-        // damit die nickinuse-Funktion den
-        // gewollten nick als aktuellen nickname
-        // erhaelt
-        irc->WantedNick = param;
+        if(param == "")
+        {
+            WxEdit_input_messages->SetValue(irc->CurrentNick);
+        }
+        else
+        {
+            irc->send_nick(param.c_str());
+            // Aktuellen Nick manuell veraendern
+            // damit die nickinuse-Funktion den
+            // gewollten nick als aktuellen nickname
+            // erhaelt
+            irc->WantedNick = param;
+        }
     }
 
     if(cmd == "join")
@@ -448,25 +455,27 @@ UserInterface::ParseClientCmd(string text)
         if(parsecfgvalue("text_language") == "de")
         {
             add_message("(i) Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
-             "/nick Neuernick - ändert den Nickname zu Neuernick\n"
+             "/nick [Neuernick] - ändert den Nickname zu Neuernick oder zeigt den aktuellen Nick an\n"
              "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
              "/leave - verlässt den aktuellen Raum"
              "/quit - verlässt das IRC-Netzwerk\n"
              "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es zu [Thema]\n"
-             "/query Name Nachricht - sendet den text Nachricht an Name\n"
-             "/msg Name Nachricht - sendet den text Nachricht an Name\n"
+             "/[msg/query] Name Nachricht - sendet den text Nachricht an Name\n"
+             "/me macht irgendwas - CTCP Aktion\n"
+             "/whois nick - zeigt Informationen zu Nick an\n"
              "/clear - löscht das Ausgabefeld");
         }
         else
         {
             add_message("(i) Currently the following commands are supported by this client: \n"
-             "/nick newnick - changes the nickname to newnick\n"
+             "/nick [newnick] - changes the nickname to newnick or shows the current nickname\n"
              "/join #channel - leaves the current channel and joins the channel #channel\n"
              "/leave - leaves the current channel\n"
              "/quit - quits the irc-network\n"
              "/topic [topic] - shows the current topic or sets the topic to [topic]\n"
-             "/query nick message - sends the text message to nick\n"
-             "/msg nick message - sends the text message to nick\n"
+             "/[msg/query] nick message - sends the text message to nick\n"
+             "/me is doing something - CTCP Action\n"
+             "/whois nick - displays information about nick\n"
              "/clear - removes all text from the output window");
         }
     }
