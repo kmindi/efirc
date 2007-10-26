@@ -5,11 +5,6 @@
             - Voice/Operator-Status beachten (+nick/@nick)
             - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
 
-!   Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...)
-    beachten:
-        - parsecfgvalue braucht eine sprachvariable in der die deutschen texte 
-        gespeichert sind. 
-        (vllt auch noch eine fuer englisch, dann mit language option)
     
 !   Hinweise (nicht nachrichten) anders markieren und/oder
     andere Schrift / allgemein Uebersichtlichkeit
@@ -38,6 +33,7 @@
 ?   Clientseitige Befehlsabfrage (/nick ... /join ... /quit ...)
 ?   Benutzerliste-buffer ist zu gross (scrollbar)     
 
+OK  Sprachwahl fuer alle Texte (auch Themaleisten-Prefix,...) beachten:
 OK   VERSION ignorieren und separat behandeln (CTCP)
 OK  /msg-Befehl muss unterstuetzt werden
 OK  Thema manuell abrufen bzw setzen mit "/topic [neuesthema]"
