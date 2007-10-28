@@ -119,14 +119,14 @@ irc_join(const irc_msg_data *msg_data, void *cp)
     if (benutzer == irc->CurrentNick)
     {
         irc->CurrentChannel = msg_data->params_a[0];
-        frame->SetTitle(wxT(config->parsecfgvalue("text_title")
+        frame->SetTitle(_U(config->parsecfgvalue("text_title")
                                + " - [ "
                                + irc->CurrentChannel + " ]"));
         frame->add_message("(i) " + config->parsecfgvalue("local_joinself"));
     }
     else
     {
-        frame->add_message("(i) " + config->parsecfgvalue("local_join", 
+        frame->add_message("(i) " + config->parsecfgvalue("local_join",
                                         benutzer));
 
         // wenn selber, reicht irc_userlist() aus, da
@@ -191,12 +191,12 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
 
         frame->clear_userlist();
         frame->set_topic("");
-        frame->SetTitle(wxT(config->parsecfgvalue("text_title")));
+        frame->SetTitle(_U(config->parsecfgvalue("text_title")));
     }
     else
     {
         frame->delete_user(benutzer);
-        frame->add_message("(i) " + config->parsecfgvalue("local_kick", 
+        frame->add_message("(i) " + config->parsecfgvalue("local_kick",
                                             benutzer, sender));
     }
 }
@@ -269,13 +269,16 @@ irc_whoisserver(const irc_msg_data *msg_data, void *cp)
     string server = msg_data->params_a[2];
     string servernachricht = msg_data->params_a[3];
 
-    frame->add_message("(i) " 
+    frame->add_message("(i) "
     + nick + " " + server + " " + servernachricht);
 }
 
-
 // Thread fuer recv_raw-Schleife
+#ifdef WINDOWS
 void
+#else
+void *
+#endif
 recv_thread(void *cp)
 {
     IRCSocket *ircsocket = (IRCSocket *)cp;
@@ -283,16 +286,29 @@ recv_thread(void *cp)
 }
 
 // Abarbeitung der Befehlsschlange
+#ifdef WINDOWS
 void
+#else
+void *
+#endif
 call_thread(void *cp)
 {
     IRCSocket *ircsocket = (IRCSocket *)cp;
     ircsocket->call_cmd();
 }
 
+#ifdef WINDOWS
 void
+#else
+void *
+#endif
 connect_thread(void *cp)
 {
+    // not used
+    #ifndef WINDOWS
+    pthread_t rt, ct;
+    #endif
+
     irc->connect();
 
     // Wer sagt mir, dass der Nick verfuegbar ist???
@@ -307,7 +323,7 @@ connect_thread(void *cp)
     irc->add_link("301", &irc_whoisaway);
     irc->add_link("311", &irc_whoisuser);
     irc->add_link("312", &irc_whoisserver);
-    irc->add_link("317", &irc_whoisidle); 
+    irc->add_link("317", &irc_whoisidle);
     irc->add_link("319", &irc_whoischan);
     irc->add_link("372", &irc_motd);
     irc->add_link("376", &irc_endofmotd);
@@ -367,24 +383,35 @@ connect_thread(void *cp)
     irc->add_link("501", &irc_error);
     irc->add_link("502", &irc_error);
 
-
+    #ifdef WINDOWS
     _beginthread(recv_thread, 0, irc);
     _beginthread(call_thread, 0, irc);
+    #else
+    pthread_create(&rt, NULL, &recv_thread, irc);
+    pthread_create(&ct, NULL, &call_thread, irc);
+    #endif
 }
 
 bool
 Efirc::OnInit()
 {
+    // not used
+    #ifdef WINDOWS
+    WSADATA wsaData;
+    #else
+    pthread_t ct;
+    #endif
+
     frame = new UserInterface(NULL);
     frame->Show();
 
     config = new ConfigInterface();
 
-    WSADATA wsaData;
-
     // TODO nach irc (class)
+    #ifdef WINDOWS
     if (WSAStartup(MAKEWORD(1, 1), &wsaData))
         frame->add_message("(!) Failed to initialise winsock!");
+    #endif
 
     irc = new IRCInterface(config->parsecfgvalue("irc_port"),
                            config->parsecfgvalue("irc_server"),
@@ -393,7 +420,11 @@ Efirc::OnInit()
                            config->parsecfgvalue("irc_realname"),
                            "pass");
 
+    #ifdef WINDOWS
     _beginthread(connect_thread, 0, NULL);
+    #else
+    pthread_create(&ct, NULL, &connect_thread, NULL);
+    #endif
 
     frame->irc = irc;
 
@@ -404,7 +435,10 @@ int
 Efirc::OnExit()
 {
     irc->disconnect_server(config->efirc_version_string.c_str());
+
+    #ifdef WINDOWS
     WSACleanup();
+    #endif
 
     return 0;
 }

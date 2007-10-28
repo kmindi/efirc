@@ -1,6 +1,10 @@
 #ifndef __Efirc_Header__
 #define __Efirc_Header__
+#ifdef WINDOWS
 #include <process.h>
+#else
+#include <pthread.h>
+#endif
 #include <ui.h>
 #include <conf.h>
 #include <irc.h>

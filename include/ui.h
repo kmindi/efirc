@@ -36,12 +36,12 @@ class UserInterface : public wxFrame
         void delete_user(string);
         void set_topic(string);
         void clear_userlist();
-        
-        string parsecfgvalue(string, string param1 = "", 
+
+        string parsecfgvalue(string, string param1 = "",
                              string param2 = "", string param3 = "");
 
-        
-        
+
+
     private:
         ConfigInterface *config;
 
@@ -57,8 +57,8 @@ class UserInterface : public wxFrame
         // Die History wird durch ein Array repraesentiert
         // und ist begrenzt in den moeglichen Eintraegen
         string history[HISTORY_SIZE];
-        
-        
+
+
         // grafische Objekte auf dem Frame
         wxListCtrl *WxEdit_channel_users;
         wxButton   *WxButton_submit;
@@ -78,12 +78,14 @@ class UserInterface : public wxFrame
 
         DECLARE_EVENT_TABLE();
 
-        
+
 
         // wrapper
         void ParseClientCmd(string);
 
         void CreateGUIControls();
+
+        void messageSubmit();
 
         void WxButton_submitClick(wxCommandEvent& event);
         void WxEdit_input_messagesKeyDown(wxKeyEvent& event);
@@ -91,4 +93,10 @@ class UserInterface : public wxFrame
 
         void OnClose(wxCloseEvent& event);
 };
+
+// convert a c++-string to wxString type
+inline wxString _U(string cppstring = "")
+{
+    return wxString(cppstring.c_str(), wxConvLocal);
+}
 #endif

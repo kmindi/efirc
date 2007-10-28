@@ -13,11 +13,7 @@ using namespace std;
 // Eventzuweisung
 BEGIN_EVENT_TABLE(UserInterface, wxFrame)
     EVT_CLOSE      (UserInterface::OnClose)
-    EVT_TEXT_ENTER (ID_WXEDIT_TOPIC,
-                    UserInterface::WxButton_submitClick)
     EVT_BUTTON     (ID_WXBUTTON_SUBMIT,
-                    UserInterface::WxButton_submitClick)
-    EVT_TEXT_ENTER (ID_WXEDIT_INPUT_MESSAGES,
                     UserInterface::WxButton_submitClick)
 END_EVENT_TABLE()
 
@@ -59,7 +55,7 @@ UserInterface::UserInterface(wxWindow *parent, wxWindowID id,
 void
 UserInterface::CreateGUIControls()
 {
-    SetTitle(wxT(config->efirc_version_string));
+    SetTitle(_U(config->efirc_version_string));
     // TODO wie macht man das jetzt so...hmmmmmm? :D
     SetIcon(wxIcon(icon));
     SetSize(8, 8, 566, 341);
@@ -73,77 +69,77 @@ UserInterface::CreateGUIControls()
                                           wxHSCROLL | wxLC_REPORT |
                                              wxLC_ALIGN_LEFT |
                                              wxLC_NO_HEADER);
-    WxEdit_channel_users->InsertColumn(0, wxT("Userlist"),
+    WxEdit_channel_users->InsertColumn(0, _U("Userlist"),
                                        wxLIST_FORMAT_LEFT, -1);
     WxEdit_topic = new wxTextCtrl(this, ID_WXEDIT_TOPIC,
-                                  wxT(""),
+                                  _U(""),
                                   wxPoint(4,4), wxSize(434,20),
                                   wxTE_READONLY, wxDefaultValidator,
-                                  wxT("WxEdit_topic"));
+                                  _U("WxEdit_topic"));
     WxEdit_input_messages = new wxTextCtrl(this,
                                            ID_WXEDIT_INPUT_MESSAGES,
-                                           wxT("Type your Message and"
+                                           _U("Type your Message and"
                                                "press ENTER"),
                                            wxPoint(4,289),
                                            wxSize(434,20), 0,
                                            wxDefaultValidator,
-                                           wxT("WxEdit_input"
+                                           _U("WxEdit_input"
                                                "_messages"));
 
     WxButton_submit = new wxButton(this, ID_WXBUTTON_SUBMIT,
-                                   wxT("Submit"), wxPoint(442,289),
+                                   _U("Submit"), wxPoint(442,289),
                                    wxSize(111,21), 0,
                                    wxDefaultValidator,
-                                   wxT("WxButton_submit"));
+                                   _U("WxButton_submit"));
 
     WxEdit_output_messages = new wxTextCtrl(this,
                                             ID_WXEDIT_OUTPUT_MESSAGES,
-                                            wxT("Output"),
+                                            _U("Output"),
                                             wxPoint(4,26),
                                             wxSize(434,259),
                                             wxTE_READONLY |
                                                wxTE_MULTILINE,
                                             wxDefaultValidator,
-                                            wxT("WxEdit_output"
+                                            _U("WxEdit_output"
                                                 "messages"));
 
-    SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_background")));
-    WxEdit_topic->SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_topic_background")));
-    WxEdit_topic->SetForegroundColour(wxColour(parsecfgvalue(
-       "colour_topic_foreground")));
-    WxEdit_output_messages->SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_output_messages_background")));
-    WxEdit_output_messages->SetForegroundColour(wxColour(parsecfgvalue(
-       "colour_output_messages_foreground")));
-    WxEdit_input_messages->SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_input_messages_background")));
-    WxEdit_input_messages->SetForegroundColour(wxColour(parsecfgvalue(
-       "colour_input_messages_foreground")));
-    WxEdit_channel_users->SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_channel_users_background")));
-    WxEdit_channel_users->SetForegroundColour(wxColour(parsecfgvalue(
-       "colour_channel_users_foreground")));
-    WxButton_submit->SetBackgroundColour(wxColour(parsecfgvalue(
-       "colour_button_background")));
-    WxButton_submit->SetForegroundColour(wxColour(parsecfgvalue(
-       "colour_button_foreground")));
+    SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_background"))));
+    WxEdit_topic->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_topic_background"))));
+    WxEdit_topic->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_topic_foreground"))));
+    WxEdit_output_messages->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_output_messages_background"))));
+    WxEdit_output_messages->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_output_messages_foreground"))));
+    WxEdit_input_messages->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_input_messages_background"))));
+    WxEdit_input_messages->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_input_messages_foreground"))));
+    WxEdit_channel_users->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_channel_users_background"))));
+    WxEdit_channel_users->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_channel_users_foreground"))));
+    WxButton_submit->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_button_background"))));
+    WxButton_submit->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_button_foreground"))));
 
     WxEdit_topic->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL, FALSE,
-                                 wxT(
+                                 _U(
        parsecfgvalue("font_topic"))));
     WxEdit_output_messages->SetFont(wxFont(8, wxSWISS, wxNORMAL,
-                                    wxNORMAL, FALSE, wxT(
+                                    wxNORMAL, FALSE, _U(
        parsecfgvalue("font_output_messages"))));
     WxEdit_input_messages->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL,
-                                   FALSE, wxT(
+                                   FALSE, _U(
        parsecfgvalue("font_inputmessages"))));
     WxEdit_channel_users->SetFont(wxFont(8, wxSWISS, wxNORMAL, wxNORMAL,
-                                        FALSE, wxT(
+                                        FALSE, _U(
        parsecfgvalue("font_channel_users"))));
     WxButton_submit->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL,
-                                    FALSE, wxT(
+                                    FALSE, _U(
        parsecfgvalue("font_button"))));
 
     string clientinfotext_deutsch = "Das hier ist efirc (v. "
@@ -184,10 +180,10 @@ UserInterface::CreateGUIControls()
     {
         //WxEdit_topic->SetValue("Thema: ");
         WxEdit_output_messages->Clear();
-        WxEdit_input_messages->SetValue("Geben Sie hier ihre Nachricht "
-                                        "ein");
+        WxEdit_input_messages->SetValue(_U("Geben Sie hier ihre Nachricht "
+                                        "ein"));
         WxEdit_input_messages->SetInsertionPoint(33);
-        WxButton_submit->SetLabel("Senden");
+        WxButton_submit->SetLabel(_U("Senden"));
         add_message("(i) " + clientinfotext_deutsch);
     }
     // Englisch als Alternative
@@ -195,13 +191,13 @@ UserInterface::CreateGUIControls()
     {
         //WxEdit_topic->SetValue("Topic: ");
         WxEdit_output_messages->Clear();
-        WxEdit_input_messages->SetValue("Put your message here");
+        WxEdit_input_messages->SetValue(_U("Put your message here"));
         WxEdit_input_messages->SetInsertionPoint(21);
-        WxButton_submit->SetLabel("Submit");
+        WxButton_submit->SetLabel(_U("Submit"));
         add_message("(i) " + clientinfotext_englisch);
     }
 
-    SetTitle(wxT(parsecfgvalue("text_title")
+    SetTitle(_U(parsecfgvalue("text_title")
                  + " - [ "
                  + parsecfgvalue("irc_channel") + " ]"));
 }
@@ -221,7 +217,7 @@ UserInterface::add_message(string message)
     strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
 
     string prefix(timestamp);
-    WxEdit_output_messages->AppendText(prefix + message + "\n");
+    WxEdit_output_messages->AppendText(_U(prefix + message + "\n"));
 }
 
 // Fuegt einen Benutzer der Benutzerliste hinzu
@@ -243,15 +239,15 @@ UserInterface::add_user(string usersinastring)
     // Zeichenkette in user schreiben
     while (ss >> user)
         // noch nicht in der Liste?
-        if(WxEdit_channel_users->FindItem(-1, user) == -1)
+        if(WxEdit_channel_users->FindItem(-1, _U(user)) == -1)
         {
             // Am Ende hinzufuegen
             item = WxEdit_channel_users->InsertItem(
-               WxEdit_channel_users->GetItemCount() + 1, user);
+               WxEdit_channel_users->GetItemCount() + 1, _U(user));
 
             // UserData ist ein Pointer auf
             // den Bezeichner
-            itemData = new string(WxEdit_channel_users->GetItemText(item));
+            itemData = new string(WxEdit_channel_users->GetItemText(item).mb_str(wxConvLocal));
 
             // die Speicheradresse des
             // Bezeichners
@@ -269,11 +265,11 @@ UserInterface::delete_user(string user)
     // TODO angemessenere Loesung, um eventuellen Operator
     // oder Benutzer mit Voice Status aus der Liste zu nehmen
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
-                                     user));
+                                     _U(user)));
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
-                                     "@" + user));
+                                     _U("@" + user)));
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
-                                     "+" + user));
+                                     _U("+" + user)));
 }
 
 // Aendert einen Nickname und zeigt die Aenderung an
@@ -292,11 +288,11 @@ UserInterface::change_nick(string nickchangeinput)
     // !!!UEBERARBEITEN!!!! TODO oh ja :D
 
     // Operator- und Voice-Status beachten
-    if(WxEdit_channel_users->FindItem(-1, "@" + alternick) > -1)
+    if(WxEdit_channel_users->FindItem(-1, _U("@" + alternick)) > -1)
     {
         add_user("@" + neuernick);
     }
-    else if(WxEdit_channel_users->FindItem(-1, "+" + alternick) > -1)
+    else if(WxEdit_channel_users->FindItem(-1, _U("+" + alternick)) > -1)
     {
 
         add_user("+" + neuernick);
@@ -309,7 +305,7 @@ UserInterface::change_nick(string nickchangeinput)
     delete_user(alternick);
 
     // Nachricht anzeigen das jemand seinen Nickname geaendert hat
-    add_message("(i) " + parsecfgvalue("local_changenick", alternick, 
+    add_message("(i) " + parsecfgvalue("local_changenick", alternick,
                                     neuernick));
 }
 
@@ -317,7 +313,7 @@ UserInterface::change_nick(string nickchangeinput)
 void
 UserInterface::set_topic(string topic)
 {
-    WxEdit_topic->SetValue(topic);
+    WxEdit_topic->SetValue(_U(topic));
     add_message("(i) " + parsecfgvalue("local_topic", topic));
 }
 
@@ -328,7 +324,7 @@ UserInterface::clear_userlist()
 }
 
 string
-UserInterface::parsecfgvalue(string searchstring, string param1, 
+UserInterface::parsecfgvalue(string searchstring, string param1,
                                string param2, string param3)
 {
     return config->parsecfgvalue(searchstring, param1, param2, param3);
@@ -357,7 +353,7 @@ UserInterface::ParseClientCmd(string text)
     {
         if(param == "")
         {
-            WxEdit_input_messages->SetValue(irc->CurrentNick);
+            WxEdit_input_messages->SetValue(_U(irc->CurrentNick));
         }
         else
         {
@@ -389,7 +385,7 @@ UserInterface::ParseClientCmd(string text)
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
-        SetTitle(wxT(parsecfgvalue("text_title")));
+        SetTitle(_U(parsecfgvalue("text_title")));
     }
 
     if(cmd == "leave" || cmd == "part")
@@ -400,7 +396,7 @@ UserInterface::ParseClientCmd(string text)
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
-        SetTitle(wxT(parsecfgvalue("text_title")));
+        SetTitle(_U(parsecfgvalue("text_title")));
     }
 
     if(cmd == "clear")
@@ -485,13 +481,19 @@ UserInterface::ParseClientCmd(string text)
 void
 UserInterface::WxButton_submitClick(wxCommandEvent& event)
 {
+    messageSubmit();
+}
+
+void
+UserInterface::messageSubmit()
+{
     string text;
     string nick;
     string channel;
 
     nick = irc->CurrentNick;
     channel = irc->CurrentChannel;
-    text = WxEdit_input_messages->GetValue();
+    text = WxEdit_input_messages->GetValue().mb_str(wxConvLocal);
 
     if(text != "" && entered)
     {
@@ -527,6 +529,8 @@ UserInterface::WxButton_submitClick(wxCommandEvent& event)
         history[1] = text;
         hindex = 0;
     }
+
+    WxEdit_input_messages->SetFocus();
 }
 
 // TODO name change
@@ -561,6 +565,8 @@ UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
         if (hindex < 0)
             hindex = 0;
     }
+    else if (myPressedKey == WXK_RETURN)
+        messageSubmit();
     else
     {
         // siehe WxEdit_input_messagesFocus()
@@ -584,7 +590,7 @@ UserInterface::WxEdit_input_messagesKeyDown(wxKeyEvent& event)
 
     // History-Eintrag ins Eingabefeld kopieren
     WxEdit_input_messages->Clear();
-    WxEdit_input_messages->WriteText(myCommand);
+    WxEdit_input_messages->WriteText(_U(myCommand));
 }
 
 // Bei Fokuserhalt Standardtext loeschen

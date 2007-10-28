@@ -10,6 +10,7 @@ rem make wird fuer das aktuelle Makefile
 rem aufgerufen
 echo.
 echo calling make
+set WINDOWS=1
 mingw32-make all
 
 rem ERRORLEVEL abfragen und ggf.
