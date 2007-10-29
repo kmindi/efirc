@@ -453,6 +453,20 @@ UserInterface::ParseClientCmd(string text)
         text = "\001" + text + "\001";
         irc->send_privmsg(recipient.c_str(), text.c_str());
     }
+    
+    if(cmd == "away")
+    {
+        if(param == "")
+        {
+            irc->send_away();
+            add_message("(i) " + parsecfgvalue("local_unaway"));
+        }
+        else
+        {
+            irc->send_away(param.c_str());
+            add_message("(i) " + parsecfgvalue("local_away",param));
+        }
+    }
 
 
     if(cmd == "help" || cmd == "hilfe")

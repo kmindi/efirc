@@ -23,7 +23,9 @@ ConfigInterface::ConfigInterface()
         "local_whoischan = %param1 befindet sich in %param2;\n"
         "local_whoisidle = %param1 ist inaktiv seit %param2 Sekunden;\n"
         "local_topic = Thema: %param1;\n"
-        "local_quitself = Du hast das IRC Netzwerk verlassen;\n";
+        "local_quitself = Du hast das IRC Netzwerk verlassen;\n"
+        "local_unaway = Du bist jetzt nicht mehr als wvp markiert;\n"
+        "local_away = Du bist jetzt als nicht verfügbar (%param1) markiert";
     
     locals_englisch = 
         "local_changenick = %param1's new nick is %param2;\n"
@@ -39,7 +41,9 @@ ConfigInterface::ConfigInterface()
         "local_whoischan = %param1 is on %param2;\n"
         "local_whoisidle = %param1 is inactive since %param2 Sekunden;\n"
         "local_topic = Topic: %param1;\n"
-        "local_quitself = You left the IRC-Network;\n";
+        "local_quitself = You left the IRC-Network;\n"
+        "local_unaway = Removed your away status;\n"
+        "local_away = You are marked as away (%param1)";
     
     if(parsecfgvalue("text_language")== "de")
     {
