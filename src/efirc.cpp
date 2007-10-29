@@ -56,6 +56,94 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] VERSION " + ctcp_text);
             }
         }
+        
+        if(ctcp_befehl == "FINGER")
+        {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] FINGER");
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] FINGER " + ctcp_text);
+            }
+        }
+        
+        if(ctcp_befehl == "SOURCE")
+        {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] SOURCE");
+            string answer = "\001SOURCE http://efirc.sf.net/\001";
+            irc->send_notice(user.c_str(), answer.c_str());
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] SOURCE " + ctcp_text);
+            }
+        }
+        
+        if(ctcp_befehl == "USERINFO")
+        {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] USERINFO");
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] USERINFO " + ctcp_text);
+            }
+        }
+        
+        if(ctcp_befehl == "CLIENTINFO")
+        {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] CLIENTINFO");
+            string answer = "\001CLIENTINFO VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME\001";
+            irc->send_notice(user.c_str(), answer.c_str());
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] CLIENTINFO " + ctcp_text);
+            }
+        }
+         
+        // TODO
+        // ping format immer mit timestamp
+        // unterschied ist nur privmsg zum anfordern und notice als antwort
+        if(ctcp_befehl == "PING")
+        {
+                frame->add_message("[" + user +"] [CTCP] PING " + ctcp_text);
+        }
+        
+        
+        if(ctcp_befehl == "TIME")
+        {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] TIME");
+            
+            char timestamp[30];
+            time_t raw_time;
+            tm *local_time;
+
+            time(&raw_time);
+            local_time = localtime(&raw_time);
+
+            strftime(timestamp, 30, "%d.%m.%Y %H:%M:%S", local_time);
+
+            string timestring(timestamp);
+            
+            
+            string answer = "\001TIME "+ timestring + "\001";
+            irc->send_notice(user.c_str(), answer.c_str());
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] TIME " + ctcp_text);
+            }
+        }
 
         if(ctcp_befehl == "ACTION")
         {
