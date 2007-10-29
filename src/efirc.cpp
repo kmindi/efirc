@@ -160,6 +160,17 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
 }
 
 void
+irc_mode(const irc_msg_data *msg_data, void *cp)
+{
+    // :services. MODE kmindi :+e
+    string text = msg_data->params_a[1];
+    string text2 = msg_data->params_a[2];
+    string recipient = msg_data->params_a[0];
+    string sender = msg_data->sender;
+    frame->add_message(sender + " MODE " + recipient + " " + text);
+}
+
+void
 irc_motd(const irc_msg_data *msg_data, void *cp)
 {
     frame->add_message(msg_data->params_a[1]);
@@ -416,6 +427,7 @@ connect_thread(void *cp)
     // TODO wirklich Ereignisse implementieren
     irc->add_link("PRIVMSG", &irc_pmsg);
     irc->add_link("NOTICE", &irc_pmsg);
+    irc->add_link("MODE", &irc_mode);
     irc->add_link("301", &irc_whoisaway);
     irc->add_link("311", &irc_whoisuser);
     irc->add_link("312", &irc_whoisserver);
