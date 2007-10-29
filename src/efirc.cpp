@@ -41,12 +41,20 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
         string ctcp_befehl = ctcp.substr(0,ctcp.find(" ",0));
         string ctcp_text = ctcp.substr(ctcp.find(" ",0)+1);
 
-        if(ctcp_befehl == "version" || ctcp_befehl == "VERSION")
+        if(ctcp_befehl == "VERSION")
         {
+            if(ctcp_text == ctcp || ctcp_text == "")
+            {
+            frame->add_message("[" + user +"] [CTCP] VERSION");
             string answer;
             answer = "\001VERSION efirc:"
                 + config->efirc_version_string + ":Windoofs\001";
             irc->send_notice(user.c_str(), answer.c_str());
+            }
+            else
+            {
+                frame->add_message("[" + user +"] [CTCP] VERSION " + ctcp_text);
+            }
         }
 
         if(ctcp_befehl == "ACTION")

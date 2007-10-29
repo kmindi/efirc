@@ -444,6 +444,15 @@ UserInterface::ParseClientCmd(string text)
         add_message("<" + irc->CurrentNick + "> -> [" + recipient + "] " + text);
         irc->send_privmsg(recipient.c_str(), text.c_str());
     }
+    
+    if(cmd == "ctcp")
+    {
+        string recipient = param.substr(0,param.find(" ",0));
+        string text = param.substr(param.find(" ",0)+1);
+        add_message("[CTCP] -> [" + recipient + "] " + text);
+        text = "\001" + text + "\001";
+        irc->send_privmsg(recipient.c_str(), text.c_str());
+    }
 
 
     if(cmd == "help" || cmd == "hilfe")
@@ -459,6 +468,7 @@ UserInterface::ParseClientCmd(string text)
              "/[msg/query] Name Nachricht - sendet den text Nachricht an Name\n"
              "/me macht irgendwas - CTCP Aktion\n"
              "/whois nick - zeigt Informationen zu Nick an\n"
+             "/ctcp nick Befehl - sendet CTCP Befehl an Nick\n"
              "/clear - löscht das Ausgabefeld");
         }
         else
@@ -472,6 +482,7 @@ UserInterface::ParseClientCmd(string text)
              "/[msg/query] nick message - sends the text message to nick\n"
              "/me is doing something - CTCP Action\n"
              "/whois nick - displays information about nick\n"
+             "/ctcp nick cmd - sends ctcp command cmd to nick\n"
              "/clear - removes all text from the output window");
         }
     }
