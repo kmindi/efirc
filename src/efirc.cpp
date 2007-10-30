@@ -163,11 +163,14 @@ void
 irc_mode(const irc_msg_data *msg_data, void *cp)
 {
     // :services. MODE kmindi :+e
-    string text = msg_data->params_a[1];
-    string text2 = msg_data->params_a[2];
-    string recipient = msg_data->params_a[0];
+
     string sender = msg_data->sender;
-    frame->add_message(sender + " MODE " + recipient + " " + text);
+    frame->add_message("MODE...");
+    //frame->add_message(
+    //sender + " MODE " + msg_data->params_a[1] + " " + 
+    //msg_data->params_a[2] + " " +
+    //msg_data->params_a[3]
+    //);
 }
 
 void
