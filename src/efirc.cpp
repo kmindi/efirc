@@ -162,15 +162,29 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
 void
 irc_mode(const irc_msg_data *msg_data, void *cp)
 {
-    // :services. MODE kmindi :+e
+    int i;
+    string Prefix = msg_data->nick;;
+    string Parameters = "";
+    string Channel = "";
 
-    string sender = msg_data->sender;
-    frame->add_message("MODE...");
-    //frame->add_message(
-    //sender + " MODE " + msg_data->params_a[1] + " " + 
-    //msg_data->params_a[2] + " " +
-    //msg_data->params_a[3]
-    //);
+    if(Prefix == "")
+    {
+         Prefix = "Server";
+    }
+
+    for(i = 0; i < msg_data->params_i; i++)
+    {
+        if(msg_data->params_a[i][0] != '#')
+        {
+            Parameters += " " + string(msg_data->params_a[i]);
+        }
+        else
+        {
+            Channel = " (" + string(msg_data->params_a[i]) + ")";
+        }
+    }
+
+    frame->add_message(config->parsecfgvalue("local_mode",Prefix,Parameters,Channel));
 }
 
 void
