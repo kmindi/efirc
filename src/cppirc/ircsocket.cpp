@@ -387,13 +387,11 @@ IRCSocket::parse(const char *raw_msg)
 void
 IRCSocket::parse_msg(const char *raw_msg)
 {
-	int i, params, length, text, p_length;
+	int i, length, text, p_length;
 	/* se substring */
 	char *sstr;
 	char *wstr;
 
-	/* number of parameters (excluding `\s:.*$') */
-	params = 0;
 	/* length of resulting parameters join */
 	p_length = 0;
 	/* specifies wheter a string is found in parameters-list */
@@ -607,6 +605,8 @@ IRCSocket::parse_msg(const char *raw_msg)
 		strncpy(msg_data->user, "", length + 1);
 	}
 
+	/* number of params */
+	msg_data->params_i = 0;
 	/* for params */
 	wstr = msg_data->params;
 
@@ -620,28 +620,28 @@ IRCSocket::parse_msg(const char *raw_msg)
 		if(*wstr == ':')
 		{
 			/* for string set text-bit and stop here */
-			params++;
+			msg_data->params_i++;
 			text = 1;
 			break;
 		}
 		else if((sstr = strstr(wstr, " ")) != NULL)
 		{
-			params++;
+			msg_data->params_i++;
 			wstr = sstr + 1;
 		}
 		/* only one paramter */
-		else if(params == 0)
-			params++;
+		else if(msg_data->params_i == 0)
+			msg_data->params_i++;
 	} while(sstr != NULL);
 
 	/* allocate memory for array with index fields */
-	msg_data->params_a = new char *[params];
+	msg_data->params_a = new char *[msg_data->params_i];
 
 	/* jump back */
 	wstr = msg_data->params;
 
 	/* fill in array */
-	for(i = 0; i < params; i++)
+	for(i = 0; i < msg_data->params_i; i++)
 	{
 		/* no string */
 		if(*wstr != ':')
@@ -668,7 +668,7 @@ IRCSocket::parse_msg(const char *raw_msg)
 	delete msg_data->params;
 
 	/* get full length including separators */
-	for(i = 0; i < params; i++)
+	for(i = 0; i < msg_data->params_i; i++)
 		p_length += strlen(msg_data->params_a[i]) + 1;
 
 	/* allocate and clear (?) */
@@ -676,13 +676,13 @@ IRCSocket::parse_msg(const char *raw_msg)
 	memset(msg_data->params, '\0', p_length + 1);
 
 	/* join parameters */
-	for(i = 0; i < params; i++)
+	for(i = 0; i < msg_data->params_i; i++)
 	{
 		/*
 		 * if last parameter is a string
 		 * prefix it with a ':'
 		 */
-		if(text && i == params - 1)
+		if(text && i == msg_data->params_i - 1)
 			strncat(msg_data->params, ":", 1);
 
 		strncat(msg_data->params, msg_data->params_a[i],
@@ -692,7 +692,7 @@ IRCSocket::parse_msg(const char *raw_msg)
 		 * if not last parameter cat space
 		 * as seperator
 		 */
-		if(i != params - 1)
+		if(i != msg_data->params_i - 1)
 			strncat(msg_data->params, " ", 1);
 	}
 
@@ -703,7 +703,7 @@ IRCSocket::parse_msg(const char *raw_msg)
 	delete msg_data->sender;
 	delete msg_data->cmd;
 	delete msg_data->params;
-	for(i = 0; i < params; i++)
+	for(i = 0; i < msg_data->params_i; i++)
 		delete msg_data->params_a[i];
 	delete[] msg_data->params_a;
 	delete msg_data->host;

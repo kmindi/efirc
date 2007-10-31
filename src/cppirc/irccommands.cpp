@@ -155,16 +155,12 @@ IRCSocket::send_whois(const char *nick)
 void
 IRCSocket::send_away(void)
 {
-	/* unmark as away */
 	send_raw("AWAY");
 }
 
 void
-IRCSocket::send_away( const char *text)
+IRCSocket::send_away(const char *msg)
 {
-	/* mark as away with awaymessage */
-	send_raw("AWAY %s", text);
+	send_raw("AWAY :%s", msg);
 }
-
-
 

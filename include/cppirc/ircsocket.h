@@ -45,6 +45,7 @@ irc_msg_data
 	char *nick;
 	char *user;
 	char **params_a;
+	unsigned int params_i;
 };
 
 /*
@@ -131,7 +132,7 @@ class IRCSocket
 		void send_topic(const char *, const char *);
 		void send_part(const char *);
 		void send_whois(const char *);
-        void send_away(void);
+		void send_away(void);
 		void send_away(const char *);
 
 	private:
@@ -158,5 +159,4 @@ class IRCSocket
 };
 
 #endif
-
 
