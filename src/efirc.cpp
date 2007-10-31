@@ -56,7 +56,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] VERSION " + ctcp_text);
             }
         }
-        
+
         if(ctcp_befehl == "FINGER")
         {
             if(ctcp_text == ctcp || ctcp_text == "")
@@ -68,7 +68,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] FINGER " + ctcp_text);
             }
         }
-        
+
         if(ctcp_befehl == "SOURCE")
         {
             if(ctcp_text == ctcp || ctcp_text == "")
@@ -82,7 +82,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] SOURCE " + ctcp_text);
             }
         }
-        
+
         if(ctcp_befehl == "USERINFO")
         {
             if(ctcp_text == ctcp || ctcp_text == "")
@@ -94,7 +94,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] USERINFO " + ctcp_text);
             }
         }
-        
+
         if(ctcp_befehl == "CLIENTINFO")
         {
             if(ctcp_text == ctcp || ctcp_text == "")
@@ -108,7 +108,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 frame->add_message("[" + user +"] [CTCP] CLIENTINFO " + ctcp_text);
             }
         }
-         
+
         // TODO
         // ping format immer mit timestamp
         // unterschied ist nur privmsg zum anfordern und notice als antwort
@@ -116,14 +116,14 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
         {
                 frame->add_message("[" + user +"] [CTCP] PING " + ctcp_text);
         }
-        
-        
+
+
         if(ctcp_befehl == "TIME")
         {
             if(ctcp_text == ctcp || ctcp_text == "")
             {
             frame->add_message("[" + user +"] [CTCP] TIME");
-            
+
             char timestamp[30];
             time_t raw_time;
             tm *local_time;
@@ -134,8 +134,8 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             strftime(timestamp, 30, "%d.%m.%Y %H:%M:%S", local_time);
 
             string timestring(timestamp);
-            
-            
+
+
             string answer = "\001TIME "+ timestring + "\001";
             irc->send_notice(user.c_str(), answer.c_str());
             }
@@ -163,28 +163,43 @@ void
 irc_mode(const irc_msg_data *msg_data, void *cp)
 {
     int i;
-    string Prefix = msg_data->nick;;
+    string Sender = msg_data->nick;
     string Parameters = "";
     string Channel = "";
+    string Modus = "";
 
-    if(Prefix == "")
+    if(Sender == "")
     {
-         Prefix = "Server";
+        /*if(string(msg_data->sender) == irc->CurrentNick)
+        {
+            Sender = irc->CurrentNick;
+        }
+        else
+        {*/
+            Sender = "Server";
+        //}
     }
 
     for(i = 0; i < msg_data->params_i; i++)
     {
-        if(msg_data->params_a[i][0] != '#')
-        {
-            Parameters += " " + string(msg_data->params_a[i]);
-        }
-        else
+        if(msg_data->params_a[i][0] == '#')
         {
             Channel = " (" + string(msg_data->params_a[i]) + ")";
         }
+        else if(msg_data->params_a[i][0] == '+' ||
+                msg_data->params_a[i][0] == '-')
+        {
+            Modus = msg_data->params_a[i];
+        }
+        else
+        {
+            Parameters += " " + string(msg_data->params_a[i]);
+        }
     }
 
-    frame->add_message(config->parsecfgvalue("local_mode",Prefix,Parameters,Channel));
+    Modus += Parameters + Channel;
+
+    frame->add_message(config->parsecfgvalue("local_mode", Sender, Modus));
 }
 
 void

@@ -8,8 +8,8 @@ ConfigInterface::ConfigInterface()
     efirc_version_string = "pre-alpha 0.2";
 
     opencfg();
-    
-    locals_deutsch = 
+
+    locals_deutsch =
         "local_changenick = %param1's neuer Nickname ist %param2;\n"
         "local_joinself = Sie haben den Raum betreten;\n"
         "local_join = %param1 hat den Raum betreten;\n"
@@ -26,9 +26,9 @@ ConfigInterface::ConfigInterface()
         "local_quitself = Du hast das IRC Netzwerk verlassen;\n"
         "local_unaway = Du bist jetzt nicht mehr als wvp markiert;\n"
         "local_away = Du bist jetzt als nicht verfügbar (%param1) markiert"
-        "local_mode = %param1 setzt Modus %param2 %param3";
-    
-    locals_englisch = 
+        "local_mode = %param1 setzt Modus %param2";
+
+    locals_englisch =
         "local_changenick = %param1's new nick is %param2;\n"
         "local_joinself = You joined the channel;\n"
         "local_join = %param1 joined the channel;\n"
@@ -46,7 +46,7 @@ ConfigInterface::ConfigInterface()
         "local_unaway = Removed your away status;\n"
         "local_away = You are marked as away (%param1)"
         "local_mode = %param1 set mode %param2 %param3";
-    
+
     if(parsecfgvalue("text_language")== "de")
     {
         configtext += "\n" + locals_deutsch;
@@ -80,7 +80,7 @@ ConfigInterface::opencfg()
 }
 
 string
-ConfigInterface::parsecfgvalue(string searchstring, string param1, 
+ConfigInterface::parsecfgvalue(string searchstring, string param1,
                                string param2, string param3)
 {
     unsigned int pos = configtext.find(searchstring + " = ", 0);
@@ -91,12 +91,12 @@ ConfigInterface::parsecfgvalue(string searchstring, string param1,
         pos += searchstring.length() +3;
         value = configtext.substr(pos, configtext.find(";",pos) - pos);
     }
-    
+
     // moegliche uebergebene parameter in den texten ersetzen
     value = ReplaceString("%param1", param1, value);
     value = ReplaceString("%param2", param2, value);
     value = ReplaceString("%param3", param3, value);
-    
+
     return value;
 }
 
@@ -143,10 +143,10 @@ ConfigInterface::reset_nickname(std::string usednick)
     // option + wert in der temp. konfiguration aendern
     // mit anhaengen von zwei zufaelligen zeichen
     // nick -> nickQP ; nick -> nickSG; oder so
-    
+
     string alternick = parsecfgvalue("irc_nickname");
     configtext = ReplaceString("irc_nickname = " + alternick + ";",
-                               "irc_nickname = " + usednick + 
+                               "irc_nickname = " + usednick +
                                generaterndstring(2) + ";", configtext);
-                               
+
 }
