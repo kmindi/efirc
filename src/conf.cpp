@@ -25,7 +25,7 @@ ConfigInterface::ConfigInterface()
         "local_topic = Thema: %param1;\n"
         "local_quitself = Du hast das IRC Netzwerk verlassen;\n"
         "local_unaway = Du bist jetzt nicht mehr als wvp markiert;\n"
-        "local_away = Du bist jetzt als nicht verfügbar (%param1) markiert"
+        "local_away = Du bist jetzt als nicht verfügbar (%param1) markiert;\n"
         "local_mode = %param1 setzt Modus %param2";
 
     locals_englisch =
@@ -44,7 +44,7 @@ ConfigInterface::ConfigInterface()
         "local_topic = Topic: %param1;\n"
         "local_quitself = You left the IRC-Network;\n"
         "local_unaway = Removed your away status;\n"
-        "local_away = You are marked as away (%param1)"
+        "local_away = You are marked as away (%param1);\n"
         "local_mode = %param1 set mode %param2 %param3";
 
     if(parsecfgvalue("text_language")== "de")
