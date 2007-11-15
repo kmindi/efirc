@@ -18,14 +18,14 @@ ConfigInterface::ConfigInterface()
         "local_kickself = Sie wurden von %param1 aus dem Raum geworfen;\n"
         "local_kick = %param1 wurde von %param2 aus dem Raum geworfen;\n"
         "local_nickinuseinfo = Nickname wird bereits verwendet;\n"
-        "local_newnickinfo = Dein neuer Nickname ist %param1;\n"
-        "local_whoisaway = %param1 ist gerade nicht verfügbar (\"%param2\");\n"
+        "local_newnickinfo = Ihr neuer Nickname ist %param1;\n"
+        "local_whoisaway = %param1 ist gerade abwesend (\"%param2\");\n"
         "local_whoischan = %param1 befindet sich in %param2;\n"
         "local_whoisidle = %param1 ist inaktiv seit %param2 Sekunden;\n"
         "local_topic = Thema: %param1;\n"
-        "local_quitself = Du hast das IRC Netzwerk verlassen;\n"
-        "local_unaway = Du bist jetzt nicht mehr als wvp markiert;\n"
-        "local_away = Du bist jetzt als nicht verfügbar (%param1) markiert;\n"
+        "local_quitself = Sie haben das IRC Netzwerk verlassen;\n"
+        "local_unaway = Sie sind jetzt nicht mehr als abwesend markiert;\n"
+        "local_away = Sie sind jetzt als abwesend (%param1) markiert;\n"
         "local_mode = %param1 setzt Modus %param2";
 
     locals_englisch =
@@ -44,8 +44,8 @@ ConfigInterface::ConfigInterface()
         "local_topic = Topic: %param1;\n"
         "local_quitself = You left the IRC-Network;\n"
         "local_unaway = Removed your away status;\n"
-        "local_away = You are marked as away (%param1);\n"
-        "local_mode = %param1 set mode %param2 %param3";
+        "local_away = You are marked as being away (%param1);\n"
+        "local_mode = %param1 set mode %param2";
 
     if(parsecfgvalue("text_language")== "de")
     {
@@ -92,7 +92,7 @@ ConfigInterface::parsecfgvalue(string searchstring, string param1,
         value = configtext.substr(pos, configtext.find(";",pos) - pos);
     }
 
-    // moegliche uebergebene parameter in den texten ersetzen
+    // Moegliche uebergebene parameter in den texten ersetzen
     value = ReplaceString("%param1", param1, value);
     value = ReplaceString("%param2", param2, value);
     value = ReplaceString("%param3", param3, value);

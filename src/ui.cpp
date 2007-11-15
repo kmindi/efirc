@@ -142,37 +142,37 @@ UserInterface::CreateGUIControls()
                                     FALSE, _U(
        parsecfgvalue("font_button"))));
 
-    string clientinfotext_deutsch = "Das hier ist efirc (v. "
-        + config->efirc_version_string
-        + ").\n"
-        + "efirc steht unter keiner Lizenz. Wir (die Programmierer) "
-        + "koennen nicht fuer das Verantwortlich gemacht werden was es "
-        + "macht oder auf irgendeine Weise hervorruft.\n"
-        + "Wenn du mehr wissen willst hilft dir vielleicht diese Seite "
-        + "weiter: \"http://efirc.sourceforge.net/\".\n"
-        + "Mit /hilfe kannst du dir eine Liste mit allen "
-        + "verfügbaren Befehlen anzeigen lassen."
-        + "\n\n"
-        + "Server: " + parsecfgvalue("irc_server") + "\n"
-        + "Raum: " + parsecfgvalue("irc_channel") + "\n"
-        + "Du bist bekannt als: " + parsecfgvalue("irc_nickname")
+    string clientinfotext_deutsch = "Das hier ist efirc (v. " +
+        config->efirc_version_string + 
+        ").\n"
+        "efirc steht unter keiner Lizenz. Wir (die Programmierer) "
+        "können nicht fuer das Verantwortlich gemacht werden was es "
+        "macht oder auf irgendeine Weise hervorruft.\n"
+        "Wenn Sie mehr wissen wollen hilft ihnen vielleicht diese Seite "
+        "weiter: \"http://efirc.sourceforge.net/\".\n"
+        "Mit /hilfe können Sie sich eine Liste mit allen "
+        "verfügbaren Befehlen anzeigen lassen."
+        "\n\n"
+        "Server: " + parsecfgvalue("irc_server") + "\n"
+        "Raum: " + parsecfgvalue("irc_channel") + "\n"
+        "Sie sind bekannt als: " + parsecfgvalue("irc_nickname") +
         // add_message() macht bereits einen Zeilenumbruch
-        + "\n\n------------------------------------------------\n";
+        "\n\n------------------------------------------------\n";
 
-    string clientinfotext_englisch = "This is efirc (v. "
-        + config->efirc_version_string
-        + ").\n"
-        + "efirc is not released under any license. We (the people who "
-        + "made efirc) can not be held responsible for anything it does "
-        + "or causes.\n"
-        + "If you want to get further information then have a look at: "
-        + "\"http://efirc.sourceforge.net/\".\n"
-        + "With /help you get a list of supported commands."
-        + "\n\n"
-        + "Server: " + parsecfgvalue("irc_server") + "\n"
-        + "Channel: " + parsecfgvalue("irc_channel") + "\n"
-        + "You are known as: " + parsecfgvalue("irc_nickname")
-        + "\n\n------------------------------------------------\n";
+    string clientinfotext_englisch = "This is efirc (v. " +
+        config->efirc_version_string + 
+        ").\n"
+        "efirc is not released under any license. We (the programmer) "
+        "can not be held responsible for anything it does "
+        "or causes.\n"
+        "If you want to get further information then have a look at: "
+        "\"http://efirc.sourceforge.net/\".\n"
+        "With /help you get a list of supported commands."
+        "\n\n"
+        "Server: " + parsecfgvalue("irc_server") + "\n"
+        "Channel: " + parsecfgvalue("irc_channel") + "\n"
+        "You are known as: " + parsecfgvalue("irc_nickname") +
+        "\n\n------------------------------------------------\n";
 
     WxEdit_input_messages->SetFocus();
 
@@ -247,7 +247,10 @@ UserInterface::add_user(string usersinastring)
 
             // UserData ist ein Pointer auf
             // den Bezeichner
-            itemData = new string(WxEdit_channel_users->GetItemText(item).mb_str(wxConvLocal));
+            itemData = new string
+            (
+                WxEdit_channel_users->GetItemText(item).mb_str(wxConvLocal)
+            );
 
             // die Speicheradresse des
             // Bezeichners
@@ -422,7 +425,7 @@ UserInterface::ParseClientCmd(string text)
         me_text = "\001ACTION " + param + "\001";
         irc->send_privmsg(channel.c_str(), me_text.c_str());
         //geht nicht im query/msg
-        add_message("<" + irc->CurrentNick + ">* " + param);
+        add_message("*<" + irc->CurrentNick + "> " + param);
     }
 
     if(cmd == "topic")
@@ -441,7 +444,10 @@ UserInterface::ParseClientCmd(string text)
     {
         string recipient = param.substr(0,param.find(" ",0));
         string text = param.substr(param.find(" ",0)+1);
-        add_message("<" + irc->CurrentNick + "> -> [" + recipient + "] " + text);
+        add_message
+        (
+            "<" + irc->CurrentNick + "> -> [" + recipient + "] " + text
+        );
         irc->send_privmsg(recipient.c_str(), text.c_str());
     }
     
@@ -473,31 +479,45 @@ UserInterface::ParseClientCmd(string text)
     {
         if(parsecfgvalue("text_language") == "de")
         {
-            add_message("(i) Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
-             "/nick [Neuernick] - ändert den Nickname zu Neuernick oder zeigt den aktuellen Nick an\n"
-             "/join #raum - verlässt den alten Raum und betritt den Raum #raum\n"
-             "/leave - verlässt den aktuellen Raum"
-             "/quit - verlässt das IRC-Netzwerk\n"
-             "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es zu [Thema]\n"
-             "/[msg/query] Name Nachricht - sendet den text Nachricht an Name\n"
-             "/me macht irgendwas - CTCP Aktion\n"
-             "/whois nick - zeigt Informationen zu Nick an\n"
-             "/ctcp nick Befehl - sendet CTCP Befehl an Nick\n"
-             "/clear - löscht das Ausgabefeld");
+            add_message
+            (
+                "(i) Dieser Client unterstuetzt zur Zeit folgende Befehle: \n"
+                "/nick [Neuernick] - ändert den Nickname zu Neuernick oder "
+                    "zeigt den aktuellen Nick an\n"
+                "/join #raum - verlässt den alten Raum und betritt den Raum "
+                    "#raum\n"
+                "/leave - verlässt den aktuellen Raum"
+                "/quit - verlässt das IRC-Netzwerk\n"
+                "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es "
+                    "zu [Thema]\n"
+                "/[msg/query] Name Nachricht - sendet den text Nachricht an "
+                    "Name\n"
+                "/me macht irgendwas - CTCP Aktion\n"
+                "/whois nick - zeigt Informationen zu Nick an\n"
+                "/ctcp nick Befehl - sendet CTCP Befehl an Nick\n"
+                "/clear - löscht das Ausgabefeld"
+            );
         }
         else
         {
-            add_message("(i) Currently the following commands are supported by this client: \n"
-             "/nick [newnick] - changes the nickname to newnick or shows the current nickname\n"
-             "/join #channel - leaves the current channel and joins the channel #channel\n"
-             "/leave - leaves the current channel\n"
-             "/quit - quits the irc-network\n"
-             "/topic [topic] - shows the current topic or sets the topic to [topic]\n"
-             "/[msg/query] nick message - sends the text message to nick\n"
-             "/me is doing something - CTCP Action\n"
-             "/whois nick - displays information about nick\n"
-             "/ctcp nick cmd - sends ctcp command cmd to nick\n"
-             "/clear - removes all text from the output window");
+            add_message
+            (
+                "(i) Currently the following commands are supported by "
+                    "this client: \n"
+                "/nick [newnick] - changes the nickname to newnick or shows "
+                    "the current nickname\n"
+                "/join #channel - leaves the current channel and joins the "
+                    "channel #channel\n"
+                "/leave - leaves the current channel\n"
+                "/quit - quits the irc-network\n"
+                "/topic [topic] - shows the current topic or sets the topic "
+                    "to [topic]\n"
+                "/[msg/query] nick message - sends the text message to nick\n"
+                "/me is doing something - CTCP Action\n"
+                "/whois nick - displays information about nick\n"
+                "/ctcp nick cmd - sends ctcp command cmd to nick\n"
+                "/clear - removes all text from the output window"
+            );
         }
     }
 

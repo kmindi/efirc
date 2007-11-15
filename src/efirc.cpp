@@ -53,7 +53,10 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             }
             else
             {
-                frame->add_message("[" + user +"] [CTCP] VERSION " + ctcp_text);
+                frame->add_message
+                (
+                    "[" + user +"] [CTCP] VERSION " + ctcp_text                          
+                );
             }
         }
 
@@ -65,7 +68,10 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             }
             else
             {
-                frame->add_message("[" + user +"] [CTCP] FINGER " + ctcp_text);
+                frame->add_message
+                (
+                    "[" + user +"] [CTCP] FINGER " + ctcp_text
+                );
             }
         }
 
@@ -91,7 +97,10 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             }
             else
             {
-                frame->add_message("[" + user +"] [CTCP] USERINFO " + ctcp_text);
+                frame->add_message
+                (
+                    "[" + user +"] [CTCP] USERINFO " + ctcp_text
+                );
             }
         }
 
@@ -100,12 +109,17 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             if(ctcp_text == ctcp || ctcp_text == "")
             {
             frame->add_message("[" + user +"] [CTCP] CLIENTINFO");
-            string answer = "\001CLIENTINFO VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME\001";
+            string answer = 
+            "\001CLIENTINFO VERSION FINGER SOURCE USERINFO"
+            "CLIENTINFO PING TIME\001";
             irc->send_notice(user.c_str(), answer.c_str());
             }
             else
             {
-                frame->add_message("[" + user +"] [CTCP] CLIENTINFO " + ctcp_text);
+                frame->add_message
+                (
+                    "[" + user +"] [CTCP] CLIENTINFO " + ctcp_text
+                );
             }
         }
 
@@ -149,11 +163,11 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
         {
             if(recipient == irc->CurrentNick)
             {
-                frame->add_message("[" + user + "]* " + ctcp_text);
+                frame->add_message("*[" + user + "] " + ctcp_text);
             }
             else
             {
-                frame->add_message("<" + user + ">* " + ctcp_text);
+                frame->add_message("*<" + user + "> " + ctcp_text);
             }
         }
     }
@@ -214,8 +228,8 @@ void
 irc_endofmotd(const irc_msg_data *msg_data, void *cp)
 {
     IRCSocket *ircsocket = (IRCSocket *) cp;
-    ircsocket->send_join(config->parsecfgvalue("irc_channel").c_str());
     frame->add_message("------------------------------------------------");
+    ircsocket->send_join(config->parsecfgvalue("irc_channel").c_str());
 }
 
 // Thema des Raums anzeigen lassen
@@ -295,7 +309,10 @@ irc_quit(const irc_msg_data *msg_data, void *cp)
     nachricht = msg_data->params_a[0];
 
     frame->delete_user(benutzer);
-    frame->add_message("(i) " + config->parsecfgvalue("local_quit", benutzer, nachricht));
+    frame->add_message
+    (
+        "(i) " + config->parsecfgvalue("local_quit", benutzer, nachricht)
+    );
 }
 
 // Benutzerliste aktualisieren / Benutzer hat seinen
@@ -326,7 +343,10 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     benutzer = msg_data->params_a[1];
     if(benutzer == irc->CurrentNick)
     {
-        frame->add_message("(i) " + config->parsecfgvalue("local_kickself",sender));
+        frame->add_message
+        (
+            "(i) " + config->parsecfgvalue("local_kickself",sender)
+        );
 
         frame->clear_userlist();
         frame->set_topic("");
@@ -379,7 +399,10 @@ irc_whoisaway(const irc_msg_data *msg_data, void *cp)
 {
     string nick = msg_data->params_a[1];
     string text = msg_data->params_a[2];
-    frame->add_message("(i) " + config->parsecfgvalue("local_whoisaway",nick,text));
+    frame->add_message
+    (
+        "(i) " + config->parsecfgvalue("local_whoisaway",nick,text)
+    );
 }
 
 void
@@ -389,7 +412,10 @@ irc_whoischan(const irc_msg_data *msg_data, void *cp)
     string chans = msg_data->params_a[2];
 
     // Rechte noch beachten ([@|+]#channel)
-    frame->add_message("(i) " + config->parsecfgvalue("local_whoischan",nick,chans));
+    frame->add_message
+    (
+        "(i) " + config->parsecfgvalue("local_whoischan",nick,chans)
+    );
 }
 
 void
@@ -398,7 +424,10 @@ irc_whoisidle(const irc_msg_data *msg_data, void *cp)
     string nick = msg_data->params_a[1];
     string seconds = msg_data->params_a[2];
 
-    frame->add_message("(i) " + config->parsecfgvalue("local_whoisidle",nick,seconds));
+    frame->add_message
+    (
+    "(i) " + config->parsecfgvalue("local_whoisidle",nick,seconds)
+    );
 }
 
 void
