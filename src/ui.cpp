@@ -156,7 +156,6 @@ UserInterface::CreateGUIControls()
         "Server: " + parsecfgvalue("irc_server") + "\n"
         "Raum: " + parsecfgvalue("irc_channel") + "\n"
         "Sie sind bekannt als: " + parsecfgvalue("irc_nickname") +
-        // add_message() macht bereits einen Zeilenumbruch
         "\n\n------------------------------------------------\n";
 
     string clientinfotext_englisch = "This is efirc (v. " +
@@ -486,7 +485,7 @@ UserInterface::ParseClientCmd(string text)
                     "zeigt den aktuellen Nick an\n"
                 "/join #raum - verlässt den alten Raum und betritt den Raum "
                     "#raum\n"
-                "/leave - verlässt den aktuellen Raum"
+                "/leave - verlässt den aktuellen Raum\n"
                 "/quit - verlässt das IRC-Netzwerk\n"
                 "/topic [Thema] - zeigt das aktuelle Thema an oder aendert es "
                     "zu [Thema]\n"
