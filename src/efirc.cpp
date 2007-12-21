@@ -110,7 +110,7 @@ irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
             frame->add_message("[" + user +"] [CTCP] CLIENTINFO");
             string answer = 
-            "\001CLIENTINFO VERSION FINGER SOURCE USERINFO"
+            "\001CLIENTINFO VERSION FINGER SOURCE USERINFO "
             "CLIENTINFO PING TIME\001";
             irc->send_notice(user.c_str(), answer.c_str());
             }
@@ -232,14 +232,14 @@ irc_endofmotd(const irc_msg_data *msg_data, void *cp)
     ircsocket->send_join(config->parsecfgvalue("irc_channel").c_str());
 }
 
-// Thema des Raums anzeigen lassen
+// Thema des Raums anzeigen
 void
 irc_topic(const irc_msg_data *msg_data, void *cp)
 {
     string topic = msg_data->params_a[2];
     frame->set_topic(topic);
 }
-
+// Thema des Raums anzeigen (angefordert)
 void
 irc_requestedtopic(const irc_msg_data *msg_data, void *cp)
 {
@@ -254,15 +254,9 @@ irc_userlist(const irc_msg_data *msg_data, void *cp)
     string benutzerliste;
     benutzerliste = msg_data->params_a[3];
     frame->add_user(benutzerliste);
-
-    /*
-    frame->add_message("(i) Folgende Benutzer sind zur Zeit im Raum: \n"
-                       + benutzerliste);
-    */
 }
 
-// Benutzerliste aktualisieren / Benutzer hat den Raum
-// betreten
+// Benutzerliste aktualisieren / Benutzer hat den Raum betreten
 void
 irc_join(const irc_msg_data *msg_data, void *cp)
 {
@@ -329,12 +323,15 @@ irc_changenick(const irc_msg_data *msg_data, void *cp)
         irc->CurrentNick = neuernick;
 }
 
+// Auf Ping mit Pong antworten
 void
 irc_pong(const irc_msg_data *msg_data, void *cp)
 {
     irc->send_pong(msg_data->params_a[0]);
 }
 
+// Benutzerliste aktualisieren / Benutzer wurde hinausgeworfen
+// Oder man wurde selber hinausgeworfen
 void
 irc_kick(const irc_msg_data *msg_data, void *cp)
 {
@@ -360,6 +357,7 @@ irc_kick(const irc_msg_data *msg_data, void *cp)
     }
 }
 
+// Falls der Nickname bereits benutzt wird den Nickname aendern
 void
 irc_nickinuse(const irc_msg_data *msg_data, void *cp)
 {
@@ -375,6 +373,7 @@ irc_nickinuse(const irc_msg_data *msg_data, void *cp)
     irc->send_nick(config->parsecfgvalue("irc_nickname").c_str());
 }
 
+// Verschiedene Fehlermeldungen anzeigen
 void
 irc_error(const irc_msg_data *msg_data, void *cp)
 {
@@ -382,7 +381,9 @@ irc_error(const irc_msg_data *msg_data, void *cp)
     frame->add_message("(!) " + text);
 }
 
-//whois antworten
+
+//whois Antworten anzeigen
+
 void
 irc_whoisuser(const irc_msg_data *msg_data, void *cp)
 {
@@ -441,6 +442,7 @@ irc_whoisserver(const irc_msg_data *msg_data, void *cp)
     + nick + " " + server + " " + servernachricht);
 }
 
+
 // Thread fuer recv_raw-Schleife
 #ifdef WINDOWS
 void
@@ -472,14 +474,14 @@ void *
 #endif
 connect_thread(void *cp)
 {
-    // not used
+    // nicht benutzt
     #ifndef WINDOWS
     pthread_t rt, ct;
     #endif
 
     irc->connect();
 
-    // Wer sagt mir, dass der Nick verfuegbar ist???
+    // Wer sagt uns, dass der Nick verfuegbar ist???
     irc->CurrentNick = config->parsecfgvalue("irc_nickname");
     irc->WantedNick = config->parsecfgvalue("irc_nickname");
     irc->CurrentChannel = config->parsecfgvalue("irc_channel");
@@ -506,7 +508,7 @@ connect_thread(void *cp)
     irc->add_link("PING", &irc_pong);
     irc->add_link("KICK", &irc_kick);
 
-    //Fehler Antworten
+    // Fehler Antworten
     irc->add_link("401", &irc_error);
     irc->add_link("402", &irc_error);
     irc->add_link("403", &irc_error);
@@ -564,7 +566,7 @@ connect_thread(void *cp)
 bool
 Efirc::OnInit()
 {
-    // not used
+    // nicht benutzt
     #ifdef WINDOWS
     WSADATA wsaData;
     #else
@@ -579,7 +581,7 @@ Efirc::OnInit()
     // TODO nach irc (class)
     #ifdef WINDOWS
     if (WSAStartup(MAKEWORD(1, 1), &wsaData))
-        frame->add_message("(!) Failed to initialise winsock!");
+        frame->add_message("(!) Fehler beim initialisiern von  Winsock!");
     #endif
 
     irc = new IRCInterface(config->parsecfgvalue("irc_port"),
