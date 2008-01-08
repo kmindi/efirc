@@ -6,11 +6,6 @@
             - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
 
 !   Mehrere Räume unterstützen
-        - Ab dem man den 2. Raum betritt (oder private Nachricht..)
-          wird rechts eine neue Liste oder am unteren Rand angezeigt
-          in der man durch Mausklick auf einen der Räume in den Raum gelangt
-          (speichern der eingaben/ausgaben jedes Felds immer in variablen die 
-          beim wiederanzeigen abgerufen werden können)
     
 !   Hinweise (nicht nachrichten) anders markieren und/oder
     andere Schrift / allgemein Uebersichtlichkeit
