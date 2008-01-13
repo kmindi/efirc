@@ -23,7 +23,7 @@ ConfigInterface::ConfigInterface()
         "local_whoischan = %param1 befindet sich in %param2;\n"
         "local_whoisidle = %param1 ist inaktiv seit %param2 Sekunden;\n"
         "local_topic = Thema: %param1;\n"
-        "local_quitself = Sie haben das IRC Netzwerk verlassen;\n"
+        "local_quitself = Sie haben das IRC Netzwerk  mit dem Grund \"%param1\"verlassen;\n"
         "local_unaway = Sie sind jetzt nicht mehr als abwesend markiert;\n"
         "local_away = Sie sind jetzt als abwesend (%param1) markiert;\n"
         "local_mode = %param1 setzt Modus %param2";
@@ -42,7 +42,7 @@ ConfigInterface::ConfigInterface()
         "local_whoischan = %param1 is on %param2;\n"
         "local_whoisidle = %param1 is inactive since %param2 Sekunden;\n"
         "local_topic = Topic: %param1;\n"
-        "local_quitself = You left the IRC-Network;\n"
+        "local_quitself = You left the IRC-Network with the message \"%param1\";\n"
         "local_unaway = Removed your away status;\n"
         "local_away = You are marked as being away (%param1);\n"
         "local_mode = %param1 set mode %param2";

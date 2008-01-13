@@ -368,26 +368,34 @@ UserInterface::ParseClientCmd(string text)
         }
     }
 
-    if(cmd == "join")
+    if(cmd == "join" and param != "")
     {
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
 
         if (channel != "")
+        {
             irc->send_part(channel.c_str());
+        }
 
         irc->send_join(param.c_str());
     }
 
     if(cmd == "quit")
     {
-        irc->disconnect_server(config->efirc_version_string.c_str());
+        // TODO nachricht mitsenden
+        string nachricht = 
+        param + " [efirc " + config->efirc_version_string + "]";
+        irc->disconnect_server(nachricht.c_str());
 
-        add_message("(i) " + parsecfgvalue("local_quitself"));
+        //add_message("(i) " + parsecfgvalue("local_quitself",nachricht));
 
-        WxEdit_channel_users->DeleteAllItems();
-        WxEdit_topic->Clear();
-        SetTitle(_U(parsecfgvalue("text_title")));
+        //WxEdit_channel_users->DeleteAllItems();
+        //WxEdit_topic->Clear();
+        //SetTitle(_U(parsecfgvalue("text_title")));
+        // kurz warten bevor alles geschlossen wird
+        Sleep(10); 
+        Destroy();
     }
 
     if(cmd == "leave" || cmd == "part")
@@ -412,13 +420,13 @@ UserInterface::ParseClientCmd(string text)
         //Todo mit grund/trennungvon grund und nick
     }
 
-    if(cmd == "whois")
+    if(cmd == "whois" and param != "")
     {
         irc->send_whois(param.c_str());
     }
 
 
-    if(cmd == "me")
+    if(cmd == "me" and param != "")
     {
         string me_text;
         me_text = "\001ACTION " + param + "\001";
@@ -439,7 +447,7 @@ UserInterface::ParseClientCmd(string text)
         }
     }
 
-    if(cmd == "query" || cmd == "msg")
+    if(cmd == "query" || cmd == "msg" and param != "")
     {
         string recipient = param.substr(0,param.find(" ",0));
         string text = param.substr(param.find(" ",0)+1);
@@ -450,7 +458,7 @@ UserInterface::ParseClientCmd(string text)
         irc->send_privmsg(recipient.c_str(), text.c_str());
     }
     
-    if(cmd == "ctcp")
+    if(cmd == "ctcp" and param != "")
     {
         string recipient = param.substr(0,param.find(" ",0));
         string text = param.substr(param.find(" ",0)+1);
