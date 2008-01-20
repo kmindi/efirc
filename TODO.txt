@@ -6,6 +6,18 @@
             - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
 
 !   Mehrere Räume unterstützen
+    allgemein: virtuell jeweils einen buffer fuer einen channel halten
+
+    1) neuer benutzerbefehl /join channelname, /part [channelname], alte
+       channelspezifischen befehle umschreiben (weiterer parameter)
+    2) ausgabefeld, benutzerliste in variable mitschreiben
+    3) bei channelwechsel (durch dropdown, join, part) fensterinhalt mit
+       entsprechendem variableninhalt ersetzen
+    4) globale variable enthaelt aktuellen channelname (fuer send)
+    --- ab hier unerheblich, trivial
+    5) choicebox config parameter
+    6) layout umstellung
+    7) ping, highlights als notice bekanntgeben
     
 !   Hinweise (nicht nachrichten) anders markieren und/oder
     andere Schrift / allgemein Uebersichtlichkeit

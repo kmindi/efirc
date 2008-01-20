@@ -64,18 +64,21 @@ UserInterface::CreateGUIControls()
     // TODO kurze Beschreibung der Objekte?
     // TODO das ist interessant (@bitweise)
     WxEdit_channel_users = new wxListCtrl(this, ID_WXEDIT_CHANNEL_USERS,
-                                          wxPoint(442,3),
-                                          wxSize(111,282),
+                                          wxPoint(442,26),
+                                          wxSize(111,262),
                                           wxHSCROLL | wxLC_REPORT |
                                              wxLC_ALIGN_LEFT |
                                              wxLC_NO_HEADER);
+                                             
     WxEdit_channel_users->InsertColumn(0, _U("Userlist"),
                                        wxLIST_FORMAT_LEFT, -1);
+                                       
     WxEdit_topic = new wxTextCtrl(this, ID_WXEDIT_TOPIC,
                                   _U(""),
                                   wxPoint(4,4), wxSize(434,20),
                                   wxTE_READONLY, wxDefaultValidator,
                                   _U("WxEdit_topic"));
+                                  
     WxEdit_input_messages = new wxTextCtrl(this,
                                            ID_WXEDIT_INPUT_MESSAGES,
                                            _U("Type your Message and"
@@ -100,9 +103,20 @@ UserInterface::CreateGUIControls()
                                             wxTE_READONLY |
                                                wxTE_MULTILINE,
                                             wxDefaultValidator,
-                                            _U("WxEdit_output"
+                                            _U("WxEdit_output_"
                                                 "messages"));
-
+                                                
+    WxChoice_channel = new wxChoice(this, 
+                                    ID_WXCHOICE_CHANNEL, 
+                                    wxPoint(442,3), 
+                                    wxSize(111,20),
+                                    1, 
+                                    _U(parsecfgvalue("irc_channel")),
+                                    0,
+                                    wxDefaultValidator,
+                                    _U("WxChoice_channel"));
+    
+    
     SetBackgroundColour(wxColour(_U(parsecfgvalue(
        "colour_background"))));
     WxEdit_topic->SetBackgroundColour(wxColour(_U(parsecfgvalue(
@@ -125,6 +139,11 @@ UserInterface::CreateGUIControls()
        "colour_button_background"))));
     WxButton_submit->SetForegroundColour(wxColour(_U(parsecfgvalue(
        "colour_button_foreground"))));
+    
+    WxChoice_channel->SetBackgroundColour(wxColour(_U(parsecfgvalue(
+       "colour_channelchoice_background"))));
+    WxChoice_channel->SetForegroundColour(wxColour(_U(parsecfgvalue(
+       "colour_channelchoice_foreground"))));
 
     WxEdit_topic->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL, FALSE,
                                  _U(
@@ -141,6 +160,10 @@ UserInterface::CreateGUIControls()
     WxButton_submit->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL,
                                     FALSE, _U(
        parsecfgvalue("font_button"))));
+    
+    WxChoice_channel->SetFont(wxFont(8, wxSWISS, wxNORMAL,wxNORMAL,
+                                    FALSE, _U(
+      parsecfgvalue("font_channelchoice"))));
 
     string clientinfotext_deutsch = "Das hier ist efirc (v. " +
         config->efirc_version_string + 
