@@ -64,8 +64,8 @@ UserInterface::CreateGUIControls()
     // TODO kurze Beschreibung der Objekte?
     // TODO das ist interessant (@bitweise)
     WxEdit_channel_users = new wxListCtrl(this, ID_WXEDIT_CHANNEL_USERS,
-                                          wxPoint(442,26),
-                                          wxSize(111,262),
+                                          wxPoint(442,27),
+                                          wxSize(111,259),
                                           wxHSCROLL | wxLC_REPORT |
                                              wxLC_ALIGN_LEFT |
                                              wxLC_NO_HEADER);
@@ -98,7 +98,7 @@ UserInterface::CreateGUIControls()
     WxEdit_output_messages = new wxTextCtrl(this,
                                             ID_WXEDIT_OUTPUT_MESSAGES,
                                             _U("Output"),
-                                            wxPoint(4,26),
+                                            wxPoint(4,27),
                                             wxSize(434,259),
                                             wxTE_READONLY |
                                                wxTE_MULTILINE,
@@ -106,12 +106,14 @@ UserInterface::CreateGUIControls()
                                             _U("WxEdit_output_"
                                                 "messages"));
                                                 
+    wxString choices[] = { _U(parsecfgvalue(
+       "irc_channel")) };
     WxChoice_channel = new wxChoice(this, 
                                     ID_WXCHOICE_CHANNEL, 
                                     wxPoint(442,3), 
-                                    wxSize(111,20),
+                                    wxSize(111,19),
                                     1, 
-                                    _U(parsecfgvalue("irc_channel")),
+                                    choices,
                                     0,
                                     wxDefaultValidator,
                                     _U("WxChoice_channel"));
@@ -229,6 +231,8 @@ UserInterface::CreateGUIControls()
 void
 UserInterface::add_message(string message)
 {
+    //muss raum beachten und in die variable schreiben und dann evtl.
+    // im aktuellen anzeigen falls die nachricht im aktuellen raum ist
     char timestamp[12];
     time_t raw_time;
     tm *local_time;
@@ -246,6 +250,7 @@ UserInterface::add_message(string message)
 void
 UserInterface::add_user(string usersinastring)
 {
+    //muss name der benutzerliste übergeben bekommen
     int item;
     string user;
     // Zeiger auf den im Speicher hinterlegten
@@ -287,6 +292,7 @@ UserInterface::add_user(string usersinastring)
 void
 UserInterface::delete_user(string user)
 {
+    // muss in allen benutzerlisten nach dem benutzer suchen
     // TODO angemessenere Loesung, um eventuellen Operator
     // oder Benutzer mit Voice Status aus der Liste zu nehmen
     WxEdit_channel_users->DeleteItem(WxEdit_channel_users->FindItem(-1,
@@ -389,6 +395,7 @@ UserInterface::ParseClientCmd(string text)
             // erhaelt
             irc->WantedNick = param;
         }
+        //nick im titel anzeigen
     }
 
     if(cmd == "join" and param != "")
@@ -396,10 +403,8 @@ UserInterface::ParseClientCmd(string text)
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
 
-        if (channel != "")
-        {
-            irc->send_part(channel.c_str());
-        }
+        // neuer eintrag in WxChoice_channel
+        // neue variablen(benutzerliste,eingabegeschichte,thema,ausgabe)
 
         irc->send_join(param.c_str());
     }
@@ -423,13 +428,12 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "leave" || cmd == "part")
     {
-        irc->send_part(channel.c_str());
-
-        channel = "";
+        irc->send_part(param.c_str());
+        //raum aus WxChoices_channel entfernen
+        //in raum dadrunter gehen /anzeigen
 
         WxEdit_channel_users->DeleteAllItems();
         WxEdit_topic->Clear();
-        SetTitle(_U(parsecfgvalue("text_title")));
     }
 
     if(cmd == "clear")
@@ -472,6 +476,8 @@ UserInterface::ParseClientCmd(string text)
 
     if(cmd == "query" || cmd == "msg" and param != "")
     {
+        // neuer eintrag in WxChoice_channel
+        // diesen anzeigen
         string recipient = param.substr(0,param.find(" ",0));
         string text = param.substr(param.find(" ",0)+1);
         add_message

@@ -6,6 +6,25 @@
             - Voice/Operator-Status-Aenderung anzeigen mit Nachricht
 
 !   Mehrere Räume unterstützen
+    add_message 
+        muss raum beachten und in die variable schreiben und dann evtl.
+        im aktuellen anzeigen falls die nachricht im aktuellen raum ist
+    add_user
+        muss name der benutzerliste übergeben bekommen
+    delete_user
+        muss in allen benutzerlisten nach dem benutzer suchen
+        nicht wenn part/leave
+    join 
+        neuer eintrag in WxChoice_channel
+        neue variablen(benutzerliste,eingabegeschichte,thema,ausgabe)
+    leave/part
+        raum aus WxChoices_channel entfernen
+        in raum dadrunter gehen /anzeigen
+    query/msg
+        neuer eintrag in WxChoice_channel
+        diesen anzeigen
+    changenick und add_user und delete_user überarbeiten
+    
     allgemein: virtuell jeweils einen buffer fuer einen channel halten
 
     1) neuer benutzerbefehl /join channelname, /part [channelname], alte
