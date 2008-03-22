@@ -3,7 +3,7 @@
 rem die Werkzeuge zum Bau befinden sich
 rem in einem Unterverzeichnis
 echo setting env
-set PATH=./sys/bin
+set PATH=%PATH%;sys\bin
 echo PATH=%PATH%
 
 rem make wird fuer das aktuelle Makefile
