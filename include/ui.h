@@ -5,7 +5,6 @@
 #include <wx/listctrl.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
-#include <wx/choice.h>
 #include <wx/colour.h>
 #include <sstream>
 #include <conf.h>
@@ -66,7 +65,6 @@ class UserInterface : public wxFrame
         wxTextCtrl *WxEdit_topic;
         wxTextCtrl *WxEdit_input_messages;
         wxTextCtrl *WxEdit_output_messages;
-        wxChoice *WxChoice_channel;
         // TODO wozu das denn???
         enum
         {
@@ -75,7 +73,6 @@ class UserInterface : public wxFrame
             ID_WXBUTTON_SUBMIT = 1004,
             ID_WXEDIT_INPUT_MESSAGES = 1003,
             ID_WXEDIT_OUTPUT_MESSAGES = 1001,
-            ID_WXCHOICE_CHANNEL = 1008,
             ID_DUMMY_VALUE_
         };
 
