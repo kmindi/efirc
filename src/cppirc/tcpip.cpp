@@ -206,7 +206,7 @@ IRCSocket::recv_raw(void)
 	/* buffer to put raw message in */
 	char buf[R_BUFSIZE];
 	char *cbuf;
-	char *obuf = new char[0];
+	char *obuf = new char[1];
 	char *nbuf;
 
 	/* does need to have a length of 0 */
@@ -219,7 +219,7 @@ IRCSocket::recv_raw(void)
 	{
 		/*
 		 * clear buffer (shouldn't be needed anymore because of
-		 * strncpy() use
+		 * strncpy() use)
 		 */
 		memset(buf, '\0', R_BUFSIZE);
 
@@ -297,7 +297,7 @@ IRCSocket::recv_raw(void)
 
 /* send raw message */
 void
-IRCSocket::send_raw(char *fmt, ...)
+IRCSocket::send_raw(const char *fmt, ...)
 {
 	char tmp[W_BUFSIZE];
 // TODO len check

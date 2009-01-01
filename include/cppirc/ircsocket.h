@@ -153,7 +153,7 @@ class IRCSocket
 		int sock_send(const char *);
 		int sock_recv(char *);
 
-		void send_raw(char *, ...);
+		void send_raw(const char *, ...);
 		char *parse(const char *);
 		void parse_msg(const char *);
 };
