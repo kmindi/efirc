@@ -7,7 +7,7 @@
 /* auth new IRC user */
 void
 IRCSocket::auth(const char *nick, const char *user, const char *real,
-   const char *pass)
+	const char *pass)
 {
 // TODO you aren't allowed to call when already done?
 	if(authed)
@@ -52,10 +52,7 @@ IRCSocket::send_nick(const char *nick)
 // TODO sometime we DO NOT have this nick
 	/* new nick requested? */
 	if(strcmp(_IRCNICK, nick))
-	{
-		strncpy(_IRCNICK, nick, W_BUFSIZE - 1);
-		_IRCNICK[W_BUFSIZE - 1] = '\0';
-	}
+		strlcpy(_IRCNICK, nick, sizeof(_IRCNICK));
 }
 
 /* send USER command to authenticate user */
@@ -85,7 +82,7 @@ IRCSocket::send_version(const char *recipient)
 {
 	char tmp[W_BUFSIZE];
 
-	snprintf(tmp, W_BUFSIZE, "\001VERSION\001 %s", VERSION);
+	snprintf(tmp, sizeof(tmp), "\001VERSION\001 %s", VERSION);
 	send_notice(recipient, tmp);
 }
 
@@ -100,26 +97,24 @@ IRCSocket::send_notice(const char *recipient, const char *text)
 void
 IRCSocket::send_privmsg(const char *recipient, const char *text)
 {
-	int length;
-	char *wstr;
-	char *substr;
-	char separator[2];
+	int l;
+	char *w, *ap;
 
 	/* handle multiple line messages */
-	length = strlen(text);
+	l = strlen(text) + 1;
 
-	/* working string for strtok() */
-	wstr = new char[length + 1];
+	/* working string for strsep() */
+	w = new char[l];
+	strlcpy(w, text, l);
 
-	strncpy(wstr, text, length + 1);
-	strncpy(separator, "\n", 2);
+	/*
+	 * while substring not NULL split up wstr by separator and send
+	 * it
+	 */
+	for(ap = w; (ap = strsep(&w, "\n")) != NULL;)
+		send_raw("PRIVMSG %s :%s", recipient, ap);
 
-	/* while substr not NULL split up wstr by separator and send it */
-	for(substr = strtok(wstr, separator); substr;
-	   substr = strtok(NULL, separator))
-		send_raw("PRIVMSG %s :%s", recipient, substr);
-
-	delete wstr;
+	delete w;
 }
 
 /* TOPIC */

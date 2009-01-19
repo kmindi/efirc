@@ -6,63 +6,59 @@
 
 int
 IRCSocket::debug(unsigned int level, const char *sender,
-   const char *fmt, ...)
+	const char *fmt, ...)
 {
 	/* return if level is below wanted level */
 	if(level < _DBGLEVEL)
 		return 1;
 
-	int i, status, spaces, length;
-	char level_ind;
+	int i, s, l;
+	char lc;
 	char timestamp[9];
-	char *space, *nfmt;
-	time_t raw_time;
+	char *d, *nfmt;
+	time_t rt;
 	/* struct containing sec, min, hr,... */
-	tm *local_time;
+	tm *lt;
 	/* for more on va_* see below */
 	va_list ap;
 	va_start(ap, fmt);
 
 	/* get local time */
-	time(&raw_time);
-	local_time = localtime(&raw_time);
+	time(&rt);
+	lt = localtime(&rt);
 
 	/* set up level-indicator */
-	if(level == 0)
-		level_ind = '.';
-	else if(level == 1)
-		level_ind = 'i';
-	else if(level == 2)
-		level_ind = 'i';
-	else if(level == 3)
-		level_ind = '!';
-	else
-		level_ind = '?';
+	switch(level)
+	{
+		case 0: lc = '.';
+		case 1: lc = 'i';
+		case 2: lc = 'i';
+		case 3: lc = '!';
+		default: lc = '?';
+	}
 
 	/* set up space */
-	spaces = _DBGSPACE - strlen(sender);
+	l = _DBGSPACE - strlen(sender) + 1;
 
-	if(spaces < 0)
-		spaces = 0;
+	if(l < 0)
+		l = 0;
 
-	space = new char[spaces + 1];
-	memset(space, '\0', spaces + 1);
-
+	d = new char[l];
 	/* fill space with spaces :) */
-	for(i = 0; i < spaces; i++)
-		strncat(space, " ", 1);
+	memset(d, ' ', l);
+	d[l - 1] = '\0';
 
 	/* set up timestamp (%H:%M:%S) */
-	strftime(timestamp, 9, "%H:%M:%S", local_time);
+	strftime(timestamp, 9, "%H:%M:%S", lt);
 
 	/* set up logline */
-	length = strlen(space) + strlen(sender) + strlen(fmt) +
-	   strlen(timestamp) + 3;
-	nfmt = new char[length + 1];
-	snprintf(nfmt, length + 1, "%s|%c|%s%s%s", timestamp, level_ind,
-	   sender, space, fmt);
+	l = strlen(d) + strlen(sender) + strlen(fmt) +
+		strlen(timestamp) + 4;
+	nfmt = new char[l];
+	snprintf(nfmt, l, "%s|%c|%s%s%s", timestamp, lc,
+	   sender, d, fmt);
 
-	status = vfprintf(_DBGSTR, nfmt, ap);
+	s = vfprintf(_DBGSTR, nfmt, ap);
 
 	va_end(ap);
 
@@ -70,8 +66,8 @@ IRCSocket::debug(unsigned int level, const char *sender,
 	fflush(_DBGSTR);
 
 	delete nfmt;
-	delete space;
+	delete d;
 
-	return status;
+	return s;
 }
 

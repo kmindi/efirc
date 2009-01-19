@@ -21,7 +21,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	}
 
 	/* connect() return code */
-	int state;
+	int s;
 
 	/* peer address */
 	sockaddr_in addr;
@@ -43,7 +43,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	#endif
 
 	debug(0, "connect_server", "Creating socket."
-	   " (IPv4, Stream Socket)\n");
+		" (IPv4, Stream Socket)\n");
 
 	/*
 	 * The socket() system call creates an endpoint for
@@ -65,7 +65,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	if(sock > -1)
 		/* socket created successfully */
 		debug(1, "connect_server", "Created socket."
-		   " (%i)\n", sock);
+			" (%i)\n", sock);
 	else
 	{
 		/*
@@ -74,10 +74,10 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		 */
 		#ifdef WINDOWS
 		debug(3, "connect_server", "Couldn't create"
-		   " socket. (%d)\n", WSAGetLastError());
+			" socket. (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Couldn't create"
-		   " socket. (%s)\n", strerror(errno));
+			" socket. (%s)\n", strerror(errno));
 		#endif
 
 		/* leaving function before connecting would be set */
@@ -112,10 +112,10 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		/* an error ocurred */
 		#ifdef WINDOWS
 		debug(3, "connect_server", "Failure while"
-		   " resolving host. (%d)\n", WSAGetLastError());
+			" resolving host. (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Failure while"
-		   " resolving host. (%s)\n", strerror(errno));
+			" resolving host. (%s)\n", strerror(errno));
 		#endif
 
 		connecting = 0;
@@ -145,10 +145,11 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		/* an error ocurred */
 		#ifdef WINDOWS
 		debug(3, "connect_server", "Failure while"
-		   " resolving address. (%d)\n", WSAGetLastError());
+			" resolving address."
+			" (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Failure while"
-		   " resolving address. (%s)\n", strerror(errno));
+			" resolving address. (%s)\n", strerror(errno));
 		#endif
 
 		connecting = 0;
@@ -159,7 +160,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	h_name = host->h_name;
 
 	debug(0, "connect_server", "Connecting server."
-	   " [%s (%s):%i]\n", inet_ntoa(ip_addr), h_name, port);
+		" [%s (%s):%i]\n", inet_ntoa(ip_addr), h_name, port);
 
 	/*
 	 * connect() initiates a connection on a socket. It attempts to
@@ -169,22 +170,22 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	 * sock : our socket descriptor
 	 * addr : specifies other socket
 	 */
-	state = connect(sock, (sockaddr *)&addr, sizeof(addr));
+	s = connect(sock, (sockaddr *)&addr, sizeof(addr));
 
 	/* same as above but only 0 on success */
-	if(state == 0)
+	if(s == 0)
 		/* connection attempt has been successfull */
 		debug(1, "connect_server", "Connected to"
-		   " server.\n");
+			" server.\n");
 	else
 	{
 		/* the attempt hasn't been successfull */
 		#ifdef WINDOWS
 		debug(3, "connect_server", "Couldn't connect to"
-		   " server. (%d)\n", WSAGetLastError());
+			" server. (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Couldn't connect to"
-		   " server. (%s)\n", strerror(errno));
+			" server. (%s)\n", strerror(errno));
 		#endif
 
 		connecting = 0;
@@ -202,27 +203,20 @@ void
 IRCSocket::recv_raw(void)
 {
 	/* length of recvd buffer */
-	int b_length, o_length, length;
+	int bl, ol, l;
 	/* buffer to put raw message in */
 	char buf[R_BUFSIZE];
-	char *cbuf;
-	char *obuf = new char[1];
-	char *nbuf;
+	char *c, *o, *n;
 
 	/* does need to have a length of 0 */
-	*obuf = '\0';
+	o = new char[1];
+	*o = '\0';
 
 	debug(0, "recv_raw", "Receiving raw messages.\n");
 
 	/* recv, recv, recv,... */
 	while(1)
 	{
-		/*
-		 * clear buffer (shouldn't be needed anymore because of
-		 * strncpy() use)
-		 */
-		memset(buf, '\0', R_BUFSIZE);
-
 		/*
 		 * read() attempts to read bytes of data from
 		 * an object into a buffer.
@@ -232,58 +226,59 @@ IRCSocket::recv_raw(void)
 		 * BUFSIZE   : bytes to read
 		 */
 		#ifdef WINDOWS
-		b_length = recv(sock, buf, R_BUFSIZE - 1, 0);
+		bl = recv(sock, buf, sizeof(buf), 0);
 		#else
-		b_length = read(sock, buf, R_BUFSIZE - 1);
+		bl = read(sock, buf, sizeof(buf));
 		#endif
 
 		/* has server gone away? are we disconnected? */
-		if(b_length > 0)
+		if(bl > 0)
 		{
 			/* received message, tell length and parse */
 			debug(1, "recv_raw", "Received message."
-			   " [%s (%i)]\n", "...", b_length);
+				" [%s (%i)]\n", "...", bl);
 
-			o_length = strlen(obuf);
-			length = o_length + b_length;
+			ol = strlen(o);
+			l = ol + bl + 1;
 
 			/*
 			 * will be our finally parsed message
 			 * and may have to hold a previous ignored
 			 * message part
 			 */
-			nbuf = new char[length + 1];
+			n = new char[l];
 
 			/* there has been something ignored - add */
-			if(o_length > 0)
-				snprintf(nbuf, length + 1, "%s%s", obuf, buf);
+			if(ol > 0)
+				snprintf(n, l, "%s%s", o, buf);
 			else
-				strncpy(nbuf, buf, b_length + 1);
+				strlcpy(n, buf, l);
 
 			/* (cut and) parse message(s) */
-			cbuf = parse(nbuf);
+			c = parse(n);
 
-			delete obuf;
-			delete nbuf;
+			delete o;
+			delete n;
 
 			/* ignored message part */
-			length = strlen(cbuf);
-			obuf = new char[length + 1];
-			strncpy(obuf, cbuf, length + 1);
+			l = strlen(c) + 1;
+			o = new char[l];
+			strlcpy(o, c, l);
 		}
 		else
 		{
 			#ifdef WINDOWS
 			debug(3, "recv_raw", "Couldn't receive"
-			   " message. (%d)\n", WSAGetLastError());
+				" message. (%d)\n", WSAGetLastError());
 			#else
 			debug(3, "recv_raw", "Couldn't receive"
-			   " message. (%s)\n", strerror(errno));
+				" message. (%s)\n", strerror(errno));
 			#endif
 
 			if(!_DBGRECON)
 			{
-				debug(3, "recv_raw", "Reconnecting disabled.\n");
+				debug(3, "recv_raw", "Reconnecting"
+					" disabled.\n");
 				break;
 			}
 
@@ -303,7 +298,8 @@ IRCSocket::send_raw(const char *fmt, ...)
 // TODO len check
 	va_list ap;
 
-	/* the argument list
+	/*
+	 * the argument list
 	 *
 	 * our function is called with
 	 * varying number of arguments
@@ -321,10 +317,10 @@ IRCSocket::send_raw(const char *fmt, ...)
 	 */
 	va_start(ap, fmt);
 
-	vsnprintf(tmp, W_BUFSIZE, fmt, ap);
+	vsnprintf(tmp, sizeof(tmp), fmt, ap);
 
 	/* add to queue */
-	add_cmd(&IRCSocket::sock_send, tmp);
+	add_cmd(tmp, &IRCSocket::sock_send);
 
 	/*
 	 * normal return from the function
@@ -341,24 +337,23 @@ IRCSocket::sock_send(const char *buf)
 	char tmp[W_BUFSIZE];
 
 	/* length of string to send */
-	len = strlen(buf);
+	len = strlen(buf) + 2;
 
 	debug(0, "sock_send", "Sending Message (%s)\n", buf);
 
 	/* we have a size maximum in the IRC proto */
-	if(len < W_BUFSIZE-3)
+	if(len <= sizeof(tmp))
 	{
 		debug(1, "sock_send", "Message size ok."
-		   " (%i/%i)\n", len, W_BUFSIZE);
+			" (%i/%i)\n", len, sizeof(tmp));
 
 		/* actual message, cat \r\n */
-		snprintf(tmp, W_BUFSIZE, "%s\r\n", buf);
-		len += 2;
+		snprintf(tmp, sizeof(tmp), "%s\r\n", buf);
 	}
 	else
 	{
 		debug(3, "sock_send", "Message too long."
-		   " (%i/%i)\n", len, W_BUFSIZE);
+			" (%i/%i)\n", len, sizeof(tmp));
 		return -1;
 	}
 
@@ -375,14 +370,14 @@ IRCSocket::sock_send(const char *buf)
 	/* check status and return send's return value */
 	if(status > -1)
 		debug(1, "sock_send", "Sent raw data."
-		   " (%i)\n", status);
+			" (%i)\n", status);
 	else
 		#ifdef WINDOWS
 		debug(3, "sock_send", "Couldn't send raw data."
-		   " (%d)\n", WSAGetLastError());
+			" (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "sock_send", "Couldn't send raw data."
-		   " (%s)\n", strerror(errno));
+			" (%s)\n", strerror(errno));
 		#endif
 
 	return status;
@@ -405,14 +400,14 @@ IRCSocket::sock_recv(char *buf)
 
 	if(status > -1)
 		debug(1, "sock_recv", "Received raw data."
-		   " (%i)\n", status);
+			" (%i)\n", status);
 	else
 		#ifdef WINDOWS
 		debug(3, "sock_send", "Couldn't receive raw data."
-		   " (%d)\n", WSAGetLastError());
+			" (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "sock_recv", "Couldn't receive raw data."
-		   " (%s)\n", strerror(errno));
+			" (%s)\n", strerror(errno));
 		#endif
 
 	return status;
@@ -442,17 +437,12 @@ IRCSocket::reconnect(void)
 		if(connecting)
 			debug(3, "reconnect", "Already connecting.\n");
 		else if(reconnecting)
-			debug(3, "reconnect", "Already reconnecting.\n");
+			debug(3, "reconnect", "Already"
+				" reconnecting.\n");
 
 		while(connecting || reconnecting) { /* ... */ }
 
-		/* check wheter connect has been successfull */
-		if(connected)
-		{
-			sleep_time = 1;
-			reconnecting = 0;
-			return;
-		}
+		return;
 	}
 
 	debug(3, "reconnect", "Trying reconnect. (%i)\n", sleep_time);
