@@ -1,4 +1,4 @@
-#include "ircsocket.h"
+#include "cppirc/ircsocket.h"
 #include "irccommands.cpp"
 #include "tcpip.cpp"
 #include "io.cpp"
@@ -11,17 +11,9 @@
 
 /* Constructor (connect to server) */
 IRCSocket::IRCSocket(unsigned int port, const char *server,
-	const char *nick, const char *user, const char *real,
-	const char *pass, FILE *log)
+   const char *nick, const char *user, const char *real,
+   const char *pass, FILE *log)
 {
-	#ifdef WINDOWS // see msdn WSAStartup
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	int err;
-
-	wVersionRequested = MAKEWORD(2, 2);
-	#endif
-
 	/* no links and commands in queue  on startup - hopefully */
 	links = 0;
 	cmds = 0;
@@ -44,23 +36,20 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 
 	/* set defaults */
 	_IRCPORT = port;
-	strlcpy(_IRCSERV, server, sizeof(_IRCSERV));
-// TODO server defaults on connect
-	strlcpy(_IRCNICK, nick, sizeof(_IRCNICK));
-	strlcpy(_IRCUSER, user, sizeof(_IRCUSER));
-	strlcpy(_IRCREAL, real, sizeof(_IRCREAL));
-	strlcpy(_IRCPASS, pass, sizeof(_IRCPASS));
+	strncpy(_IRCSERV, server, W_BUFSIZE - 1);
+	_IRCSERV[W_BUFSIZE - 1] = '\0';
+	strncpy(_IRCNICK, nick,   W_BUFSIZE - 1);
+	_IRCNICK[W_BUFSIZE - 1] = '\0';
+	strncpy(_IRCUSER, user,   W_BUFSIZE - 1);
+	_IRCUSER[W_BUFSIZE - 1] = '\0';
+	strncpy(_IRCREAL, real,   W_BUFSIZE - 1);
+	_IRCREAL[W_BUFSIZE - 1] = '\0';
+	strncpy(_IRCPASS, pass,   W_BUFSIZE - 1);
+	_IRCPASS[W_BUFSIZE - 1] = '\0';
 	_DBGSTR = log;
 	_DBGSPACE = 15;
 	_DBGLEVEL = 3;
 	_DBGRECON = 1;
-
-	#ifdef WINDOWS
-	err = WSAStartup(wVersionRequested, &wsaData);
-
-	if(err != 0)
-		debug(3, "IRCSocket", "WSAStartup failed. (%d)\n", err);
-	#endif
 }
 
 /* Destructor (disconnect from server) */
@@ -73,8 +62,6 @@ IRCSocket::~IRCSocket()
 	/* close socket */
 	#ifdef WINDOWS
 	shutdown(sock, 2);
-
-	WSACleanup();
 	#else
 	close(sock);
 	#endif
@@ -83,15 +70,14 @@ IRCSocket::~IRCSocket()
 /*
  * add new command on IRC socket to queue
  *
- * buf      : parameter the function is given
- * function : function to be called
+ * function : command on socket
  */
 void
-IRCSocket::add_cmd(const char *buf,
-	int (IRCSocket::*function)(const char *buf))
+IRCSocket::add_cmd(int (IRCSocket::*function)(const char *buf),
+   const char *buf)
 {
 	/* buffer legnth */
-	int l;
+	int length;
 
 	/* pointing to new cmd in queue */
 	irc_queue_cmd *ntp;
@@ -99,13 +85,13 @@ IRCSocket::add_cmd(const char *buf,
 	/* struct with command and arguments */
 	ntp = new irc_queue_cmd;
 
-	l = strlen(buf) + 1;
+	length = strlen(buf);
 
 	/* new command on top */
 	ntp->function = function;
-	ntp->buf = new char[l];
+	ntp->buf = new char[length + 1];
 	/* should be string + \0 */
-	strlcpy(ntp->buf, buf, l);
+	strncpy(ntp->buf, buf, length + 1);
 	ntp->next = 0;
 
 	/* new top/bottom */
@@ -122,15 +108,14 @@ IRCSocket::add_cmd(const char *buf,
 
 	/* print notice (command and args) */
 	debug(1, "add_cmd", "New command in queue."
-		"(%i, %s, %i)\n", cmds, buf, function);
+	   "(%i, %s, %i)\n", cmds, buf, function);
 
 	/* one more */
 	cmds++;
 }
 
 /* remove current command from queue */
-void
-IRCSocket::del_cmd(void)
+void IRCSocket::del_cmd(void)
 {
 	char *buf;
 	int (IRCSocket::*function)(const char *buf);
@@ -150,7 +135,7 @@ IRCSocket::del_cmd(void)
 		function = cbp->function;
 
 		debug(1, "del_cmd", "Will be removed. (%s, %i)\n",
-			buf, function);
+		   buf, function);
 
 		/* NOW removing command in queue (1.) */
 		delete cbp->buf;
@@ -164,15 +149,14 @@ IRCSocket::del_cmd(void)
 	}
 	else
 		/* no match found */
-		debug(1, "del_cmd", "No more commands in"
-			" queue.\n");
+		debug(1, "del_cmd", "No more command in"
+		   " queue.\n");
 }
 
 /* call current command in queue */
-void
-IRCSocket::call_cmd(void)
+void IRCSocket::call_cmd(void)
 {
-	int (IRCSocket::*function)(const char *buf), s;
+	int (IRCSocket::*function)(const char *buf), status;
 	const char *buf;
 
 	while(1)
@@ -186,16 +170,13 @@ IRCSocket::call_cmd(void)
 			function = cbp->function;
 
 			/* actual call, preserve return code */
-			s = (this->*function)(buf);
+			status = (this->*function)(buf);
 
-			/*
-			 * now, after successfull run, remove it from
-			 * the queue
-			 */
-			if(s > -1)
+			/* now, after successfull run, remove it from the queue */
+			if(status > -1)
 			{
-				debug(1, "call_cmd", "Called."
-					" (%s, %i)\n", buf, function);
+				debug(1, "call_cmd", "Called. (%s, %i)\n",
+				   buf, function);
 
 				del_cmd();
 			}
@@ -204,22 +185,19 @@ IRCSocket::call_cmd(void)
 			{
 				if(!_DBGRECON)
 				{
-					debug(3, "call_cmd",
-						"Reconnecting"
-						" disabled.\n");
+					debug(3, "recv_raw", "Reconnecting disabled.\n");
 					break;
 				}
 
-				debug(3, "call_cmd", "Requesting"
-					" reconnect.\n");
+				debug(3, "call_cmd", "Requesting reconnect.\n");
 
 				reconnect();
 			}
 		}
 		else
 			/* minor log-level */
-			debug(0, "call_cmd", "No more commands in"
-				" queue.\n");
+			debug(0, "call_cmd", "No more command in"
+			   " queue.\n");
 
 		/* don't hurry */
 		#ifdef WINDOWS
@@ -239,21 +217,21 @@ IRCSocket::call_cmd(void)
  */
 void
 IRCSocket::add_link(const char *cmd,
-	void (*function)(const irc_msg_data*, void*))
+   void (*function)(const irc_msg_data*, void*))
 {
 	/* command length */
-	int l;
+	int length;
 
 	/* new link on top */
 	irc_act_link *ntp;
 
 	ntp = new struct irc_act_link;
 
-	l = strlen(cmd) + 1;
+	length = strlen(cmd);
 
 	ntp->function = function;
-	ntp->cmd = new char[l];
-	strlcpy(ntp->cmd, cmd, l);
+	ntp->cmd = new char[length + 1];
+	strncpy(ntp->cmd, cmd, length + 1);
 	ntp->next = 0;
 
 	/* pointer to bottom/top */
@@ -270,7 +248,7 @@ IRCSocket::add_link(const char *cmd,
 
 	/* maybe some debugging needed...this time we trust you */
 	debug(1, "add_link", "New link added. (%i, %s, %i)\n",
-		links, cmd, function);
+	   links, cmd, function);
 
 	/* one more link */
 	links++;
@@ -279,7 +257,7 @@ IRCSocket::add_link(const char *cmd,
 /* unlink */
 void
 IRCSocket::del_link(const char *cmd,
-	void (*function)(const irc_msg_data*, void*))
+   void (*function)(const irc_msg_data*, void*))
 {
 	unsigned int i;
 	irc_act_link *cp;
@@ -287,7 +265,7 @@ IRCSocket::del_link(const char *cmd,
 	irc_act_link *np;
 
 	debug(0, "del_link", "Deleting link. (%s, %i)\n",
-		cmd, function);
+	   cmd, function);
 
 	/* start at botton */
 	cp = abp;
@@ -299,8 +277,7 @@ IRCSocket::del_link(const char *cmd,
 		{
 			np = cp->next;
 
-			debug(1, "del_link", "Will be deleted."
-				" (%i)\n", i);
+			debug(1, "del_link", "Will be deleted. (%i)\n", i);
 
 			delete cp->cmd;
 			delete cp;
@@ -334,7 +311,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
 	irc_act_link *cp;
 
 	debug(0, "act_link", "Activating link. (%s)\n",
-		msg_data->cmd);
+	   msg_data->cmd);
 
 	/* beginning at bottom */
 	cp = abp;
@@ -351,7 +328,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
 			cp->function(msg_data, this);
 
 			debug(1, "act_link", "Activated. (%i)\n",
-				cp->function);
+			   cp->function);
 		}
 
 		/* going on */
@@ -364,14 +341,14 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
 
 /* cut IRC reply */
 char *
-IRCSocket::parse(char *msg)
+IRCSocket::parse(const char *raw_msg)
 {
 	/* substring */
 	char *sstr;
 	/* working with it */
 	char *wstr;
 
-	wstr = (char *)msg;
+	wstr = (char *)raw_msg;
 
 	debug(0, "parse", "Splitting reply into messages.\n");
 
@@ -390,7 +367,7 @@ IRCSocket::parse(char *msg)
 			*sstr = '\0';
 
 			debug(1, "parse", "Found relevant"
-				" messagepart.\n");
+			   " messagepart.\n");
 
 			parse_msg(wstr);
 
@@ -399,7 +376,7 @@ IRCSocket::parse(char *msg)
 		}
 		else
 			debug(1, "parse", "No (further?) relevant"
-				" messagepart.\n");
+			   " messagepart.\n");
 	} while(sstr != NULL);
 
 	/* return adress in memory where ignored message part starts */
@@ -408,151 +385,316 @@ IRCSocket::parse(char *msg)
 
 /* parse IRC reply */
 void
-IRCSocket::parse_msg(char *msg)
+IRCSocket::parse_msg(const char *raw_msg)
 {
-	int i, l;
-	char *w, *s;
+	int i, length, text, p_length;
+	/* se substring */
+	char *sstr;
+	char *wstr;
+
+	/* length of resulting parameters join */
+	p_length = 0;
+	/* specifies wheter a string is found in parameters-list */
+	text = 0;
 
 	/* struct containing sender, command and parameters */
 	irc_msg_data *msg_data = new irc_msg_data;
 
-	w = (char *)msg;
+	debug(3, "parse_msg", "Parsing message. (%s)\n",
+	   raw_msg);
 
-	debug(3, "parse_msg", "Parsing message. (%s)\n", msg);
-
-	if(*w == ':')
+	/* found user/server command */
+	if(raw_msg[0] == ':')
 	{
 		debug(1, "parse_msg", "Is server or user"
-			" command.\n");
+		   " command.\n");
 
-		w++;
+		raw_msg++;
 
-		cpsub(&msg_data->sender, &w, ' ');
-
-		debug(1, "parse_msg", "Sender is: %s\n",
-			msg_data->sender);
-
-		cpsub(&msg_data->cmd, &w, ' ');
-
-		debug(1, "parse_msg", "Command is: %s\n",
-			msg_data->cmd);
-
-		cpsub(&msg_data->params, &w, '\0');
-
-		debug(1, "parse_msg", "Parameters are: %s\n",
-			msg_data->params);
-
-		debug(1, "parse_msg", "Parsing sender.\n");
-
-		w = msg_data->sender;
-		cpsub(&msg_data->nick, &w, '!');
-		if(w == NULL) // is server command
+		/* sender */
+		sstr = strstr(raw_msg, " ");
+		if(sstr != NULL)
 		{
-			msg_data->nick = new char[1];
-			msg_data->user = new char[1];
-			msg_data->host = new char[1];
+			*sstr = '\0';
 
-			*msg_data->nick = '\0';
-			*msg_data->user = '\0';
-			*msg_data->host = '\0';
+			length = strlen(raw_msg);
 
-			debug(1, "parse_msg", "Server is: %s\n",
-				msg_data->sender);
+			msg_data->sender = new char[length + 1];
+			strncpy(msg_data->sender, raw_msg, length + 1);
+
+			debug(1, "parse_msg", "Found sender."
+			   " (%s)\n", msg_data->sender);
+
+			raw_msg = sstr + 1;
 		}
 		else
 		{
-			debug(1, "parse_msg", "Nickname is: %s\n",
-				msg_data->nick);
+			length = strlen("");
 
-			cpsub(&msg_data->user, &w, '@');
+			msg_data->sender = new char[length + 1];
+			strncpy(msg_data->sender, "", length + 1);
 
-			debug(1, "parse_msg", "Username is: %s\n",
-				msg_data->user);
-
-			cpsub(&msg_data->host, &w, '\0');
-
-			debug(1, "parse_msg", "Hostname is: %s\n",
-				msg_data->host);
+			debug(1, "parse_msg", "No sender.\n");
 		}
+
+		/* command */
+		sstr = strstr(raw_msg, " ");
+		if(sstr != NULL)
+		{
+			*sstr = '\0';
+
+			length = strlen(raw_msg);
+
+			msg_data->cmd = new char[length + 1];
+			strncpy(msg_data->cmd, raw_msg, length + 1);
+
+			debug(1, "parse_msg", "Found command."
+			   " (%s)\n", msg_data->cmd);
+
+			raw_msg = sstr + 1;
+		}
+		else
+		{
+			length = strlen("");
+
+			msg_data->cmd = new char[length + 1];
+			strncpy(msg_data->cmd, "", length + 1);
+
+			debug(1, "parse_msg", "No command.\n");
+		}
+
+		length = strlen(raw_msg);
+
+		/* parameters */
+		msg_data->params = new char[length + 1];
+		strncpy(msg_data->params, raw_msg, length + 1);
+
+		debug(1, "parse_msg", "Found parameters."
+		   " (%s)\n", msg_data->params);
+
+		/* nice format */
+		/* for sender */
+		wstr = msg_data->sender;
+
+		debug(1, "parse_msg", "Parsing sender."
+		   " (%s)\n", wstr);
+
+		sstr = strstr(wstr, "!");
+		if(sstr != NULL)
+		{
+			*sstr = '\0';
+
+			length = strlen(wstr);
+
+			msg_data->nick = new char[length + 1];
+			strncpy(msg_data->nick, wstr, length + 1);
+			wstr = sstr + 1;
+
+			debug(1, "parse_msg", "Found nickname."
+			   " (%s)\n", msg_data->nick);
+
+			sstr += 1;
+		}
+		else
+		{
+			length = strlen("");
+
+			msg_data->nick = new char[length + 1];
+			strncpy(msg_data->nick, "", length + 1);
+
+			debug(1, "parse_msg", "No nick.\n");
+		}
+
+		sstr = strstr(wstr, "@");
+		if(sstr != NULL)
+		{
+			*sstr = '\0';
+
+			length = strlen(wstr);
+
+			msg_data->user = new char[length + 1];
+			strncpy(msg_data->user, wstr, length + 1);
+			wstr = sstr + 1;
+
+			debug(1, "parse_msg", "Found username."
+			   " (%s)\n", msg_data->user);
+
+			sstr += 1;
+		}
+		else
+		{
+			length = strlen("");
+
+			msg_data->user = new char[length + 1];
+			strncpy(msg_data->user, "", length + 1);
+
+			debug(1, "parse_msg", "No user.\n");
+		}
+
+		length = strlen(wstr);
+
+		msg_data->host = new char[length + 1];
+		strncpy(msg_data->host, wstr, length + 1);
+
+		debug(1, "parse_msg", "Found host."
+		   " (%s)\n", msg_data->host);
+
+		/* not usable anymore - set to "USER" */
+		delete msg_data->sender;
+		length = strlen(msg_data->nick) + strlen(msg_data->user) +
+		   strlen(msg_data->host);
+		msg_data->sender = new char[length + 1];
+		snprintf(msg_data->sender, length + 1, "%s%s%s",
+		   msg_data->nick, msg_data->user, msg_data->host);
 	}
+	/* we have a server message */
 	else
 	{
 		debug(1, "parse_msg", "Is server message.\n");
 
+		length = strlen("SERVER");
+
 // TODO server we're really connected to
-		l = strlen("SERVER") + 1;
-		msg_data->sender = new char[l];
-		strlcpy(msg_data->sender, "SERVER", l);
+		msg_data->sender = new char[length + 1];
+		strncpy(msg_data->sender, "SERVER", length + 1);
 
-		cpsub(&msg_data->cmd, &w, ' ');
+		/* command */
+		sstr = strstr(raw_msg, " ");
+		if(sstr != NULL)
+		{
+			*sstr = '\0';
 
-		debug(1, "parse_msg", "Command is: %s\n",
-			msg_data->cmd);
+			length = strlen(raw_msg);
 
-		cpsub(&msg_data->params, &w, '\0');
+			msg_data->cmd = new char[length + 1];
+			strncpy(msg_data->cmd, raw_msg, length + 1);
 
-		debug(1, "parse_msg", "Parameters are: %s\n",
-			msg_data->params);
+			debug(1, "parse_msg", "Found command."
+			   " (%s)\n", msg_data->cmd);
 
-		msg_data->host = new char[1];
-		msg_data->nick = new char[1];
-		msg_data->user = new char[1];
+			raw_msg = sstr + 1;
+		}
+		else
+		{
+			length = strlen("");
 
-		*msg_data->host = '\0';
-		*msg_data->nick = '\0';
-		*msg_data->user = '\0';
+			msg_data->cmd = new char[length + 1];
+			strncpy(msg_data->cmd, "", length + 1);
+
+			debug(1, "parse_msg", "No command.\n");
+		}
+
+		length = strlen(raw_msg);
+
+		/* parameters */
+		msg_data->params = new char[length + 1];
+		strncpy(msg_data->params, raw_msg, length + 1);
+
+		debug(1, "parse_msg", "Found parameters."
+		   " (%s)\n", msg_data->params);
+
+		/* safely :/ */
+		length = strlen("");
+		msg_data->host = new char[length + 1];
+		strncpy(msg_data->host, "", length + 1);
+		length = strlen("");
+		msg_data->nick = new char[length + 1];
+		strncpy(msg_data->nick, "", length + 1);
+		length = strlen("");
+		msg_data->user = new char[length + 1];
+		strncpy(msg_data->user, "", length + 1);
 	}
 
-	/* number of parameters */
+	/* number of params */
 	msg_data->params_i = 0;
-	w = msg_data->params;
+	/* for params */
+	wstr = msg_data->params;
 
 	debug(1, "parse_msg", "Parsing parameters."
-		" (%s)\n", msg_data->params);
+	   " (%s)\n", wstr);
 
-	/* get the number of parameters not containing text */
+	/* get number of nontext params */
 	do
 	{
-		/* from now there will be text */
-		if(*w == ':')
+		/* found parameter */
+		if(*wstr == ':')
 		{
 			/* for string set text-bit and stop here */
 			msg_data->params_i++;
+			text = 1;
 			break;
 		}
-		else if((s = strstr(w, " ")) != NULL)
+		else if((sstr = strstr(wstr, " ")) != NULL)
 		{
 			msg_data->params_i++;
-			w = s + 1;
+			wstr = sstr + 1;
 		}
 		/* only one paramter */
 		else if(msg_data->params_i == 0)
 			msg_data->params_i++;
-	} while(s != NULL);
+	} while(sstr != NULL);
 
 	/* allocate memory for array with index fields */
 	msg_data->params_a = new char *[msg_data->params_i];
 
-	w = msg_data->params;
+	/* jump back */
+	wstr = msg_data->params;
+
+	/* fill in array */
+	for(i = 0; i < msg_data->params_i; i++)
+	{
+		/* no string */
+		if(*wstr != ':')
+		{
+			sstr = strstr(wstr, " ");
+
+			/* only one paramter */
+			if(sstr != NULL)
+				*sstr = '\0';
+		}
+		/* string - skip ':' */
+		else
+			wstr++;
+
+		length = strlen(wstr);
+
+		msg_data->params_a[i] = new char[length + 1];
+		strncpy(msg_data->params_a[i], wstr, length + 1);
+
+		wstr = sstr + 1;
+	}
+
+	/* parameters are rebuilt */
+	delete msg_data->params;
+
+	/* get full length including separators */
+	for(i = 0; i < msg_data->params_i; i++)
+		p_length += strlen(msg_data->params_a[i]) + 1;
+
+	/* allocate and clear (?) */
+	msg_data->params = new char[p_length + 1];
+	memset(msg_data->params, '\0', p_length + 1);
+
+	/* join parameters */
 	for(i = 0; i < msg_data->params_i; i++)
 	{
 		/*
-		 * check whether this parameter is a string and skip ':'
-		 * before a string
+		 * if last parameter is a string
+		 * prefix it with a ':'
 		 */
-		if(*w != ':')
-			s = strsep(&w, " ");
-		else
-			s = w++;
+		if(text && i == msg_data->params_i - 1)
+			strncat(msg_data->params, ":", 1);
 
-		l = strlen(s) + 1;
+		strncat(msg_data->params, msg_data->params_a[i],
+		   strlen(msg_data->params_a[i]));
 
-		msg_data->params_a[i] = new char[l];
-		strlcpy(msg_data->params_a[i], s, l);
+		/*
+		 * if not last parameter cat space
+		 * as seperator
+		 */
+		if(i != msg_data->params_i - 1)
+			strncat(msg_data->params, " ", 1);
 	}
-
-	while(w != msg_data->params)
-		if(*--w == '\0') *w = ' ';
 
 	/* pass msg data and call event matching functions */
 	act_link(msg_data);
@@ -568,31 +710,5 @@ IRCSocket::parse_msg(char *msg)
 	delete msg_data->nick;
 	delete msg_data->user;
 	delete msg_data;
-}
-
-void
-IRCSocket::cpsub(char **dst, char **src, char sep)
-{
-	int l;
-	char *t;
-	char delim[2];
-
-	snprintf(delim, sizeof(delim), "%c", sep);
-
-	t = strsep(src, delim);
-
-	if((*src != NULL || sep == '\0') && t != NULL)
-	{
-		l = strlen(t) + 1;
-		*dst = new char[l];
-		strlcpy(*dst, t, l);
-
-		if(sep != '\0') *(--*src)++ = sep;
-	}
-	else
-	{
-		*dst = new char[1];
-		**dst = '\0';
-	}
 }
 
