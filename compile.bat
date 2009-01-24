@@ -24,7 +24,7 @@ rem efirc.exe in bin aufrufen
 echo.
 echo ...starting...
 cd bin
-test
+efirc
 rem exit 0
 
 rem Fenster offen halten, um
