@@ -1,6 +1,10 @@
-#ifndef __IRCInterface_Header__
-#define __IRCInterface_Header__
-#include <string>
+// irc.h
+// definiert die Klasse IRCInterface
+
+#ifndef _IRCInterface_
+#define _IRCInterface_
+
+#include <wx/string.h>
 #include <cppirc/ircsocket.h>
 
 using namespace std;
@@ -8,11 +12,12 @@ using namespace std;
 class IRCInterface : public IRCSocket
 {
     public:
-        string CurrentNick;
-        string CurrentChannel;
-        string WantedNick;
-
-        IRCInterface(string, string, string, string, string, string);
+        wxString CurrentNick;
+        wxString CurrentHostname;
+        wxString CurrentPort;
+        wxString WantedNick;
+    
+        IRCInterface(wxString, wxString, wxString, wxString, wxString, wxString);
         ~IRCInterface();
 
         void connect();

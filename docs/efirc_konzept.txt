@@ -1,0 +1,111 @@
+Frage:
+was ist wenn man in einen raum reingejoint wird?, also autojoin quasi.
+fenstererzeugen? fenstersuchen?
+
+Wichtig, noch zu erledigen:
+Unicode Unterstützung (wxWidgets neukompilieren -> libwxmsw28u.a)
+    - Nur eine Threadklasse, diese hat einen Konstruktor dem ein Parameter übergeben werden kann.
+    Dieser Parameter ist ein Zeiger zu der Funktion die im Entry()-Teil aufgerufen wird.
+
+Fehlercodes (IRC-Fehlercodes beachten)
+Farben
+VERBINDUNG ZUR KONFIGURATION
+
+
+Allgemeiner Aufbau, Struktur, grob:
+
+Eine ZENTRALE verwaltet alles:
+-   Verbindet sich mit dem IRC -> Instanz der IRCInterface-Klasse mit 2 Threads dafür.
+    Dabei leitet sie die empfangen nachrichten bei bedarf an fensterfunktionen weiter.
+    Abgehende Nachrichten werden an die entsprechenden benutzer/räume gesendet
+-   Sie verwaltet die verbindung zur konfigurationsschnittstelle und wendet 
+    dort festgelegte einstellungen an oder übergibt geänderte einstellungen
+-   Sie erzeugt bei Bedarf (beim Start) neue Instanzen der Fensterklasse
+
+INSTANZEN/FENSTER:
+-   Jeder Raum wird in einem eigenen Fenster (neuer Instanz der Userinterface-Klasse)
+    dargestellt
+-   Nachrichten an einen selber, werden im aktuellen "obersten" Fenster angezeigt
+
+
+die fensterklasse enthält funktionen die generell nur aus der zentrale verwaltet werden.
+
+Folgende Funktionen werden gebraucht:
+    müssen Ausgabe lokalisiert und angepasst ausgeben, dazu verbinden sie siche mit 
+    einer Konfigurationsverarbeitetenfunktion und übergeben bis zu VIER, 4 Parameter
+
+Titel ändern
+Thema ändern
+Benutzerliste bearbeiten (komplett, hinzufügen, entfernen, status/modus ändern, name ändern) (auto whois?)
+Nachricht in bestimmten Fenster anhängen
+    
+    muss Ausgabe lokalisiert und angepasst ausgeben, dazu mit Konfiguration verbinden
+    und Parameter übergeben
+
+
+
+Konfigurationsschnittstelle:
+    Anforderungen:
+        - Jede Option hat einen voreingestellten Wert
+        - Lokale oder entfernte (protokoll?) Konfigurationsdatei
+        - Format der Konfigurationsdatei? -> wie INF?
+            [ZENTRALE] ... [IRC] ... [FENSTER]
+        - mit folgenden optionen:
+            - Änderungen in Konfigdatei speichern
+            - Farben
+            - Anzahl der erlaubten Fenster und damit maximale Anzahl an Räumen
+            - Ausgabeformat von Text ( <nick> nachricht / [nick] nachricht / zeitstempel / ...)
+            - Lokalisierung
+        - wxString.Replace...
+        - Verarbeitenfunktion gibt bei Bedarf lokalisierten und angepassten Text zurück
+         
+         
+         
+ANHANG:
+Voreingestellte Konfiguration
+    
+der titel sieht folgendermaßen aus nickname@[serverip/hostname]:port/[#raum]
+
+[IRC]
+irc_server = irc.freenode.net;
+irc_port = 6667;
+irc_channel = #efirc;
+irc_username = efirc;
+irc_realname = efirc v.[efirc_version];
+irc_nickname = benutzer_[efirc_random_string];
+
+[COLOUR]
+colour_background = #000000;
+colour_topic_background = #000000;
+colour_topic_foreground = #00c000;
+colour_output_messages_background = #000000;
+colour_output_messages_foreground = #00c000;
+colour_input_messages_background = #000000;
+colour_input_messages_foreground = #00c000;
+colour_channel_users_background = #000000;
+colour_channel_users_foreground = #00c000;
+colour_button_background = #008000;
+colour_button_foreground = #00c000;
+
+colour_error = #00FF00;
+colour_action = #F0F0F0; blablaa
+
+[FORMAT]
+text_output_privmsg = <%param1> %param2;
+text_output_privmsg_priv = [%param1] %param2;
+text_output_ctcp_me = *%param1 %param2;
+text_static_title = efirc %param1@[%param2]:%param3/[%param4] # -> nick@host:port/#channel
+
+[LOCAL]
+text_language = de;
+text_title = efirc [efirc_version];
+text_quit_message = tschuess;
+
+[FONT]
+font_topic = ;
+font_output_messages = ;
+font_input_messages = ;
+font_channel_users = ;
+font_button = ;
+
+

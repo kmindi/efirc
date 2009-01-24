@@ -1,14 +1,20 @@
+// irc.cpp
+// implementiert die Klasse IRCInterface
+
 #include <irc.h>
 
 using namespace std;
 
-IRCInterface::IRCInterface(string port, string server,
-                           string nick, string user, string real,
-                           string pass)
+IRCInterface::IRCInterface(wxString port, wxString server,
+                           wxString nick, wxString user, wxString real,
+                           wxString pass)
              : IRCSocket(atoi(port.c_str()), server.c_str(),
                          nick.c_str(), user.c_str(), real.c_str(),
                          pass.c_str(), fopen("cppirc.log", "w"))
 {
+    CurrentNick = nick;
+    CurrentHostname = server;
+    CurrentPort = port;
 }
 
 void
