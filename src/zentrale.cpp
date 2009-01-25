@@ -292,6 +292,8 @@ void irc_whoisserver(const irc_msg_data *msg_data, void *cp);
 void irc_userlist(const irc_msg_data *msg_data, void *cp);
 void irc_join(const irc_msg_data *msg_data, void *cp);
 void irc_nick(const irc_msg_data *msg_data, void *cp);
+void irc_unaway(const irc_msg_data *msg_data, void *cp);
+void irc_nowaway(const irc_msg_data *msg_data, void *cp);
 // SOLLEN MITGLIEDER VON ZENTRALE SEIN; DANN DURCH zentrale.h SCHON BEKANNT
 
 void Zentrale::connect_thread()
@@ -305,11 +307,15 @@ void Zentrale::connect_thread()
     irc->add_link("NOTICE", &irc_pmsg);
     
     //irc->add_link("MODE", &irc_mode);
+    
     irc->add_link("301", &irc_whoisaway);
+    irc->add_link("305", &irc_unaway);
+    irc->add_link("306", &irc_nowaway);
     irc->add_link("311", &irc_whoisuser);
     irc->add_link("312", &irc_whoisserver);
     irc->add_link("317", &irc_whoisidle);
     irc->add_link("319", &irc_whoischan);
+    
     irc->add_link("372", &irc_motd);
     irc->add_link("376", &irc_endofmotd);
     irc->add_link("332", &irc_topic);

@@ -270,6 +270,20 @@ void irc_pong(const irc_msg_data *msg_data, void *cp)
     wxGetApp().irc->send_pong(msg_data->params_a[0]);
 }
 
+// RPL_UNAWAY / 305
+void irc_unaway(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger = msg_data->params_a[0];
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("RPL_UNAWAY");
+}
+
+// RPL_NOWAWAY / 306
+void irc_nowaway(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger = msg_data->params_a[0];
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("RPL_NOWAWAY");
+}
+
 //whois Antworten anzeigen
 
 void irc_whoisuser(const irc_msg_data *msg_data, void *cp)

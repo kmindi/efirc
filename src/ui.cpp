@@ -172,17 +172,17 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     
     if(local == "AWAY")
     {
-        if(param1 == "")
-        {
-            WxEdit_ausgabefeld->AppendText(_T("Sie Sind jetzt nicht mehr abwesend"));
-        }
-        else
-        {
-            WxEdit_ausgabefeld->AppendText(_T("Sie Sind jetzt abwesend" + param1));
-        }
+        // ES WIRD EINE LEERE ZEILE AUSGEGEBEN WENN MAN DEN STATUS WIEDER AUF VERFUEGBAR SETZT
+        if(param1 != "")
+            WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: " + param1));
     }
     
+    if(local == "RPL_UNAWAY")
+        WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt nicht mehr abwesend"));
 
+    if(local == "RPL_NOWAWAY")
+        WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt als abwesend markiert"));
+    
     // Whois Antworten
     if(local == "WHOIS_BENUTZER")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " (" + param2 + "@" + param3 + " - " + param4 + ") ]"));
