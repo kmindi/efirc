@@ -5,7 +5,7 @@ rem aufgerufen
 echo.
 echo ...calling make...
 set WINDOWS=1
-mingw32-make all
+mingw32-make all 2> build.log
 
 rem echo ...Stripping...
 rem strip --strip-all bin\test.exe
@@ -25,9 +25,11 @@ echo.
 echo ...starting...
 cd bin
 efirc
-rem exit 0
+exit %ERRORLEVEL%
 
 rem Fenster offen halten, um
 rem moegliche Fehler zu analysieren
 :error
+echo.
+echo ERRORLEVEL %ERRORLEVEL% (see build.log for details)
 pause
