@@ -59,9 +59,6 @@ class Fenster : public wxFrame
         void BenutzerHinzufuegen(wxString benutzerliste = "");
         void BenutzerEntfernen(wxString benutzer = "");
         void BenutzerAendern(wxString altername, wxString neuername);
-        //void Benutzerliste_komplett(wxString& benutzerliste);
-        //void Benutzerliste_benutzer_entfernen(wxString& benutzer);
-        //void Benutzerliste_benutzer_hinzufuegen(wxString& benutzer);
         //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
         
         

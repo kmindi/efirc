@@ -8,12 +8,13 @@ DECLARE_APP(Zentrale) //braucht man fuer wxGetApp um damit auf die funktionen de
 // Empfangene normale Nachrichten werden ausgegeben
 void irc_pmsg(const irc_msg_data *msg_data, void *cp)
 {
+    wxChar leerzeichen = ' ';
+    
     wxString text = msg_data->params_a[1];
     wxString empfaenger = msg_data->params_a[0];
     wxString user = msg_data->nick;
     wxString prefix = _T("\001");
-    wxChar leerzeichen = ' ';
-
+    
     // CTCP abfragen ("'\001'BEFEHL text'\001'")
     //Falls kein CTCP:
     
@@ -160,7 +161,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             }
         }
     }
-    
+
 }
 
 // Message of the day anzeigen

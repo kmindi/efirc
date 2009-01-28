@@ -6,6 +6,7 @@
 // main funkition erstellen, Instanz der Klasse Zentrale erstellen
 // mit DECLARE_APP(Zentrale/) und wxGetApp() kann auf Funktionen dieser Klasse zugegrifffen werden
 IMPLEMENT_APP(Zentrale) // erstellt main funktion
+// {}
 
 bool Zentrale::OnInit()
 {
@@ -13,11 +14,9 @@ bool Zentrale::OnInit()
     new wxSocketClient();
     
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    
-    // Verlinkung der IRC-Funktionen starten und IRC Threads starten
-    connect_thread(); 
-    
+    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
     for(int i=0;i<10;i++) { zgr_fenster[i]=NULL; }
@@ -29,11 +28,16 @@ bool Zentrale::OnInit()
     neuesFenster(raum);
     
     
+    // Verlinkung der IRC-Funktionen starten und IRC Threads starten
+    // Eine Instanz der Fensterklasse muss erzeugt sein
+    connect_thread(); 
+    
+    
+    
     // TEST FUNKTIONEN
     neuesFenster("tescht");
     fenstersuchen("tescht")->Fehler(1); // fehleranzeigetest
 
-    
     return TRUE;
 } 
 
