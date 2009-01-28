@@ -35,8 +35,6 @@ bool Zentrale::OnInit()
     
     
     // TEST FUNKTIONEN
-    neuesFenster("tescht");
-    fenstersuchen("tescht")->Fehler(1); // fehleranzeigetest
 
     return TRUE;
 } 
@@ -302,8 +300,6 @@ void irc_nowaway(const irc_msg_data *msg_data, void *cp);
 
 void Zentrale::connect_thread()
 {
-    irc->connect();
-
     // Ereignisverknüpfung
     // TODO wirklich Ereignisse implementieren
 
@@ -379,6 +375,8 @@ void Zentrale::connect_thread()
     irc->add_link("501", &irc_error);
     irc->add_link("502", &irc_error);
     
+    
+    irc->connect();
     
     Thread *thread = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
     Thread *thread2 = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten

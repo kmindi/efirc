@@ -34,7 +34,19 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     // EIGENE FUNKTION ?
     WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxBLACK)); // muss gesetzt werden
     defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+    
+    
+    // Eine gedrueckte Taste bei Fokus im Eingabefeld
+    // loest das Ereignis aus, welches die festgelegte
+    // Methode aufruft
+    WxEdit_eingabefeld->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Fenster::WxEdit_eingabefeldTasteGedrueckt), NULL, this);
+
+    // Bei Fokus ggf. den Text im Eingabefeld loeschen
+    WxEdit_eingabefeld->Connect(wxEVT_SET_FOCUS, wxKeyEventHandler(Fenster::WxEdit_eingabefeldFokus), NULL, this);
 }
+
+
+// Ereignissabhaengige Funktionen
 
 // Schliessen
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
@@ -55,7 +67,41 @@ void Fenster::BeiAktivierung(wxActivateEvent& event)
 // Sendenknopf
 void Fenster::WxButton_sendenClick(wxCommandEvent& event)
 {
-    //in geschichte speichern
+    NachrichtSenden();
+}
+
+// Tastendruck im Eingabefeld
+void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
+{
+    // Der Wert der gedrueckten Taste
+    int gedrueckte_taste = event.GetKeyCode();
+
+    if (gedrueckte_taste == WXK_RETURN)
+    {
+        NachrichtSenden();
+    }
+
+    else
+    {
+        // Ereignis weiterleiten
+        event.Skip();
+    }
+    return;
+}
+
+// Bei Fokuserhalt Standardtext loeschen
+void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
+{
+    // VERBINDUNG ZUR KONFIGURATION
+    if (WxEdit_eingabefeld->GetValue() == "Nachricht eingeben und Senden")
+    {
+        WxEdit_eingabefeld->Clear();
+    }
+}
+
+void Fenster::NachrichtSenden()
+{
+    // IN GESCHICHTE SPEICHERN
     
     wxString eingabe = WxEdit_eingabefeld->GetValue(); // Eingegebenen Text in Variable speichern
     WxEdit_eingabefeld->Clear(); // Eingabefeld leeren

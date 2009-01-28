@@ -37,13 +37,16 @@ class Fenster : public wxFrame
         void OnClose(wxCloseEvent& event);
         void WxButton_sendenClick(wxCommandEvent& event);
         void BeiAktivierung(wxActivateEvent& event);
+        void NachrichtSenden();
         
         wxString eingabe_geschichte[50];
         //Autocomplete.
         
 
         DECLARE_EVENT_TABLE()
-    
+        void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
+        void WxEdit_eingabefeldFokus(wxKeyEvent& event);
+        
     public:
         int fensternummer;
         Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxCLOSE_BOX); 
