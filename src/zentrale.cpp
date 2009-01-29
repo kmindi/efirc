@@ -267,7 +267,7 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
     // wenn nicht an raum/benutzer senden
     else
     {
-        NachrichtSenden(fensternummer,eingabe);
+        NachrichtSenden(fensternummer,eingabe.mb_str(wxConvUTF8));
     }
 }
 

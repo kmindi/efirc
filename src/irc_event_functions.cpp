@@ -131,6 +131,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
         if(ctcp_befehl == "PING")
         {
             wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("P_PRIVMSG",user,ctcp_befehl + " " + ctcp_text);
+            //ANTWORT?
         }
 
 
