@@ -200,6 +200,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         
     else if(local == "PART")
         WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum verlassen (" + param2 + ")"));
+    
+    else if(local == "QUIT")
+        WxEdit_ausgabefeld->AppendText(_T(param1 + " hat das IRC-Netzwerk verlassen (" + param2 + ")"));
         
     else if(local == "MOTD")
         WxEdit_ausgabefeld->AppendText(_T(param1));

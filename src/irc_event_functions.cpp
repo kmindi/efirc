@@ -256,7 +256,17 @@ void irc_leave(const irc_msg_data *msg_data, void *cp)
     wxString nachricht = msg_data->params_a[1];
     wxString benutzer = msg_data->nick;
     wxGetApp().fenstersuchen(empfaenger)->BenutzerEntfernen(benutzer);
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("PART",benutzer,nachricht);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("PART", benutzer, nachricht);
+}
+
+void irc_quit(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger = wxGetApp().irc->CurrentNick; // Emfpaenger ist man immer selber
+    wxString benutzer = msg_data->nick;
+    wxString nachricht = msg_data->params_a[0];
+
+    wxGetApp().fenstersuchen(empfaenger)->BenutzerEntfernen(benutzer);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("QUIT", benutzer, nachricht);
 }
 
 // Benutzerliste aktualisieren / Benutzer hat seinen Namen geaendert

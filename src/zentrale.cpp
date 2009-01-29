@@ -294,6 +294,7 @@ void irc_whoisserver(const irc_msg_data *msg_data, void *cp);
 void irc_userlist(const irc_msg_data *msg_data, void *cp);
 void irc_join(const irc_msg_data *msg_data, void *cp);
 void irc_leave(const irc_msg_data *msg_data, void *cp);
+void irc_quit(const irc_msg_data *msg_data, void *cp);
 void irc_nick(const irc_msg_data *msg_data, void *cp);
 void irc_unaway(const irc_msg_data *msg_data, void *cp);
 void irc_nowaway(const irc_msg_data *msg_data, void *cp);
@@ -324,7 +325,7 @@ void Zentrale::connect_thread()
     irc->add_link("353", &irc_userlist);
     irc->add_link("JOIN", &irc_join);
     irc->add_link("PART", &irc_leave);
-    //irc->add_link("QUIT", &irc_quit);
+    irc->add_link("QUIT", &irc_quit);
     irc->add_link("NICK", &irc_nick);
     irc->add_link("PING", &irc_pong);
     //irc->add_link("KICK", &irc_kick);
