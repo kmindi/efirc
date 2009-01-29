@@ -249,6 +249,16 @@ void irc_join(const irc_msg_data *msg_data, void *cp)
     
 }
 
+// Benutzerliste aktualisieren / Benutzer hat den Raum verlassen
+void irc_leave(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nachricht = msg_data->params_a[1];
+    wxString benutzer = msg_data->nick;
+    wxGetApp().fenstersuchen(empfaenger)->BenutzerEntfernen(benutzer);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("PART",benutzer,nachricht);
+}
+
 // Benutzerliste aktualisieren / Benutzer hat seinen Namen geaendert
 void irc_nick(const irc_msg_data *msg_data, void *cp)
 {

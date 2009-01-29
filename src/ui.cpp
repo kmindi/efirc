@@ -155,7 +155,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    if(local == "PRIVMSG")
+    else if(local == "PRIVMSG")
     {
         if(param1 == "")
         {
@@ -167,7 +167,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    if(local == "P_ACTION")
+    else if(local == "P_ACTION")
     {
         WxEdit_ausgabefeld->AppendText(_T("[ "));
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
@@ -176,14 +176,14 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         WxEdit_ausgabefeld->AppendText(_T(" ]"));
     }
     
-    if(local == "ACTION")
+    else if(local == "ACTION")
     {
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
         WxEdit_ausgabefeld->AppendText(_T("*" + param1 + " " + param2));
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     }
         
-    if(local == "TOPIC")
+    else if(local == "TOPIC")
     {
         if(param2 == "")
         {
@@ -195,13 +195,16 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    if(local == "JOIN")
+    else if(local == "JOIN")
         WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum betreten"));
-    
-    if(local == "MOTD")
+        
+    else if(local == "PART")
+        WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum verlassen (" + param2 + ")"));
+        
+    else if(local == "MOTD")
         WxEdit_ausgabefeld->AppendText(_T(param1));
     
-    if(local == "CTCP")
+    else if(local == "CTCP")
     {
          if(param3 == "")
         {
@@ -214,39 +217,39 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
        
-    if(local == "MODE")
+    else if(local == "MODE")
     {
         WxEdit_ausgabefeld->AppendText(_T(param1 + " setzt Modus: " + param2));
     }
           
     
-    if(local == "AWAY")
+    else if(local == "AWAY")
     {
         // ES WIRD EINE LEERE ZEILE AUSGEGEBEN WENN MAN DEN STATUS WIEDER AUF VERFUEGBAR SETZT
         if(param1 != "")
             WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: " + param1));
     }
     
-    if(local == "RPL_UNAWAY")
+    else if(local == "RPL_UNAWAY")
         WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt nicht mehr abwesend"));
 
-    if(local == "RPL_NOWAWAY")
+    else if(local == "RPL_NOWAWAY")
         WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt als abwesend markiert"));
     
     // Whois Antworten
-    if(local == "WHOIS_BENUTZER")
+    else if(local == "WHOIS_BENUTZER")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " (" + param2 + "@" + param3 + " - " + param4 + ") ]"));
     
-    if(local == "WHOIS_ABWESEND")
+    else if(local == "WHOIS_ABWESEND")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist abwesend: " + param2 + " ]"));
         
-    if(local == "WHOIS_RAEUME")
+    else if(local == "WHOIS_RAEUME")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist in: " + param2 + " ]"));
         
-    if(local == "WHOIS_UNTAETIG")
+    else if(local == "WHOIS_UNTAETIG")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist untaetig seit: " + param2 + " ]"));
         
-    if(local == "WHOIS_SERVERNACHRICHT")
+    else if(local == "WHOIS_SERVERNACHRICHT")
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " " + param2 + " " + param3 + " ]"));
         
 }
@@ -359,15 +362,17 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
 
 void Fenster::BenutzerEntfernen(wxString benutzer)
 {
-    // @ und + duerfen kein Bestandteil vom Benutzername sein
-    long id = WxList_benutzerliste->FindItem(-1,_T(benutzer));
-    WxList_benutzerliste->DeleteItem(id);
+    wxString Benutzer_prefix_liste[3]={_T(""),_T("@"),_T("+")};
+    long id = 0;
     
-    id = WxList_benutzerliste->FindItem(-1,_T("@" + benutzer));
-    WxList_benutzerliste->DeleteItem(id);
-    
-    id = WxList_benutzerliste->FindItem(-1,_T("+" + benutzer));
-    WxList_benutzerliste->DeleteItem(id);
+    for(int i = 0;i<3;i++)
+    {
+        id = WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + benutzer));
+        if(id != -1)
+        {
+            WxList_benutzerliste->DeleteItem(id);
+        }
+    }   
 }
 
 void Fenster::BenutzerAendern(wxString altername, wxString neuername)
@@ -381,7 +386,7 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
         id = WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + altername));
         if(id != -1)
         {
-            WxList_benutzerliste->DeleteItem(WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + altername)));
+            WxList_benutzerliste->DeleteItem(id);
             BenutzerHinzufuegen(_T(Benutzer_prefix_liste[i] + neuername));
         }
     }
