@@ -214,7 +214,11 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
        
-        
+    if(local == "MODE")
+    {
+        WxEdit_ausgabefeld->AppendText(_T(param1 + " setzt Modus: " + param2));
+    }
+          
     
     if(local == "AWAY")
     {

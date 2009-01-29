@@ -14,8 +14,8 @@ bool Zentrale::OnInit()
     new wxSocketClient();
     
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
 
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
@@ -280,6 +280,7 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 // Bevor die Funktionen die mit der IRC-Schnittstelle verbunden werden verwendet werden, muessen 
 // sie bekannt gemacht sein
 void irc_pmsg(const irc_msg_data *msg_data, void *cp);
+void irc_mode(const irc_msg_data *msg_data, void *cp);
 void irc_endofmotd(const irc_msg_data *msg_data, void *cp);
 void irc_motd(const irc_msg_data *msg_data, void *cp);
 void irc_topic(const irc_msg_data *msg_data, void *cp);
@@ -306,7 +307,7 @@ void Zentrale::connect_thread()
     irc->add_link("PRIVMSG", &irc_pmsg);
     irc->add_link("NOTICE", &irc_pmsg);
     
-    //irc->add_link("MODE", &irc_mode);
+    irc->add_link("MODE", &irc_mode);
     
     irc->add_link("301", &irc_whoisaway);
     irc->add_link("305", &irc_unaway);

@@ -164,6 +164,46 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
 
 }
 
+void irc_mode(const irc_msg_data *msg_data, void *cp)
+{
+    // NOCH HERAUSSUCHEN WENN +o und +v (=> @ und + vor nickname bzw chanop und voice)
+    
+    
+    wxString Sender = msg_data->nick;
+    wxString empfaenger = msg_data->params_a[0];
+    wxString Parameter = "";
+    wxString Raum = "";
+    wxString Modus = "";
+
+    if(Sender == "")
+    {
+        Sender = msg_data->sender;
+    }
+
+    for(int i = 0; i < msg_data->params_i; i++)
+    {
+        if(msg_data->params_a[i][0] == '#')
+        {
+            Raum = _T(" (");
+            Raum += _T(msg_data->params_a[i]); 
+            Raum += _T(")");
+        }
+        else if(msg_data->params_a[i][0] == '+' ||
+                msg_data->params_a[i][0] == '-')
+        {
+            Modus = msg_data->params_a[i];
+        }
+        else
+        {
+            Parameter += " " + string(msg_data->params_a[i]);
+        }
+    }
+
+    Modus += Parameter + Raum;
+
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("MODE", Sender, Modus);
+}
+
 // Message of the day anzeigen
 void irc_motd(const irc_msg_data *msg_data, void *cp)
 {
@@ -260,9 +300,13 @@ void irc_requestedtopic(const irc_msg_data *msg_data, void *cp)
 void irc_error(const irc_msg_data *msg_data, void *cp)
 {
     wxString empfaenger = msg_data->params_a[0];
-    // Fehlernummer auslesen und uebergeben
-    // in Fehler() abfrage nach den IRC Fehlerantworten
-    wxGetApp().fenstersuchen(empfaenger)->Fehler(2,_T(msg_data->params_a[2]));
+    wxString fehler = _T(msg_data->cmd);
+    for(int i = 0; i < msg_data->params_i; i++)
+    {
+        fehler += _T(" ");
+        fehler += _T(msg_data->params_a[i]);
+    }
+    wxGetApp().fenstersuchen(empfaenger)->Fehler(2,fehler);
 }
 
 // Auf Ping mit Pong antworten
