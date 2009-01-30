@@ -1,4 +1,4 @@
-CPP=g++
+CPP=mingw32-g++
 ifdef WINDOWS
 DEF=-DWINDOWS
 endif
