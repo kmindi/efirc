@@ -8,14 +8,36 @@
 IMPLEMENT_APP(Zentrale) // erstellt main funktion
 // {}
 
+// Benutzerdefinierte Ereignisse deklarieren und definieren
+BEGIN_DECLARE_EVENT_TYPES()
+    DECLARE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND, 7777)
+END_DECLARE_EVENT_TYPES()
+
+DEFINE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND)
+#define EVT_MY_CUSTOM_COMMAND(id, fn) \
+    DECLARE_EVENT_TABLE_ENTRY( \
+        wxEVT_MY_CUSTOM_COMMAND, id, wxID_ANY, \
+        (wxObjectEventFunction)(wxEventFunction) wxStaticCastEvent( wxCommandEventFunction, &fn ), \
+        (wxObject *) NULL \
+    ),
+
+
+BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
+    EVT_MY_CUSTOM_COMMAND(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
+END_EVENT_TABLE()
+
 bool Zentrale::OnInit()
 {
+    Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
+    
+    
+    
     // neuen Socket erzeugen (unter Windows liefert dies WSAData...?)
     new wxSocketClient();
     
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
 
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
@@ -38,6 +60,12 @@ bool Zentrale::OnInit()
 
     return TRUE;
 } 
+
+
+void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
+{
+    wxGetApp().neuesFenster(event.GetString());
+}
 
 // Funktionen die auf die Fenster-KLasse zugreifen bzw. auf Instanzen eben dieser
 void Zentrale::neuesFenster(wxString namedesfensters)
@@ -262,7 +290,7 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
     wxString befehlsprefix = "/";
     if(eingabe.StartsWith(befehlsprefix.c_str(), &eingabe))
     {
-        BefehlVerarbeiten(fensternummer, eingabe);
+        BefehlVerarbeiten(fensternummer, eingabe.mb_str(wxConvUTF8));
     }
     // wenn nicht an raum/benutzer senden
     else

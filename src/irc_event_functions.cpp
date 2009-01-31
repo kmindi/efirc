@@ -5,6 +5,13 @@
 
 DECLARE_APP(Zentrale) //braucht man fuer wxGetApp um damit auf die funktionen der Zentrale zuzugreifen
 
+
+// Benutzerdefiniertes Ereignis muss hier auch bekannt sein, definiert wird es in zentrale.cpp
+BEGIN_DECLARE_EVENT_TYPES()
+    DECLARE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND, 7777)
+END_DECLARE_EVENT_TYPES()
+
+
 // Empfangene normale Nachrichten werden ausgegeben
 void irc_pmsg(const irc_msg_data *msg_data, void *cp)
 {
@@ -239,7 +246,9 @@ void irc_join(const irc_msg_data *msg_data, void *cp)
     // Wenn man selber der Benutzer ist, dann hat man den Raum betreten
     // Deshalb wird hier das Fenster erst erstellt und nicht schon bei der Befehlsabfrage
     {
-        wxGetApp().neuesFenster(_T(msg_data->params_a[0]));
+        wxCommandEvent eventCustom(wxEVT_MY_CUSTOM_COMMAND);
+        eventCustom.SetString(_T(msg_data->params_a[0]));
+        wxPostEvent(wxGetApp().Ereignisvw, eventCustom);
     }
     else
     // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat

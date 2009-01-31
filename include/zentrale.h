@@ -10,6 +10,7 @@ class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <thread.h>
 #include <ui.h>
 #include <irc.h>
+#include <event.h>
 
 class Zentrale : public wxApp
 {
@@ -21,6 +22,7 @@ class Zentrale : public wxApp
         // auf die privaten Thread funktionen zugreifen koennen
         
         IRCInterface *irc; //zeiger zum IRCInterface erzeugen
+        Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
         
         void fensterzerstoeren(int);
         void fensterzerstoeren(wxString);
@@ -29,7 +31,9 @@ class Zentrale : public wxApp
         Fenster* fenstersuchen(wxString); 
         
         // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
-        // PER VARIABLE FESTSETZEN NICHT FEST 10
+        // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
+        // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
+        // MAXIMALE ANZAHL DER RAEUME PER VARIABLE FESTSETZEN
         Fenster *zgr_fenster[10]; //feld fuer zeiger auf maximal 10 instanzen
         wxString fenstername[10]; 
         wxString raum; // fuer join nach motd, temporaer
