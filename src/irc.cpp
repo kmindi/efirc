@@ -13,6 +13,7 @@ IRCInterface::IRCInterface(wxString port, wxString server,
                          pass.c_str(), fopen("cppirc.log", "w"))
 {
     CurrentNick = nick;
+    WantedNick = nick;
     CurrentHostname = server;
     CurrentPort = port;
 }

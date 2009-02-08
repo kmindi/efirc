@@ -30,15 +30,15 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     
     
     SetIcon(wxIcon(icon));
-    // OBJEKTE ANPASSEN, VERBINDUNG ZUR KONFIGURATION
-    // EIGENE FUNKTION ?
-    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxBLACK)); // muss gesetzt werden
-    defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
     
+    // OBJEKTE ANPASSEN, VERBINDUNG ZUR KONFIGURATION
+    // IN EIGENE FUNKTION AUSLAGERN
+    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxBLACK)); // voreingestelltes Aussehen setzen ...
+    defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle(); // ... und speichern
+    
+    // Ereignisse verknuepfen
     
     // Eine gedrueckte Taste bei Fokus im Eingabefeld
-    // loest das Ereignis aus, welches die festgelegte
-    // Methode aufruft
     WxEdit_eingabefeld->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Fenster::WxEdit_eingabefeldTasteGedrueckt), NULL, this);
 
     // Bei Fokus ggf. den Text im Eingabefeld loeschen
@@ -261,7 +261,6 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
 {
     
     //VERBINDUNG ZUR KONFIGURATION
-    // FARBE?
     
     // Zeitstempel erzeugen
     char timestamp[12];
@@ -272,24 +271,24 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
     strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
     wxString prefix(timestamp);
     
-    // Farbe setzen
+    // Aussehen aendern (Farbe)
     WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxRED, *wxBLUE));
     
-    // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen    
-    WxEdit_ausgabefeld->AppendText(_T("\n"+prefix+" (!) "));
-    
-    wxString fehlernummer_str;
-    fehlernummer_str << fehlernummer;
-    param1 = _T("(" + fehlernummer_str + ") (" + param1 + ")");
-    // Fehlernummern abfragen
-    if(fehlernummer == 1)
-        WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden" + param1));
-    if(fehlernummer == 2)
-        WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten " + param1));
-    if(fehlernummer == 3)
-        WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden " + param1));
-    
-    // Farbe wieder auf voreingestellten Wert setzten, siehe Konstruktor
+        // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen    
+        WxEdit_ausgabefeld->AppendText(_T("\n"+prefix+" (!) "));
+        
+        wxString fehlernummer_str;
+        fehlernummer_str << fehlernummer;
+        param1 = _T("(" + fehlernummer_str + ") (" + param1 + ")");
+        // Fehlernummern abfragen
+        if(fehlernummer == 1)
+            WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden" + param1));
+        if(fehlernummer == 2)
+            WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten " + param1));
+        if(fehlernummer == 3)
+            WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden " + param1));
+        
+    // Voreingestelltes Aussehen wiederherstellen (Farbe wieder entfernen)
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
 }
 
@@ -363,19 +362,21 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
     }
 }
 
-void Fenster::BenutzerEntfernen(wxString benutzer)
+bool Fenster::BenutzerEntfernen(wxString benutzer)
 {
     wxString Benutzer_prefix_liste[3]={_T(""),_T("@"),_T("+")};
     long id = 0;
+    bool entfernt = false;
     
     for(int i = 0;i<3;i++)
     {
         id = WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + benutzer));
         if(id != -1)
         {
-            WxList_benutzerliste->DeleteItem(id);
+            entfernt = WxList_benutzerliste->DeleteItem(id);
         }
     }   
+    return entfernt;
 }
 
 void Fenster::BenutzerAendern(wxString altername, wxString neuername)

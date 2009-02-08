@@ -8,7 +8,7 @@ DECLARE_APP(Zentrale) //braucht man fuer wxGetApp um damit auf die funktionen de
 
 // Benutzerdefiniertes Ereignis muss hier auch bekannt sein, definiert wird es in zentrale.cpp
 BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND, 7777)
+    DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
 END_DECLARE_EVENT_TYPES()
 
 
@@ -246,7 +246,7 @@ void irc_join(const irc_msg_data *msg_data, void *cp)
     // Wenn man selber der Benutzer ist, dann hat man den Raum betreten
     // Deshalb wird hier das Fenster erst erstellt und nicht schon bei der Befehlsabfrage
     {
-        wxCommandEvent eventCustom(wxEVT_MY_CUSTOM_COMMAND);
+        wxCommandEvent eventCustom(wxEVT_NEUES_FENSTER);
         eventCustom.SetString(_T(msg_data->params_a[0]));
         wxPostEvent(wxGetApp().Ereignisvw, eventCustom);
     }
@@ -271,12 +271,27 @@ void irc_leave(const irc_msg_data *msg_data, void *cp)
 
 void irc_quit(const irc_msg_data *msg_data, void *cp)
 {
-    wxString empfaenger = wxGetApp().irc->CurrentNick; // Emfpaenger ist man immer selber
+    wxString empfaenger = wxGetApp().irc->CurrentNick;
     wxString benutzer = msg_data->nick;
     wxString nachricht = msg_data->params_a[0];
+    bool benutzer_entfernt = false;
 
-    wxGetApp().fenstersuchen(empfaenger)->BenutzerEntfernen(benutzer);
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("QUIT", benutzer, nachricht);
+    // IN JEDEM FENSTER ENTFERNEN
+    for(int i = 0; i<10; i++)
+    {
+        benutzer_entfernt = false; // In diesem Fenster wurde noch nicht versucht den Benutzer zu entfernen
+        
+        if(!(wxGetApp().zgr_fenster[i]==NULL))
+        // nicht in nicht vorhandenen Fenstern
+        {
+            benutzer_entfernt = wxGetApp().zgr_fenster[i]->BenutzerEntfernen(benutzer);
+            if(benutzer_entfernt = true)
+            // Nachricht ausgeben falls der Benutzer in diesem Fenster entfernt werden konnte
+            {
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("QUIT", benutzer, nachricht);
+            }
+        }
+    }
 }
 
 // Benutzerliste aktualisieren / Benutzer hat seinen Namen geaendert
@@ -292,7 +307,7 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
         if(!(wxGetApp().zgr_fenster[i]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
-            if(benutzer == wxGetApp().irc->CurrentNick)
+            if(benutzer == wxGetApp().irc->CurrentNick || benutzer == wxGetApp().irc->WantedNick)
             // Wenn man selber der Benutzer ist, dann muss der eigene Nick geaendert werden
             {
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer,neuername);
@@ -309,6 +324,33 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
             }
         }
     }
+}
+
+// Nickname wird bereits genutzt
+void irc_nickinuse(const irc_msg_data *msg_data, void *cp)
+{
+    // WENN DER FEHLER SCHON BEIM VERBINDEN AUFTRITT 
+    // WIRD DER NEUE NAME NICHT VOM SERVER NOCHMAL GESENDET
+    // MAN KANN ALSO NICHT MIT irc_nick DADRAUF REAGIEREN
+    
+    
+    // VERBINDUNG ZUR KONFIGURATION
+    // Fehlermeldung anzeigen (alternativ irc_error aufrufen hier.
+    
+    
+    //statt diesem irc_error aufrufen
+        wxString fehler = _T(msg_data->cmd);
+        for(int i = 0; i < msg_data->params_i; i++)
+        {
+            fehler += _T(" ");
+            fehler += _T(msg_data->params_a[i]);
+        }
+        wxGetApp().fenstersuchen(wxGetApp().irc->WantedNick)->Fehler(2,fehler);
+     //statt diesem irc_error aufrufen
+     
+     
+    wxGetApp().irc->WantedNick += _T("_"); // _ an den namen anhaengen
+    wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick);
 }
 
 

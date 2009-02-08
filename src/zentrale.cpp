@@ -10,20 +10,21 @@ IMPLEMENT_APP(Zentrale) // erstellt main funktion
 
 // Benutzerdefinierte Ereignisse deklarieren und definieren
 BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND, 7777)
+    DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
 END_DECLARE_EVENT_TYPES()
 
-DEFINE_EVENT_TYPE(wxEVT_MY_CUSTOM_COMMAND)
-#define EVT_MY_CUSTOM_COMMAND(id, fn) \
+DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)
+
+#define EVT_NEUES_FENSTER(id, fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
-        wxEVT_MY_CUSTOM_COMMAND, id, wxID_ANY, \
+        wxEVT_NEUES_FENSTER, id, wxID_ANY, \
         (wxObjectEventFunction)(wxEventFunction) wxStaticCastEvent( wxCommandEventFunction, &fn ), \
         (wxObject *) NULL \
     ),
 
 
 BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
-    EVT_MY_CUSTOM_COMMAND(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
+    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
 END_EVENT_TABLE()
 
 bool Zentrale::OnInit()
@@ -36,8 +37,8 @@ bool Zentrale::OnInit()
     new wxSocketClient();
     
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
 
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
@@ -170,7 +171,9 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     
     if(befehl_name.Upper() == "QUIT")
     {
-        // alle Fenster zerstoeren        
+        wxString quitmessage = wxT("ef!rc");
+        irc->disconnect_server(quitmessage.c_str());
+        // ALLE FENSTER ZERSTOEREN
     }
 
     if(befehl_name.Upper() == "JOIN" && befehl_parameter != "")
@@ -193,17 +196,9 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     
     if(befehl_name.Upper() == "NICK" && befehl_parameter != "")
     {
-            irc->send_nick(befehl_parameter.c_str());
-            // Aktuellen Nick manuell veraendern
-            // damit die nickinuse-Funktion den
-            // gewollten nick als aktuellen nickname
-            // erhaelt
-            // irc->WantedNick = param;
-            
-            // wenn kein nickname gesetzt wurde (also der nick user_QIFS oder so ist)
-            // dann weiterversuchen
-            // andernfalls nachricht anzeigen und an den nick _ anhaehgen nach zwei versuchen 
-            // aufforderung zum selber eingeben anzeigen, auf NICK neuernick warten
+            irc->send_nick(befehl_parameter.c_str()); // Nickname senden
+            irc->WantedNick = befehl_parameter; 
+            // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
     }
     
     if(befehl_name.Upper() == "ME" && befehl_parameter != "")
@@ -324,6 +319,7 @@ void irc_join(const irc_msg_data *msg_data, void *cp);
 void irc_leave(const irc_msg_data *msg_data, void *cp);
 void irc_quit(const irc_msg_data *msg_data, void *cp);
 void irc_nick(const irc_msg_data *msg_data, void *cp);
+void irc_nickinuse(const irc_msg_data *msg_data, void *cp);
 void irc_unaway(const irc_msg_data *msg_data, void *cp);
 void irc_nowaway(const irc_msg_data *msg_data, void *cp);
 // SOLLEN MITGLIEDER VON ZENTRALE SEIN; DANN DURCH zentrale.h SCHON BEKANNT
@@ -378,7 +374,7 @@ void Zentrale::connect_thread()
     irc->add_link("424", &irc_error);
     irc->add_link("431", &irc_error);
     irc->add_link("432", &irc_error);
-    irc->add_link("433", &irc_error); //nick in use
+    irc->add_link("433", &irc_nickinuse);
     irc->add_link("436", &irc_error);
     irc->add_link("441", &irc_error);
     irc->add_link("442", &irc_error);
