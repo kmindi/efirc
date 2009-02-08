@@ -504,7 +504,7 @@ IRCSocket::parse_msg(char *msg)
 		if(*w != ':')
 			s = strsep(&w, " ");
 		else
-			s = w++;
+			s = ++w;
 
 		l = strlen(s) + 1;
 
