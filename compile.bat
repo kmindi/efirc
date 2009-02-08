@@ -5,7 +5,7 @@ rem aufgerufen
 echo.
 echo ...calling make...
 set WINDOWS=1
-mingw32-make all 2> build.log
+mingw32-make.exe 2> build.log
 
 rem echo ...Stripping...
 rem strip --strip-all bin\test.exe
@@ -24,7 +24,8 @@ rem efirc.exe in bin aufrufen
 echo.
 echo ...starting...
 cd bin
-efirc
+copy ..\src\efirc.exe efirc.exe
+efirc.exe
 exit %ERRORLEVEL%
 
 rem Fenster offen halten, um
