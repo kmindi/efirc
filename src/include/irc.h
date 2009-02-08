@@ -5,7 +5,7 @@
 #define _IRCInterface_
 
 #include <wx/string.h>
-#include <cppirc/ircsocket.h>
+#include <ircsocket.h>
 
 using namespace std;
 

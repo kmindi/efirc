@@ -30,12 +30,11 @@ class Zentrale : public wxApp
         
         Fenster* fenstersuchen(wxString); 
         
-        // --------------------------------------------------------------------------
         // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
-        // --------------------------------------------------------------------------
-        
+        // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
+        // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
         // MAXIMALE ANZAHL DER RAEUME PER VARIABLE FESTSETZEN
-        Fenster *zgr_fenster[10]; // feld fuer zeiger auf maximal 10 instanzen
+        Fenster *zgr_fenster[10]; //feld fuer zeiger auf maximal 10 instanzen
         wxString fenstername[10]; 
         wxString raum; // fuer join nach motd, temporaer
         void neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
