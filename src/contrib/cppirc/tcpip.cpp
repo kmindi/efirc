@@ -251,12 +251,13 @@ IRCSocket::recv_raw(void)
 			c = parse(n);
 
 			delete o;
-			delete n;
 
 			/* ignored message part */
 			l = strlen(c) + 1;
 			o = new char[l];
 			strlcpy(o, c, l);
+
+			delete n;
 		} else {
 			#ifdef WINDOWS
 			debug(3, "recv_raw", "Couldn't receive"

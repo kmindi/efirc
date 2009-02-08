@@ -1,12 +1,13 @@
 // TODO errorhandler for ^C
 //      malloc()-use
 //      high load when "couldn't create socket"
+//      trigger call_cmd() when added cmd
 
 #ifndef _IRCSOCKET_H_
 #define	_IRCSOCKET_H_
 
 #ifdef WINDOWS
-#include <windows.h>
+#include <Winsock2.h>
 #include "sstring.h"
 #else
 #include <string.h>
