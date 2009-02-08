@@ -23,7 +23,7 @@ class Fenster : public wxFrame
         wxTextCtrl *WxEdit_eingabefeld;
         wxTextCtrl *WxEdit_ausgabefeld;
         
-        wxTextAttr defaultstyle;
+        wxTextAttr defaultstyle; // TextAttribut fuer das voreingestellte Aussehen deklarieren
         
         enum
         {
@@ -60,7 +60,7 @@ class Fenster : public wxFrame
         
         //Benutzerlistenfunktionen
         void BenutzerHinzufuegen(wxString benutzerliste = "");
-        void BenutzerEntfernen(wxString benutzer = "");
+        bool BenutzerEntfernen(wxString benutzer = "");
         void BenutzerAendern(wxString altername, wxString neuername);
         //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
         
