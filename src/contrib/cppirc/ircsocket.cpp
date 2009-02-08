@@ -1,10 +1,4 @@
 #include "ircsocket.h"
-#ifdef WINDOWS
-#include "io.cpp"
-#include "irccommands.cpp"
-#include "sstring.c"
-#include "tcpip.cpp"
-#endif
 
 /****************************
  *
