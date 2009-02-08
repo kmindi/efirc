@@ -25,6 +25,7 @@ echo.
 echo ...starting...
 cd bin
 copy ..\src\efirc.exe efirc.exe
+del ..\src\efirc.exe
 efirc.exe
 exit %ERRORLEVEL%
 

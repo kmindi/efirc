@@ -8,9 +8,7 @@ PATH+=c:\mingw\bin;c:\upx
 in cmd zum kompilieren von wxwidgets:
 C:\wxwidgets\build\msw\
 mingw32-make -f makefile.gcc BUILD=release MONOLITHIC=1 USE_OPENGL=1 RUNTIME_LIBS=static USE_RTTI=0 USE_EXCEPTIONS=1
-(mingw32-make -f makefile.gcc BUILD=release MONOLITHIC=1 USE_OPENGL=1 RUNTIME_LIBS=static USE_RTTI=0 USE_EXCEPTIONS=1 UNICODE=1)
 
-dateien aus wxwidgets ordner/include/wx nach include/wx
+dateien aus wxwidgets ordner\include\wx nach src\include\wx
 setup.h aus wx\msw nach wx kopieren
-libwxmsw28.a aus wxwidgets ordner/lib/gcc_lib nach lib/
-(libwxmsw28u.a aus wxwidgets ordner/lib/gcc_lib nach lib/)
+libwxmsw28.a aus wxwidgets ordner/lib/gcc_lib nach C:\MinGW\lib\
