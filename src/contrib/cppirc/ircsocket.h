@@ -6,7 +6,7 @@
 #ifndef _IRCSOCKET_H_
 #define	_IRCSOCKET_H_
 
-#ifdef WINDOWS
+#ifdef WIN32
 #include <Winsock2.h>
 #include "sstring.h"
 #else

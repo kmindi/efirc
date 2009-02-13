@@ -12,6 +12,8 @@ void*
 listen(void* arg)
 {
 	ircsocket.recv_raw();
+
+	return 0;
 }
 
 void

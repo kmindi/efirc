@@ -11,7 +11,7 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	const char *nick, const char *user, const char *real,
 	const char *pass, FILE *log)
 {
-	#ifdef WINDOWS /* see msdn WSAStartup */
+	#ifdef WIN32 /* see msdn WSAStartup */
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;
@@ -52,7 +52,7 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	_DBGLEVEL = 3;
 	_DBGRECON = 1;
 
-	#ifdef WINDOWS
+	#ifdef WIN32
 	err = WSAStartup(wVersionRequested, &wsaData);
 
 	if(err != 0)
@@ -68,7 +68,7 @@ IRCSocket::~IRCSocket()
 		disconnect_server("");
 
 	/* close socket */
-	#ifdef WINDOWS
+	#ifdef WIN32
 	shutdown(sock, 2);
 
 	WSACleanup();
@@ -206,7 +206,7 @@ IRCSocket::call_cmd(void)
 				" queue.\n");
 
 		/* don't hurry */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		Sleep(10);
 		#else
 		usleep(10);

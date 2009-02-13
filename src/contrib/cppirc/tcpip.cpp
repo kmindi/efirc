@@ -35,7 +35,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	connected = 0;
 
 	/* close socket so that it isn't just overwritten */
-	#ifdef WINDOWS
+	#ifdef WIN32
 	shutdown(sock, 2);
 	#else
 	close(sock);
@@ -70,7 +70,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		 * Now an error has occured. Error number is
 		 * printed and the function exits with 1.
 		 */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "connect_server", "Couldn't create"
 			" socket. (%d)\n", WSAGetLastError());
 		#else
@@ -107,7 +107,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		debug(1, "connect_server", "Got address.\n");
 	else {
 		/* an error ocurred */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "connect_server", "Failure while"
 			" resolving host. (%d)\n", WSAGetLastError());
 		#else
@@ -127,7 +127,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	/* we need a copy of this */
 	ip_addr = addr.sin_addr;
 	/* the real hostname of the host we are connecting */
-	#ifdef WINDOWS
+	#ifdef WIN32
 	//host = gethostbyaddr(&ip_addr, sizeof(ip_addr), PF_INET);
 	#else
 	host = gethostbyaddr(&ip_addr, sizeof(ip_addr), PF_INET);
@@ -139,7 +139,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 		debug(1, "connect_server", "Got host.\n");
 	else {
 		/* an error ocurred */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "connect_server", "Failure while"
 			" resolving address."
 			" (%d)\n", WSAGetLastError());
@@ -175,7 +175,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 			" server.\n");
 	else {
 		/* the attempt hasn't been successfull */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "connect_server", "Couldn't connect to"
 			" server. (%d)\n", WSAGetLastError());
 		#else
@@ -219,7 +219,7 @@ IRCSocket::recv_raw(void)
 		 * buf       : buffer read into
 		 * BUFSIZE   : bytes to read
 		 */
-		#ifdef WINDOWS
+		#ifdef WIN32
 		bl = recv(sock, buf, sizeof(buf), 0);
 		#else
 		bl = read(sock, buf, sizeof(buf));
@@ -259,7 +259,7 @@ IRCSocket::recv_raw(void)
 
 			delete n;
 		} else {
-			#ifdef WINDOWS
+			#ifdef WIN32
 			debug(3, "recv_raw", "Couldn't receive"
 				" message. (%d)\n", WSAGetLastError());
 			#else
@@ -360,7 +360,7 @@ IRCSocket::sock_send(const char *buf)
 		debug(1, "sock_send", "Sent raw data."
 			" (%i)\n", status);
 	else
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "sock_send", "Couldn't send raw data."
 			" (%d)\n", WSAGetLastError());
 		#else
@@ -390,7 +390,7 @@ IRCSocket::sock_recv(char *buf)
 		debug(1, "sock_recv", "Received raw data."
 			" (%i)\n", status);
 	else
-		#ifdef WINDOWS
+		#ifdef WIN32
 		debug(3, "sock_send", "Couldn't receive raw data."
 			" (%d)\n", WSAGetLastError());
 		#else
@@ -437,7 +437,7 @@ IRCSocket::reconnect(void)
 	reconnecting = 1;
 
 	/* sleep given time before another attempt */
-	#ifdef WINDOWS
+	#ifdef WIN32
 	Sleep(sleep_time * 1000);
 	#else
 	sleep(sleep_time);

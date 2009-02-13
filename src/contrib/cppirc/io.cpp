@@ -14,7 +14,7 @@ IRCSocket::debug(unsigned int level, const char *sender,
 	if(level < _DBGLEVEL)
 		return 1;
 
-	int i, s, l;
+	int s, l;
 	char lc;
 	char timestamp[9];
 	char *d, *nfmt;
