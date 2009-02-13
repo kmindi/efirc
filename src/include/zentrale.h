@@ -29,6 +29,7 @@ class Zentrale : public wxApp
         void EingabeVerarbeiten(int,wxString);
         
         Fenster* fenstersuchen(wxString); 
+        Fenster* fenster(wxString name);
         
         // --------------------------------------------------------------------------
         // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND

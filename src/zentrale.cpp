@@ -27,6 +27,7 @@ BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
     EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
 END_EVENT_TABLE()
 
+//{}
 bool Zentrale::OnInit()
 {
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
@@ -109,9 +110,10 @@ void Zentrale::neuesFenster(wxString namedesfensters)
 
 void Zentrale::fensterzerstoeren(int fensternummer)
 {
-    irc->send_part((fenstername[fensternummer]).c_str());
+    //irc->send_part((fenstername[fensternummer]).c_str());
     zgr_fenster[fensternummer]->Destroy();
-    zgr_fenster[fensternummer]=NULL;
+    zgr_fenster[fensternummer] = NULL;
+    fenstername[fensternummer] = _T("");
 }
 
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
@@ -120,14 +122,15 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
     {
         if(fenstername[i] == namedesfensters)
         {
-            irc->send_part((fenstername[i]).c_str());
+            //irc->send_part((fenstername[i]).c_str());
             zgr_fenster[i]->Destroy();
-            zgr_fenster[i]=NULL;
+            zgr_fenster[i] = NULL;
+            fenstername[i] = _T("");
         }
     }
 }
 
-// Gibt einen Zeiger auf ein Fenster zurueck
+// Gibt IMMER einen Zeiger auf ein Fenster zurueck
 Fenster* Zentrale::fenstersuchen(wxString name)
 {
     Fenster *zgr = NULL; // Zeiger auf Fenster
@@ -144,7 +147,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         int i = 0; // laufende Nummer auf 0 setzen
         while(i < 10 && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
         {
-            if(fenstername[i]==name) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
+            if(fenstername[i] == name) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
             {
                 return zgr_fenster[i];
             }
@@ -162,6 +165,26 @@ Fenster* Zentrale::fenstersuchen(wxString name)
     }
 } 
 
+// Gibt  IMMER einen Zeiger auf ein Fenster zurueck
+// DARF nur mit VORHANDENEN Fenstern benutzt werden
+Fenster* Zentrale::fenster(wxString name)
+{
+    while(1)
+    {
+        // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
+        for(int i = 0; i<10; i++)
+        {
+            if(fenstername[i] == _T(name))
+            {
+                return zgr_fenster[i];
+            }
+        }
+        // wenn kein Fenster gefunden wurde wird ein neues erstellt
+        //neuesFenster(name);
+    }
+}
+
+
 void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 {
     // fenstername[fensternummer]
@@ -169,49 +192,51 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
     
-    if(befehl_name.Upper() == "QUIT")
+    if(befehl_name.Upper() == _T("QUIT"))
     {
-        wxString quitmessage = wxT("ef!rc");
+        wxString quitmessage = _T("ef!rc");
         irc->disconnect_server(quitmessage.c_str());
         // ALLE FENSTER ZERSTOEREN
     }
 
-    if(befehl_name.Upper() == "JOIN" && befehl_parameter != "")
+    if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
     {
         irc->send_join(befehl_parameter.c_str());
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
     
-    if(befehl_name.Upper() == "PART" || befehl_name.Upper() == "LEAVE")
+    if(befehl_name.Upper() == _T("PART") || befehl_name.Upper() == _T("LEAVE"))
     {
-        if(befehl_parameter == "")
+        if(befehl_parameter == _T(""))
         {
-            fensterzerstoeren(fensternummer);
+            //fensterzerstoeren(fensternummer);
+            irc->send_part(fenstername[fensternummer].c_str());
         }
         else
         {
-            fensterzerstoeren(befehl_parameter);
+            //fensterzerstoeren(befehl_parameter);
+            irc->send_part(befehl_parameter.c_str());
         }
     }
     
-    if(befehl_name.Upper() == "NICK" && befehl_parameter != "")
+    if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
     {
             irc->send_nick(befehl_parameter.c_str()); // Nickname senden
             irc->WantedNick = befehl_parameter; 
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
     }
     
-    if(befehl_name.Upper() == "ME" && befehl_parameter != "")
+    if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
     {
         // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
         wxString me_text = _T("\001ACTION " + befehl_parameter + "\001");
         irc->send_privmsg(fenstername[fensternummer].c_str(), me_text.c_str());
-        zgr_fenster[fensternummer]->NachrichtAnhaengen("ACTION", irc->CurrentNick, befehl_parameter);
+        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
     }
     
-    if(befehl_name.Upper() == "TOPIC")
+    if(befehl_name.Upper() == _T("TOPIC"))
     {
-        if(befehl_parameter == "")
+        if(befehl_parameter == _T(""))
         {
             irc->send_topic(fenstername[fensternummer].c_str());
         }
@@ -221,49 +246,49 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         }
     }
 
-    if((befehl_name.Upper() == "QUERY" || befehl_name.Upper() == "MSG") && befehl_parameter != "")
+    if((befehl_name.Upper() == _T("QUERY") || befehl_name.Upper() == _T("MSG")) && befehl_parameter != _T(""))
     {
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
         
         irc->send_privmsg(empfaenger.c_str(),nachricht.c_str());
-        zgr_fenster[fensternummer]->NachrichtAnhaengen("P_PRIVMSG",irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
     }
     
-    if(befehl_name.Upper() == "AWAY")
+    if(befehl_name.Upper() == _T("AWAY"))
     {
-        if(befehl_parameter == "")
+        if(befehl_parameter == _T(""))
         {
             irc->send_away();
-            zgr_fenster[fensternummer]->NachrichtAnhaengen("AWAY");
+            zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"));
         }
         else
         {
             irc->send_away(befehl_parameter.c_str());
-            zgr_fenster[fensternummer]->NachrichtAnhaengen("AWAY",befehl_parameter);
+            zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
             
         }
     }
     
     
-    if(befehl_name.Upper() == "CTCP" && befehl_parameter != "")
+    if(befehl_name.Upper() == _T("CTCP") && befehl_parameter != _T(""))
     {
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
         
         irc->send_privmsg(empfaenger.c_str(), (_T("\001" + nachricht + "\001")).c_str());
         
-        zgr_fenster[fensternummer]->NachrichtAnhaengen("CTCP",irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
     }
     
     
-    if(befehl_name.Upper() == "WHOIS" && befehl_parameter != "")
+    if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
     {
         irc->send_whois(befehl_parameter.c_str());
     }
     
     // sonstige Befehle
-    if(befehl_name.Upper() == "CLEAR")
+    if(befehl_name.Upper() == _T("CLEAR"))
     {
         zgr_fenster[fensternummer]->AusgabefeldLeeren();
     }
@@ -276,13 +301,13 @@ void Zentrale::NachrichtSenden(int fensternummer, wxString nachricht)
     // Nachricht im Textfenster anzeigen
     // UNICODE?
     //AKTUELLER NICKNAME?
-    zgr_fenster[fensternummer]->NachrichtAnhaengen("PRIVMSG",irc->CurrentNick,nachricht);
+    zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("PRIVMSG"),irc->CurrentNick,nachricht);
 }
 
 void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 {
     //Ist es ein Befehl?
-    wxString befehlsprefix = "/";
+    wxString befehlsprefix = _T("/");
     if(eingabe.StartsWith(befehlsprefix.c_str(), &eingabe))
     {
         BefehlVerarbeiten(fensternummer, eingabe.mb_str(wxConvUTF8));
@@ -425,6 +450,6 @@ void Zentrale::call_thread()
 
 int Zentrale::OnExit()
 {
-    wxString quitmessage = wxT("ef!rc");
+    wxString quitmessage = _T("ef!rc");
     irc->disconnect_server(quitmessage.c_str());
 }

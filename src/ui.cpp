@@ -20,13 +20,13 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     Center();
     
     // Objekte erzeugen
-    WxList_benutzerliste =      new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(442,3), wxSize(111,282), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
+    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(442,3), wxSize(111,282), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
     WxList_benutzerliste->InsertColumn(0, _T("Benutzerliste"), wxLIST_FORMAT_LEFT, -1);
     
-    WxEdit_thema =              new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(434,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
-    WxEdit_eingabefeld =     new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,289), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
-    WxButton_senden =           new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,289), wxSize(111,21), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld =    new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T("Ausgabefeld"), wxPoint(4,26), wxSize(434,259), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
+    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(434,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
+    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,289), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
+    WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,289), wxSize(111,21), 0, wxDefaultValidator, _T("WxButton_senden"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T("Ausgabefeld"), wxPoint(4,26), wxSize(434,259), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
     
     
     SetIcon(wxIcon(icon));
@@ -51,7 +51,9 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
 // Schliessen
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
 {
-    wxGetApp().fensterzerstoeren(fensternummer);
+    //wxGetApp().fensterzerstoeren(fensternummer);
+    wxGetApp().EingabeVerarbeiten(fensternummer,_T("/part"));
+    // ueberpruefung ob nur noch ein fenster und ob schon im raum usw
 }
 
 void Fenster::BeiAktivierung(wxActivateEvent& event)
@@ -93,7 +95,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
 void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
 {
     // VERBINDUNG ZUR KONFIGURATION
-    if (WxEdit_eingabefeld->GetValue() == "Nachricht eingeben und Senden")
+    if (WxEdit_eingabefeld->GetValue() == _T("Nachricht eingeben und Senden"))
     {
         WxEdit_eingabefeld->Clear();
     }
@@ -112,11 +114,11 @@ void Fenster::NachrichtSenden()
 void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxString port)
 {
     // VERBINDUNG ZUR KONFIGURATION
-    if(nick = "") 
+    if(nick = _T("")) 
         nick = wxGetApp().irc->CurrentNick;
-    if(hostname = "") 
+    if(hostname = _T("")) 
         hostname = wxGetApp().irc->CurrentHostname;
-    if(port = "")
+    if(port = _T(""))
         port = wxGetApp().irc->CurrentPort;
         
     SetTitle(_T("efirc [" + nick + "@" + hostname + ":" + port + "/" + titel + "]"));
@@ -142,7 +144,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     // locale abfragen
     // MIT SWITCH / CASE 
     
-    if(local == "P_PRIVMSG")
+    if(local == _T("P_PRIVMSG"))
     {
         if(param3 == "")
         {
@@ -155,7 +157,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    else if(local == "PRIVMSG")
+    else if(local == _T("PRIVMSG"))
     {
         if(param1 == "")
         {
@@ -167,7 +169,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    else if(local == "P_ACTION")
+    else if(local == _T("P_ACTION"))
     {
         WxEdit_ausgabefeld->AppendText(_T("[ "));
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
@@ -176,14 +178,14 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         WxEdit_ausgabefeld->AppendText(_T(" ]"));
     }
     
-    else if(local == "ACTION")
+    else if(local == _T("ACTION"))
     {
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
         WxEdit_ausgabefeld->AppendText(_T("*" + param1 + " " + param2));
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     }
         
-    else if(local == "TOPIC")
+    else if(local == _T("TOPIC"))
     {
         if(param2 == "")
         {
@@ -195,21 +197,21 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
     
-    else if(local == "JOIN")
+    else if(local == _T("JOIN"))
         WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum betreten"));
         
-    else if(local == "PART")
+    else if(local == _T("PART"))
         WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum verlassen (" + param2 + ")"));
     
-    else if(local == "QUIT")
+    else if(local == _T("QUIT"))
         WxEdit_ausgabefeld->AppendText(_T(param1 + " hat das IRC-Netzwerk verlassen (" + param2 + ")"));
         
-    else if(local == "MOTD")
+    else if(local == _T("MOTD"))
         WxEdit_ausgabefeld->AppendText(_T(param1));
     
-    else if(local == "CTCP")
+    else if(local == _T("CTCP"))
     {
-         if(param3 == "")
+         if(param3 == _T(""))
         {
             WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "@[CTCP]> " + param2 + " ]"));
         }
@@ -220,39 +222,39 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
     }
        
-    else if(local == "MODE")
+    else if(local == _T("MODE"))
     {
         WxEdit_ausgabefeld->AppendText(_T(param1 + " setzt Modus: " + param2));
     }
           
     
-    else if(local == "AWAY")
+    else if(local == _T("AWAY"))
     {
         // ES WIRD EINE LEERE ZEILE AUSGEGEBEN WENN MAN DEN STATUS WIEDER AUF VERFUEGBAR SETZT
-        if(param1 != "")
+        if(param1 != _T(""))
             WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: " + param1));
     }
     
-    else if(local == "RPL_UNAWAY")
+    else if(local == _T("RPL_UNAWAY"))
         WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt nicht mehr abwesend"));
 
-    else if(local == "RPL_NOWAWAY")
+    else if(local == _T("RPL_NOWAWAY"))
         WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt als abwesend markiert"));
     
     // Whois Antworten
-    else if(local == "WHOIS_BENUTZER")
+    else if(local == _T("WHOIS_BENUTZER"))
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " (" + param2 + "@" + param3 + " - " + param4 + ") ]"));
     
-    else if(local == "WHOIS_ABWESEND")
+    else if(local == _T("WHOIS_ABWESEND"))
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist abwesend: " + param2 + " ]"));
         
-    else if(local == "WHOIS_RAEUME")
+    else if(local == _T("WHOIS_RAEUME"))
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist in: " + param2 + " ]"));
         
-    else if(local == "WHOIS_UNTAETIG")
+    else if(local == _T("WHOIS_UNTAETIG"))
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist untaetig seit: " + param2 + " ]"));
         
-    else if(local == "WHOIS_SERVERNACHRICHT")
+    else if(local == _T("WHOIS_SERVERNACHRICHT"))
         WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " " + param2 + " " + param3 + " ]"));
         
 }
@@ -295,7 +297,7 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
 {
     WxEdit_thema->SetValue(thema);
-    NachrichtAnhaengen("TOPIC",thema,benutzer);
+    NachrichtAnhaengen(_T("TOPIC"),thema,benutzer);
 }
 
 void Fenster::AusgabefeldLeeren()
@@ -310,11 +312,11 @@ void Fenster::AusgabefeldLeeren()
 // Benutzer sortiert eintragen
 void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
 {
-    wxString Benutzer = ""; 
-    wxString Benutzer_Vergleich = "";
-    wxChar leerzeichen = ' ';
+    wxString Benutzer = _T(""); 
+    wxString Benutzer_Vergleich = _T("");
+    wxChar leerzeichen = _T(' ');
     
-    while(benutzerliste != "")
+    while(benutzerliste != _T(""))
     // solange noch Benutzer in der benutzerliste stehen wird diese Schleife durchlaufen
     {
         Benutzer = benutzerliste.BeforeFirst(leerzeichen);

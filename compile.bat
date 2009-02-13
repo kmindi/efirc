@@ -24,8 +24,7 @@ rem efirc.exe in bin aufrufen
 echo.
 echo ...starting...
 cd bin
-copy ..\src\efirc.exe efirc.exe
-del ..\src\efirc.exe
+move ..\src\efirc.exe efirc.exe
 efirc.exe
 exit %ERRORLEVEL%
 

@@ -52,15 +52,15 @@ class Fenster : public wxFrame
         Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxCLOSE_BOX); 
         
         
-        void TitelSetzen(wxString titel, wxString nick = "", wxString hostname = "", wxString port = "");
-        void NachrichtAnhaengen(wxString local, wxString param1 = "", wxString param2 = "", wxString param3 = "", wxString param4 = "");
-        void Fehler(int fehlernummer = 0, wxString param1 = "");
-        void ThemaAendern(wxString thema, wxString benutzer="");
+        void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
+        void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));
+        void Fehler(int fehlernummer = 0, wxString param1 = _T(""));
+        void ThemaAendern(wxString thema, wxString benutzer=_T(""));
         void AusgabefeldLeeren();
         
         //Benutzerlistenfunktionen
-        void BenutzerHinzufuegen(wxString benutzerliste = "");
-        bool BenutzerEntfernen(wxString benutzer = "");
+        void BenutzerHinzufuegen(wxString benutzerliste = _T(""));
+        bool BenutzerEntfernen(wxString benutzer = _T(""));
         void BenutzerAendern(wxString altername, wxString neuername);
         //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
         
