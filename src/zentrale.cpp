@@ -32,11 +32,6 @@ bool Zentrale::OnInit()
 {
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
     
-    
-    
-    // neuen Socket erzeugen (unter Windows liefert dies WSAData...?)
-    new wxSocketClient();
-    
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
     irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
     //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
