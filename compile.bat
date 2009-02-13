@@ -4,7 +4,6 @@ rem make wird fuer das aktuelle Makefile
 rem aufgerufen
 echo.
 echo ...calling make...
-set WINDOWS=1
 mingw32-make.exe 2> build.log
 
 rem echo ...Stripping...
