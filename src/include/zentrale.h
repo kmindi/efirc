@@ -5,7 +5,6 @@
 #define _ZENTRALE_
 
 #include <wx/app.h>
-#include <wx/socket.h>
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <thread.h>
 #include <ui.h>
