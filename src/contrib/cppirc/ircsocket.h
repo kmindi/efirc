@@ -8,7 +8,6 @@
 
 #ifdef WIN32
 #include <Winsock2.h>
-#include "sstring.h"
 #else
 #include <string.h>
 #include <unistd.h>
@@ -21,6 +20,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif
+
+#if defined WIN32 || defined linux
+#include "sstring.h"
+#endif
+
 #include <stdio.h>
 #include <time.h>
 
