@@ -1,0 +1,6 @@
+OBJS= irc.o ui.o thread.o irc_event_functions.o
+CXXFLAGS+= `wx-config --cxxflags` -Lcontrib/cppirc -Iinclude -Icontrib/cppirc
+LDLIBS= `wx-config --libs` -lircsocket -lsstring
+
+efirc.exe: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) zentrale.cpp $(LDLIBS)
