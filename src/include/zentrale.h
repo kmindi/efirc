@@ -14,6 +14,9 @@ class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 class Zentrale : public wxApp
 {
     public:
+        Zentrale() {}
+        ~Zentrale() {}
+        
         virtual bool OnInit();
         
         friend class Thread; 

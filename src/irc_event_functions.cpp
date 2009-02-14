@@ -7,9 +7,7 @@ DECLARE_APP(Zentrale) //braucht man fuer wxGetApp um damit auf die funktionen de
 
 
 // Benutzerdefiniertes Ereignis muss hier auch bekannt sein, definiert wird es in zentrale.cpp
-BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
-END_DECLARE_EVENT_TYPES()
+DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
 
 
 // Empfangene normale Nachrichten werden ausgegeben

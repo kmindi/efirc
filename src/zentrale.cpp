@@ -9,11 +9,8 @@ IMPLEMENT_APP(Zentrale) // erstellt main funktion
 // {}
 
 // Benutzerdefinierte Ereignisse deklarieren und definieren
-BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
-END_DECLARE_EVENT_TYPES()
-
-DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)
+DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)//{}
+DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)//{}
 
 #define EVT_NEUES_FENSTER(id, fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
@@ -23,9 +20,9 @@ DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)
     ),
 
 
-BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
-    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
-END_EVENT_TABLE()
+BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)//{}
+    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)//{}
+END_EVENT_TABLE()//{}
 
 //{}
 bool Zentrale::OnInit()
@@ -35,7 +32,9 @@ bool Zentrale::OnInit()
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
     irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
     //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-
+    //irc = new IRCInterface(_T("6667"),_T("irc.eu-irc.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    
+    
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
     for(int i=0;i<10;i++) { zgr_fenster[i]=NULL; }
@@ -64,21 +63,21 @@ void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
     wxGetApp().neuesFenster(event.GetString());
 }
 
-// Funktionen die auf die Fenster-KLasse zugreifen bzw. auf Instanzen eben dieser
+// Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
 void Zentrale::neuesFenster(wxString namedesfensters)
 {
     bool fenstererzeugt = false;
     
     // nach freier Nummer suchen
     int i = 0;
-    for(int j = 0; j<10 ; j++)
+    for(int j = 0; j < 10 ; j++)
     {
         if(fenstername[j] == namedesfensters)
         fenstererzeugt = true;
     }
-    while(fenstererzeugt == false && i <10)
+    while(fenstererzeugt == false && i < 10)
     {
-        if(zgr_fenster[i]==NULL)
+        if(zgr_fenster[i] == NULL)
         {
                 // i ist auch die Fensternummer und die Window ID
                 zgr_fenster[i] = new Fenster( namedesfensters, i, wxPoint(8, 8), wxSize(566, 341) ); // neue instanz erzeugen, i = id des fensters / window
@@ -105,7 +104,6 @@ void Zentrale::neuesFenster(wxString namedesfensters)
 
 void Zentrale::fensterzerstoeren(int fensternummer)
 {
-    //irc->send_part((fenstername[fensternummer]).c_str());
     zgr_fenster[fensternummer]->Destroy();
     zgr_fenster[fensternummer] = NULL;
     fenstername[fensternummer] = _T("");
@@ -117,7 +115,6 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
     {
         if(fenstername[i] == namedesfensters)
         {
-            //irc->send_part((fenstername[i]).c_str());
             zgr_fenster[i]->Destroy();
             zgr_fenster[i] = NULL;
             fenstername[i] = _T("");
@@ -142,11 +139,11 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         int i = 0; // laufende Nummer auf 0 setzen
         while(i < 10 && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
         {
-            if(fenstername[i] == name) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
+            if(fenstername[i] == _T(name)) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
             {
                 return zgr_fenster[i];
             }
-            if(i==9)
+            if(i == 9)
             // falls keine uebereinstimmung gefunden wurde, Fehler ausgeben und oberstes Fenster als Ausgabe setzten
             {
                 // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
@@ -166,7 +163,6 @@ Fenster* Zentrale::fenster(wxString name)
 {
     while(1)
     {
-        // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
         for(int i = 0; i<10; i++)
         {
             if(fenstername[i] == _T(name))
@@ -174,15 +170,12 @@ Fenster* Zentrale::fenster(wxString name)
                 return zgr_fenster[i];
             }
         }
-        // wenn kein Fenster gefunden wurde wird ein neues erstellt
-        //neuesFenster(name);
     }
 }
 
 
 void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 {
-    // fenstername[fensternummer]
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
@@ -204,12 +197,10 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            //fensterzerstoeren(fensternummer);
             irc->send_part(fenstername[fensternummer].c_str());
         }
         else
         {
-            //fensterzerstoeren(befehl_parameter);
             irc->send_part(befehl_parameter.c_str());
         }
     }

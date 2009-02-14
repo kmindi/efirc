@@ -139,14 +139,14 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     wxString prefix(timestamp);
     
     // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-    WxEdit_ausgabefeld->AppendText(_T("\n"+prefix+" "));
+    WxEdit_ausgabefeld->AppendText(_T("\n" + prefix + " "));
 
     // locale abfragen
     // MIT SWITCH / CASE 
     
     if(local == _T("P_PRIVMSG"))
     {
-        if(param3 == "")
+        if(param3 == _T(""))
         {
             WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "> " + param2 + " ]"));
         }
@@ -159,7 +159,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     
     else if(local == _T("PRIVMSG"))
     {
-        if(param1 == "")
+        if(param1 == _T(""))
         {
             WxEdit_ausgabefeld->AppendText(_T(param2));
         }
@@ -187,7 +187,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         
     else if(local == _T("TOPIC"))
     {
-        if(param2 == "")
+        if(param2 == _T(""))
         {
             WxEdit_ausgabefeld->AppendText(_T("Das Thema ist:" + param1));
         }
