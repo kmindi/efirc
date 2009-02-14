@@ -42,7 +42,7 @@ bool Zentrale::OnInit()
     
     // erste Instanz der Fenster-klasse erzeugen.
     // VERBINDUNG ZUR KONFIGURATION
-    raum = "#efirc";
+    raum = _T("#efirc");
     neuesFenster(raum);
     
     
@@ -149,7 +149,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
                 // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
                 // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
                 zgr = dynamic_cast<Fenster*>(GetTopWindow());
-                zgr->Fehler(3,_T(name));
+                zgr->Fehler(3,name);
                 return zgr;
             }
             i++;
@@ -165,7 +165,7 @@ Fenster* Zentrale::fenster(wxString name)
     {
         for(int i = 0; i<10; i++)
         {
-            if(fenstername[i] == _T(name))
+            if(fenstername[i] == name)
             {
                 return zgr_fenster[i];
             }
@@ -183,13 +183,13 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     if(befehl_name.Upper() == _T("QUIT"))
     {
         wxString quitmessage = _T("ef!rc");
-        irc->disconnect_server(quitmessage.c_str());
+        irc->disconnect_server(quitmessage.mb_str());
         // ALLE FENSTER ZERSTOEREN
     }
 
     if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
     {
-        irc->send_join(befehl_parameter.c_str());
+        irc->send_join(befehl_parameter.mb_str());
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
     
@@ -197,17 +197,17 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->send_part(fenstername[fensternummer].c_str());
+            irc->send_part(fenstername[fensternummer].mb_str());
         }
         else
         {
-            irc->send_part(befehl_parameter.c_str());
+            irc->send_part(befehl_parameter.mb_str());
         }
     }
     
     if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
     {
-            irc->send_nick(befehl_parameter.c_str()); // Nickname senden
+            irc->send_nick(befehl_parameter.mb_str()); // Nickname senden
             irc->WantedNick = befehl_parameter; 
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
     }
@@ -215,8 +215,8 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
     {
         // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
-        wxString me_text = _T("\001ACTION " + befehl_parameter + "\001");
-        irc->send_privmsg(fenstername[fensternummer].c_str(), me_text.c_str());
+        wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
+        irc->send_privmsg(fenstername[fensternummer].mb_str(), me_text.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
     }
     
@@ -224,11 +224,11 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->send_topic(fenstername[fensternummer].c_str());
+            irc->send_topic(fenstername[fensternummer].mb_str());
         }
         else
         {
-            irc->send_topic(fenstername[fensternummer].c_str(),befehl_parameter.c_str());
+            irc->send_topic(fenstername[fensternummer].mb_str(),befehl_parameter.mb_str());
         }
     }
 
@@ -237,7 +237,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
         
-        irc->send_privmsg(empfaenger.c_str(),nachricht.c_str());
+        irc->send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
     }
     
@@ -250,7 +250,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         }
         else
         {
-            irc->send_away(befehl_parameter.c_str());
+            irc->send_away(befehl_parameter.mb_str());
             zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
             
         }
@@ -262,7 +262,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
         
-        irc->send_privmsg(empfaenger.c_str(), (_T("\001" + nachricht + "\001")).c_str());
+        irc->send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
         
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
     }
@@ -270,7 +270,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     
     if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
     {
-        irc->send_whois(befehl_parameter.c_str());
+        irc->send_whois(befehl_parameter.mb_str());
     }
     
     // sonstige Befehle
@@ -283,7 +283,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
 void Zentrale::NachrichtSenden(int fensternummer, wxString nachricht)
 {
-    irc->send_privmsg(fenstername[fensternummer].c_str(), nachricht.c_str());
+    irc->send_privmsg(fenstername[fensternummer].mb_str(), nachricht.mb_str());
     // Nachricht im Textfenster anzeigen
     // UNICODE?
     //AKTUELLER NICKNAME?
@@ -294,14 +294,14 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 {
     //Ist es ein Befehl?
     wxString befehlsprefix = _T("/");
-    if(eingabe.StartsWith(befehlsprefix.c_str(), &eingabe))
+    if(eingabe.StartsWith(befehlsprefix, &eingabe))
     {
-        BefehlVerarbeiten(fensternummer, eingabe.mb_str(wxConvUTF8));
+        BefehlVerarbeiten(fensternummer, eingabe);
     }
     // wenn nicht an raum/benutzer senden
     else
     {
-        NachrichtSenden(fensternummer,eingabe.mb_str(wxConvUTF8));
+        NachrichtSenden(fensternummer,eingabe);
     }
 }
 
@@ -437,5 +437,5 @@ void Zentrale::call_thread()
 int Zentrale::OnExit()
 {
     wxString quitmessage = _T("ef!rc");
-    irc->disconnect_server(quitmessage.c_str());
+    irc->disconnect_server(quitmessage.mb_str());
 }

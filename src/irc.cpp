@@ -8,9 +8,9 @@ using namespace std;
 IRCInterface::IRCInterface(wxString port, wxString server,
                            wxString nick, wxString user, wxString real,
                            wxString pass)
-             : IRCSocket(atoi(port.c_str()), server.c_str(),
-                         nick.c_str(), user.c_str(), real.c_str(),
-                         pass.c_str(), fopen("cppirc.log", "w"))
+             : IRCSocket(atoi(port.mb_str()), server.mb_str(),
+                         nick.mb_str(), user.mb_str(), real.mb_str(),
+                         pass.mb_str(), fopen("cppirc.log", "w"))
 {
     CurrentNick = nick;
     WantedNick = nick;

@@ -121,7 +121,7 @@ void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxSt
     if(port = _T(""))
         port = wxGetApp().irc->CurrentPort;
         
-    SetTitle(_T("efirc [" + nick + "@" + hostname + ":" + port + "/" + titel + "]"));
+    SetTitle(_T("efirc [") + nick + _T("@") + hostname + _T(":") + port + _T("/") + titel + _T("]"));
 }
 
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)
@@ -136,10 +136,10 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     time(&raw_time);
     local_time = localtime(&raw_time);
     strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
-    wxString prefix(timestamp);
+    wxString prefix(timestamp, wxConvUTF8);
     
     // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-    WxEdit_ausgabefeld->AppendText(_T("\n" + prefix + " "));
+    WxEdit_ausgabefeld->AppendText(_T("\n") + prefix + _T(" "));
 
     // locale abfragen
     // MIT SWITCH / CASE 
@@ -148,12 +148,12 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         if(param3 == _T(""))
         {
-            WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "> " + param2 + " ]"));
+            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("> ") + param2 + _T(" ]"));
         }
         else
         // wenn 3 Parameter uebergeben wurden, dann hat man selbst eine Nachricht an einen Benutzer geschrieben
         {
-            WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "->" + param2 + "> " + param3 + " ]"));
+            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("->") + param2 + _T("> ") + param3 + _T(" ]"));
         }
     }
     
@@ -161,11 +161,11 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         if(param1 == _T(""))
         {
-            WxEdit_ausgabefeld->AppendText(_T(param2));
+            WxEdit_ausgabefeld->AppendText(param2);
         }
         else
         {
-            WxEdit_ausgabefeld->AppendText(_T("<" + param1 + "> " + param2));
+            WxEdit_ausgabefeld->AppendText(_T("<") + param1 + _T("> ") + param2);
         }
     }
     
@@ -173,7 +173,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         WxEdit_ausgabefeld->AppendText(_T("[ "));
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(_T("*" + param1 + " " + param2));
+        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" ") + param2);
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
         WxEdit_ausgabefeld->AppendText(_T(" ]"));
     }
@@ -181,7 +181,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     else if(local == _T("ACTION"))
     {
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(_T("*" + param1 + " " + param2));
+        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" ") + param2);
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     }
         
@@ -189,42 +189,42 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         if(param2 == _T(""))
         {
-            WxEdit_ausgabefeld->AppendText(_T("Das Thema ist:" + param1));
+            WxEdit_ausgabefeld->AppendText(_T("Das Thema ist:") + param1);
         }
         else
         {
-            WxEdit_ausgabefeld->AppendText(_T("*" + param2 + " hat das Thema geaendert: " + param1));
+            WxEdit_ausgabefeld->AppendText(_T("*") + param2 + _T(" hat das Thema geaendert: ") + param1);
         }
     }
     
     else if(local == _T("JOIN"))
-        WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum betreten"));
+        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat den Raum betreten"));
         
     else if(local == _T("PART"))
-        WxEdit_ausgabefeld->AppendText(_T(param1 + " hat den Raum verlassen (" + param2 + ")"));
+        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat den Raum verlassen (") + param2 + _T(")"));
     
     else if(local == _T("QUIT"))
-        WxEdit_ausgabefeld->AppendText(_T(param1 + " hat das IRC-Netzwerk verlassen (" + param2 + ")"));
+        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat das IRC-Netzwerk verlassen (") + param2 + _T(")"));
         
     else if(local == _T("MOTD"))
-        WxEdit_ausgabefeld->AppendText(_T(param1));
+        WxEdit_ausgabefeld->AppendText(param1);
     
     else if(local == _T("CTCP"))
     {
          if(param3 == _T(""))
         {
-            WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "@[CTCP]> " + param2 + " ]"));
+            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("@[CTCP]> ") + param2 + _T(" ]"));
         }
         else
         // wenn 3 Parameter uebergeben wurden, dann hat man selbst eine Nachricht an einen Benutzer geschrieben
         {
-            WxEdit_ausgabefeld->AppendText(_T("[ <" + param1 + "@[CTCP]->" + param2 + "> " + param3 + " ]"));
+            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("@[CTCP]->") + param2 + _T("> ") + param3 + _T(" ]"));
         }
     }
        
     else if(local == _T("MODE"))
     {
-        WxEdit_ausgabefeld->AppendText(_T(param1 + " setzt Modus: " + param2));
+        WxEdit_ausgabefeld->AppendText(param1 + _T(" setzt Modus: ") + param2);
     }
           
     
@@ -232,7 +232,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         // ES WIRD EINE LEERE ZEILE AUSGEGEBEN WENN MAN DEN STATUS WIEDER AUF VERFUEGBAR SETZT
         if(param1 != _T(""))
-            WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: " + param1));
+            WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: ") + param1);
     }
     
     else if(local == _T("RPL_UNAWAY"))
@@ -243,19 +243,19 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     
     // Whois Antworten
     else if(local == _T("WHOIS_BENUTZER"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " (" + param2 + "@" + param3 + " - " + param4 + ") ]"));
+        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" (") + param2 + _T("@") + param3 + _T(" - ") + param4 + _T(") ]"));
     
     else if(local == _T("WHOIS_ABWESEND"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist abwesend: " + param2 + " ]"));
+        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist abwesend: ") + param2 + _T(" ]"));
         
     else if(local == _T("WHOIS_RAEUME"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist in: " + param2 + " ]"));
+        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist in: ") + param2 + _T(" ]"));
         
     else if(local == _T("WHOIS_UNTAETIG"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " ist untaetig seit: " + param2 + " ]"));
+        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist untaetig seit: ") + param2 + _T(" ]"));
         
     else if(local == _T("WHOIS_SERVERNACHRICHT"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: " + param1 + " " + param2 + " " + param3 + " ]"));
+        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ") + param2 + _T(" ") + param3 + _T(" ]"));
         
 }
 
@@ -271,24 +271,24 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
     time(&raw_time);
     local_time = localtime(&raw_time);
     strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
-    wxString prefix(timestamp);
+    wxString prefix(timestamp, wxConvUTF8);
     
     // Aussehen aendern (Farbe)
     WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxRED, *wxBLUE));
     
         // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen    
-        WxEdit_ausgabefeld->AppendText(_T("\n"+prefix+" (!) "));
+        WxEdit_ausgabefeld->AppendText(_T("\n")+prefix+_T(" (!) "));
         
         wxString fehlernummer_str;
         fehlernummer_str << fehlernummer;
-        param1 = _T("(" + fehlernummer_str + ") (" + param1 + ")");
+        param1 = _T("(") + fehlernummer_str + _T(") (") + param1 + _T(")");
         // Fehlernummern abfragen
         if(fehlernummer == 1)
-            WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden" + param1));
+            WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden") + param1);
         if(fehlernummer == 2)
-            WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten " + param1));
+            WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten ") + param1);
         if(fehlernummer == 3)
-            WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden " + param1));
+            WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
         
     // Voreingestelltes Aussehen wiederherstellen (Farbe wieder entfernen)
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
@@ -321,7 +321,7 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
     {
         Benutzer = benutzerliste.BeforeFirst(leerzeichen);
         // wenn der Benutzer noch nicht vorhanden ist
-        if(WxList_benutzerliste->FindItem(-1,_T(Benutzer)) == -1)
+        if(WxList_benutzerliste->FindItem(-1,Benutzer) == -1)
         {
             long id = 0;
             bool erstellt = false;
@@ -372,7 +372,7 @@ bool Fenster::BenutzerEntfernen(wxString benutzer)
     
     for(int i = 0;i<3;i++)
     {
-        id = WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + benutzer));
+        id = WxList_benutzerliste->FindItem(-1,Benutzer_prefix_liste[i] + benutzer);
         if(id != -1)
         {
             entfernt = WxList_benutzerliste->DeleteItem(id);
@@ -389,13 +389,14 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
     
     for(int i = 0;i<3;i++)
     {
-        id = WxList_benutzerliste->FindItem(-1,_T(Benutzer_prefix_liste[i] + altername));
+        id = WxList_benutzerliste->FindItem(-1,Benutzer_prefix_liste[i] + altername);
         if(id != -1)
         {
             WxList_benutzerliste->DeleteItem(id);
-            BenutzerHinzufuegen(_T(Benutzer_prefix_liste[i] + neuername));
+            BenutzerHinzufuegen(Benutzer_prefix_liste[i] + neuername);
         }
     }
 }
+
 
 
