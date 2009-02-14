@@ -139,7 +139,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         int i = 0; // laufende Nummer auf 0 setzen
         while(i < 10 && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
         {
-            if(fenstername[i] == _T(name)) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
+            if(fenstername[i] == name) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
             {
                 return zgr_fenster[i];
             }
