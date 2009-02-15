@@ -198,7 +198,7 @@ void
 IRCSocket::recv_raw(void)
 {
 	/* length of recvd buffer */
-	int bl, ol, l;
+	size_t bl, ol, l;
 	/* buffer to put raw message in */
 	char buf[R_BUFSIZE];
 	char *c, *o, *n;
@@ -324,24 +324,25 @@ IRCSocket::send_raw(const char *fmt, ...)
 int
 IRCSocket::sock_send(const char *buf)
 {
-	int len, status;
+	int status;
+	size_t l;
 	char tmp[W_BUFSIZE];
 
 	/* length of string to send */
-	len = strlen(buf) + 2;
+	l = strlen(buf) + 2;
 
 	debug(0, "sock_send", "Sending Message (%s)\n", buf);
 
 	/* we have a size maximum in the IRC proto */
-	if(len <= sizeof(tmp)) {
+	if(l <= sizeof(tmp)) {
 		debug(1, "sock_send", "Message size ok."
-			" (%i/%i)\n", len, sizeof(tmp));
+			" (%i/%i)\n", l, sizeof(tmp));
 
 		/* actual message, cat \r\n */
 		snprintf(tmp, sizeof(tmp), "%s\r\n", buf);
 	} else {
 		debug(3, "sock_send", "Message too long."
-			" (%i/%i)\n", len, sizeof(tmp));
+			" (%i/%i)\n", l, sizeof(tmp));
 		return -1;
 	}
 
@@ -353,7 +354,7 @@ IRCSocket::sock_send(const char *buf)
 	 * sock : socket descriptor
 	 * 0    : default flags
 	 */
-	status = send(sock, tmp, len, 0);
+	status = send(sock, tmp, l, 0);
 
 	/* check status and return send's return value */
 	if(status > -1)

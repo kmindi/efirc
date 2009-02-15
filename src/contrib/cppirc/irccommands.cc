@@ -77,13 +77,64 @@ IRCSocket::send_pong(const char *key)
 	send_raw("PONG %s", key);
 }
 
-/* CTCP - our client version */
+/* CTCP replies */
 void
-IRCSocket::send_version(const char *recipient)
+IRCSocket::send_ctcp_version(const char *recipient, const char *version)
+{
+	send_ctcp(recipient, "VERSION", version);
+}
+
+void
+IRCSocket::send_ctcp_clientinfo(const char *recipient,
+	const char *clientinfo)
+{
+	send_ctcp(recipient, "CLIENTINFO", clientinfo);
+}
+
+void
+IRCSocket::send_ctcp_finger(const char *recipient, const char *finger)
+{
+	send_ctcp(recipient, "FINGER", finger);
+}
+
+void
+IRCSocket::send_ctcp_source(const char *recipient, const char *source)
+{
+	send_ctcp(recipient, "SOURCE", source);
+}
+
+void
+IRCSocket::send_ctcp_userinfo(const char *recipient,
+	const char *userinfo)
+{
+	send_ctcp(recipient, "USERINFO", userinfo);
+}
+
+void
+IRCSocket::send_ctcp_ping(const char *recipient, const char *ping)
+{
+	send_ctcp(recipient, "PING", ping);
+}
+
+void
+IRCSocket::send_ctcp_time(const char *recipient, const char *time)
+{
+	send_ctcp(recipient, "TIME", time);
+}
+
+void
+IRCSocket::send_ctcp_errmsg(const char *recipient, const char *errmsg)
+{
+	send_ctcp(recipient, "ERRMSG", errmsg);
+}
+
+void
+IRCSocket::send_ctcp(const char *recipient, const char *type,
+	const char *reply)
 {
 	char tmp[W_BUFSIZE];
 
-	snprintf(tmp, sizeof(tmp), "\001VERSION\001 %s", VERSION);
+	snprintf(tmp, sizeof(tmp), "\001%s %s\001", type, reply);
 	send_notice(recipient, tmp);
 }
 
@@ -158,5 +209,12 @@ void
 IRCSocket::send_away(const char *msg)
 {
 	send_raw("AWAY :%s", msg);
+}
+
+/* INVITE */
+void
+IRCSocket::send_invite(const char *nick, const char *chan)
+{
+	send_raw("INVITE %s %s", nick, chan);
 }
 

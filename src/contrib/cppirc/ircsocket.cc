@@ -24,10 +24,10 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	cmds = 0;
 
 	/* no queue, no links */
-	abp = 0;
-	atp = 0;
-	cbp = 0;
-	ctp = 0;
+	abp = NULL;
+	atp = NULL;
+	cbp = NULL;
+	ctp = NULL;
 
 	/* yet no */
 	connected = 0;
@@ -103,7 +103,7 @@ IRCSocket::add_cmd(const char *buf,
 	ntp->buf = new char[l];
 	/* should be string + \0 */
 	strlcpy(ntp->buf, buf, l);
-	ntp->next = 0;
+	ntp->next = NULL;
 
 	/* new top/bottom */
 	if(cmds > 0) {
@@ -238,7 +238,7 @@ IRCSocket::add_link(const char *cmd,
 	ntp->function = function;
 	ntp->cmd = new char[l];
 	strlcpy(ntp->cmd, cmd, l);
-	ntp->next = 0;
+	ntp->next = NULL;
 
 	/* pointer to bottom/top */
 	if(links > 0) {
@@ -262,7 +262,6 @@ void
 IRCSocket::del_link(const char *cmd,
 	void (*function)(const irc_msg_data*, void*))
 {
-	unsigned int i;
 	irc_act_link *cp;
 	irc_act_link *pp;
 	irc_act_link *np;
@@ -270,21 +269,21 @@ IRCSocket::del_link(const char *cmd,
 	debug(0, "del_link", "Deleting link. (%s, %i)\n",
 		cmd, function);
 
-	/* start at botton */
+	/* start at botton, let pp not be uninitialized */
 	cp = abp;
+	pp = cp;
 // TODO there may be more than one matching link (see also act_link()
 	/* link will be removed, but first search for it */
-	for(i = 0; i < links; i++) {
+	while(cp != NULL) {
 		if(!strcmp(cp->cmd, cmd) && cp->function == function) {
 			np = cp->next;
 
-			debug(1, "del_link", "Will be deleted."
-				" (%i)\n", i);
+			debug(1, "del_link", "Will be deleted.\n");
 
 			delete cp->cmd;
 			delete cp;
 
-			if(i > 0)
+			if(pp != abp)
 				pp->next = np;
 			else
 				abp = np;
@@ -309,7 +308,6 @@ IRCSocket::del_link(const char *cmd,
 void
 IRCSocket::act_link(const irc_msg_data *msg_data)
 {
-	unsigned int i;
 	irc_act_link *cp;
 
 	debug(0, "act_link", "Activating link. (%s)\n",
@@ -318,7 +316,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
 	/* beginning at bottom */
 	cp = abp;
 
-	for(i = 0; i < links; i++) {
+	while(cp != NULL) {
 		/* found match? - act link */
 		if(!strcmp(cp->cmd, msg_data->cmd)) {
 			/*
@@ -384,7 +382,8 @@ IRCSocket::parse(char *msg)
 void
 IRCSocket::parse_msg(char *msg)
 {
-	int i, l;
+	int i;
+	size_t l;
 	char *w, *s;
 
 	/* struct containing sender, command and parameters */

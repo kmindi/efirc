@@ -7,8 +7,7 @@
  ****************************/
 
 int
-IRCSocket::debug(unsigned int level, const char *sender,
-	const char *fmt, ...)
+IRCSocket::debug(int level, const char *sender, const char *fmt, ...)
 {
 	/* return if level is below wanted level */
 	if(level < _DBGLEVEL)

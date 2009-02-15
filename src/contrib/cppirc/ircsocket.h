@@ -47,7 +47,7 @@ struct irc_msg_data {
 	char *nick;
 	char *user;
 	char **params_a;
-	unsigned int params_i;
+	int params_i;
 };
 
 /*
@@ -86,12 +86,12 @@ class IRCSocket
 			FILE *);
 		~IRCSocket(void);
 
-		unsigned int connected;
+		int connected;
 		FILE *_DBGSTR;
-		unsigned int _DBGSPACE;
-		unsigned int _DBGLEVEL;
-		unsigned int _DBGRECON;
+		int _DBGLEVEL;
+		int _DBGRECON;
 		unsigned int _IRCPORT;
+		size_t _DBGSPACE;
 		char _IRCSERV[HOSTSIZE];
 		char _IRCNICK[W_BUFSIZE];
 		char _IRCUSER[W_BUFSIZE];
@@ -126,30 +126,38 @@ class IRCSocket
 		void send_notice(const char *, const char *);
 		void send_privmsg(const char *, const char *);
 		void send_pong(const char *);
-		void send_version(const char *);
+		void send_ctcp_version(const char *, const char *);
+		void send_ctcp_clientinfo(const char *, const char *);
+		void send_ctcp_finger(const char *, const char *);
+		void send_ctcp_source(const char *, const char *);
+		void send_ctcp_userinfo(const char *, const char *);
+		void send_ctcp_ping(const char *, const char *);
+		void send_ctcp_time(const char *, const char *);
+		void send_ctcp_errmsg(const char *, const char *);
+		void send_ctcp(const char *, const char *, const char *);
 		void send_topic(const char *);
 		void send_topic(const char *, const char *);
 		void send_part(const char *);
 		void send_whois(const char *);
 		void send_away(void);
 		void send_away(const char *);
+		void send_invite(const char *, const char *);
 
 	private:
 		int sock;
-		char* VERSION[W_BUFSIZE];
-		unsigned int links;
-		unsigned int cmds;
-		unsigned int reconnecting;
-		unsigned int connecting;
-		unsigned int authed;
-		unsigned int sleep_time;
+		char VERSION[W_BUFSIZE];
+		int reconnecting;
+		int connecting;
+		int authed;
+		int sleep_time;
+		size_t links;
+		size_t cmds;
 		irc_act_link *abp;
 		irc_act_link *atp;
 		irc_queue_cmd *cbp;
 		irc_queue_cmd *ctp;
 
-		int debug(unsigned int, const char *, const char *,
-			...);
+		int debug(int, const char *, const char *, ...);
 		int sock_send(const char *);
 		int sock_recv(char *);
 
