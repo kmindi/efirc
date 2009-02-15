@@ -6,11 +6,11 @@
 // main funkition erstellen, Instanz der Klasse Zentrale erstellen
 // mit DECLARE_APP(Zentrale/) und wxGetApp() kann auf Funktionen dieser Klasse zugegrifffen werden
 IMPLEMENT_APP(Zentrale) // erstellt main funktion
-// {}
+
 
 // Benutzerdefinierte Ereignisse deklarieren und definieren
-DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)//{}
-DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)//{}
+DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
+DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)
 
 #define EVT_NEUES_FENSTER(id, fn) \
     DECLARE_EVENT_TABLE_ENTRY( \
@@ -20,11 +20,10 @@ DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)//{}
     ),
 
 
-BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)//{}
-    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)//{}
-END_EVENT_TABLE()//{}
+BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
+    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
+END_EVENT_TABLE()
 
-//{}
 bool Zentrale::OnInit()
 {
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
@@ -176,6 +175,8 @@ Fenster* Zentrale::fenster(wxString name)
 
 void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 {
+    //fenstername[fensternummer]
+    
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
@@ -210,6 +211,21 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             irc->send_nick(befehl_parameter.mb_str()); // Nickname senden
             irc->WantedNick = befehl_parameter; 
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
+    }
+    
+    if(befehl_name.Upper() == _T("INVITE") && befehl_parameter != _T(""))
+    {
+        wxString nickname = befehl_parameter.BeforeFirst(leerzeichen);
+        wxString raum = befehl_parameter.AfterFirst(leerzeichen);
+        
+        if(raum == _T(""))
+        {
+            raum = fenstername[fensternummer];
+        }
+        
+        // wxGetApp().irc->send_invite(nickname.mb_str(),raum.mb_str());
+        // NOCH NICHT IM CPPIRC
+        
     }
     
     if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
@@ -333,6 +349,7 @@ void irc_nick(const irc_msg_data *msg_data, void *cp);
 void irc_nickinuse(const irc_msg_data *msg_data, void *cp);
 void irc_unaway(const irc_msg_data *msg_data, void *cp);
 void irc_nowaway(const irc_msg_data *msg_data, void *cp);
+void irc_invite(const irc_msg_data *msg_data, void *cp);
 // SOLLEN MITGLIEDER VON ZENTRALE SEIN; DANN DURCH zentrale.h SCHON BEKANNT
 
 void Zentrale::connect_thread()
@@ -364,6 +381,7 @@ void Zentrale::connect_thread()
     irc->add_link("NICK", &irc_nick);
     irc->add_link("PING", &irc_pong);
     //irc->add_link("KICK", &irc_kick);
+    irc->add_link("INVITE", &irc_invite);
 
     // FEHLER
     // Fehler Antworten

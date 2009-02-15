@@ -362,6 +362,14 @@ void irc_nickinuse(const irc_msg_data *msg_data, void *cp)
     wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick.mb_str());
 }
 
+// Einladung in einen Raum
+void irc_invite(const irc_msg_data *msg_data, void *cp)
+{
+    wxString benutzer(msg_data->nick, wxConvUTF8);
+    wxString raum(msg_data->params_a[1], wxConvUTF8);
+    
+    wxGetApp().fenstersuchen(wxGetApp().irc->CurrentNick)->NachrichtAnhaengen(_T("INVITE"),benutzer,raum);
+}
 
 // Thema des Raums anzeigen
 void irc_topic(const irc_msg_data *msg_data, void *cp)

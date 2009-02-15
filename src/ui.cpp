@@ -206,6 +206,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     else if(local == _T("QUIT"))
         WxEdit_ausgabefeld->AppendText(param1 + _T(" hat das IRC-Netzwerk verlassen (") + param2 + _T(")"));
         
+    else if(local == _T("INVITE"))
+        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat dich in den folgenden Raum eingeladen: ") + param2);
+        
     else if(local == _T("MOTD"))
         WxEdit_ausgabefeld->AppendText(param1);
     
@@ -226,7 +229,6 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         WxEdit_ausgabefeld->AppendText(param1 + _T(" setzt Modus: ") + param2);
     }
-          
     
     else if(local == _T("AWAY"))
     {
