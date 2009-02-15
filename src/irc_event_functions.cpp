@@ -66,8 +66,8 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 // Fenster auswählen
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-                wxString antwort = _T("\001VERSION efirc:0.3.testing:Windoofs\001");
-                wxGetApp().irc->send_notice(user.mb_str(), antwort.mb_str());
+                wxString version = _T("efirc:0.3.testing:Windoofs");
+                wxGetApp().irc->send_ctcp_version(user.mb_str(), version.mb_str());
             }
             else
             {
@@ -94,8 +94,8 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 // Fenster auswählen
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-                wxString antwort = _T("\001SOURCE http://efirc.sourceforge.net/\001");
-                wxGetApp().irc->send_notice(user.mb_str(), antwort.mb_str());
+                wxString quelle = _T("http://efirc.sourceforge.net/");
+                wxGetApp().irc->send_ctcp_source(user.mb_str(), quelle.mb_str());
             }
             else
             {
@@ -122,8 +122,8 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 // Fenster auswählen
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-                wxString antwort = _T("\001CLIENTINFO VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME\001");
-                wxGetApp().irc->send_notice(user.mb_str(), antwort.mb_str());
+                wxString antwort = _T("VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME");
+                wxGetApp().irc->send_ctcp_clientinfo(user.mb_str(), antwort.mb_str());
             }
             else
             {
@@ -135,7 +135,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
         // UNTERSCHIED IST NUR PRIVMSG ZUM ANFORDERN UND NOTICE ALS ANTWORT
         if(ctcp_befehl == _T("PING"))
         {
-            wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("P_PRIVMSG"),user,ctcp_befehl + _T(" ") + ctcp_text);
+            wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
             //ANTWORT?
         }
 
@@ -157,9 +157,9 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
                 strftime(timestamp, 30, "%d.%m.%Y %H:%M:%S", local_time);
 
                 wxString timewxString(timestamp, wxConvUTF8);
-                wxString antwort = _T("\001TIME ") + timewxString + _T("\001");
+                wxString antwort = timewxString;
                 
-                wxGetApp().irc->send_notice(user.mb_str(), antwort.mb_str());
+                wxGetApp().irc->send_ctcp_time(user.mb_str(), antwort.mb_str());
             }
             else
             {
