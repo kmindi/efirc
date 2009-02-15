@@ -26,7 +26,7 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(434,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
     WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,289), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
     WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,289), wxSize(111,21), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T("Ausgabefeld"), wxPoint(4,26), wxSize(434,259), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,26), wxSize(434,259), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
     
     
     SetIcon(wxIcon(icon));
@@ -189,7 +189,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     {
         if(param2 == _T(""))
         {
-            WxEdit_ausgabefeld->AppendText(_T("Das Thema ist:") + param1);
+            WxEdit_ausgabefeld->AppendText(_T("Das Thema ist: ") + param1);
         }
         else
         {
