@@ -511,8 +511,9 @@ IRCSocket::parse_msg(char *msg)
 		strlcpy(msg_data->params_a[i], s, l);
 	}
 
-	while(w != msg_data->params)
-		if(*--w == '\0') *w = ' ';
+	if(w != NULL)
+		while(w != msg_data->params)
+			if(*--w == '\0') *w = ' ';
 
 	/* pass msg data and call event matching functions */
 	act_link(msg_data);

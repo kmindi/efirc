@@ -145,7 +145,6 @@ class IRCSocket
 
 	private:
 		int sock;
-		char VERSION[W_BUFSIZE];
 		int reconnecting;
 		int connecting;
 		int authed;
