@@ -20,13 +20,13 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     Center();
     
     // Objekte erzeugen
-    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(442,3), wxSize(111,282), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
+    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(442,4), wxSize(111,284), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
     WxList_benutzerliste->InsertColumn(0, _T("Benutzerliste"), wxLIST_FORMAT_LEFT, -1);
     
     WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(434,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
-    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,289), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
-    WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,289), wxSize(111,21), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,26), wxSize(434,259), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
+    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,292), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
+    WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,292), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(434,260), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
     
     
     SetIcon(wxIcon(icon));
@@ -43,6 +43,33 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
 
     // Bei Fokus ggf. den Text im Eingabefeld loeschen
     WxEdit_eingabefeld->Connect(wxEVT_SET_FOCUS, wxKeyEventHandler(Fenster::WxEdit_eingabefeldFokus), NULL, this);
+    
+    
+    
+    // Groessenaenderung beachten
+        // Sizer erzeugen:
+        wxBoxSizer *sizer_links = new wxBoxSizer(wxVERTICAL);
+        wxBoxSizer *sizer_rechts = new wxBoxSizer(wxVERTICAL);
+        wxBoxSizer *sizer_alles = new wxBoxSizer(wxHORIZONTAL);
+        
+        // Vertikale Groessenaenderung: Thema, Ausgabefeld und Eingabefeld
+            sizer_links->Add(WxEdit_thema, 0 , wxEXPAND | wxBOTTOM, 3); // Thema behaelt seine Groesse bei vertikaler Groessenaenderung
+            sizer_links->Add(WxEdit_ausgabefeld, 1, wxEXPAND | wxBOTTOM, 3); // Ausgabefeld wird hoeher bei vertikaler Groessenaenderung
+            sizer_links->Add(WxEdit_eingabefeld, 0, wxEXPAND); // Eingabefeld behaelt seine Groesse bei vertikaler Groessenaenderung
+            // Bei Horizontaler Groessenaenderung werden alle Objekte groesser (wxEXPAND)
+        
+        // Vertikale Groessenaenderung: Benutzerliste, Sendenknopf
+            sizer_rechts->Add(WxList_benutzerliste, 1, wxEXPAND | wxBOTTOM, 3); // Benutzerliste wird hoeher bei vertikaler Groessenaenderung
+            sizer_rechts->Add(WxButton_senden, 0, wxEXPAND ); // Sendenknopf behaelt seine Groesse bei vertikaler Groessenaenderung
+            // Bei Horizontaler Groessenaenderung werden alle Objekte groesser (wxEXPAND)
+        
+        // Horizontal beide zusammen
+            sizer_alles->Add(sizer_links, 1, wxEXPAND | wxALL, 3); // Linker Teil wird breiter bei horizontaler Groessenaenderung
+            sizer_alles->Add(sizer_rechts, 0, wxEXPAND | wxTOP | wxRIGHT | wxBOTTOM, 3); // Rechter Teil behaelt seine Groesse
+            
+    
+        sizer_alles->SetSizeHints( this ); // Minimale Groesse des Fensters (this) beachten ( = nicht unterschreiten)
+        SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
 }
 
 
