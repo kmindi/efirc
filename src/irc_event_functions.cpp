@@ -66,7 +66,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 // Fenster auswählen
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-                wxString version = _T("efirc:0.3.testing:Windoofs");
+                wxString version = _T("efirc:0.3.testing(") + _T(wxString(wxVERSION_STRING)) + _T("):Windoofs");
                 wxGetApp().irc->send_ctcp_version(user.mb_str(), version.mb_str());
             }
             else

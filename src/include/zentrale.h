@@ -5,6 +5,8 @@
 #define _ZENTRALE_
 
 #include <wx/app.h>
+#include <wx/version.h> // fuer Versionsinformationen von wxWidgets
+#include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <thread.h>
 #include <ui.h>
