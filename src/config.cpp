@@ -4,8 +4,8 @@ using namespace std;
 
 Konfiguration::Konfiguration(wxString dateipfad, wxString standardkonfiguration)
 {
-    opencfg(dateipfad);
     standardkonfiguration_text = standardkonfiguration;
+    opencfg(dateipfad);
 }
 
 void Konfiguration::opencfg(wxString dateipfad)
@@ -23,6 +23,19 @@ void Konfiguration::opencfg(wxString dateipfad)
             konfiguration_text += file.GetLine(i) + _T("\n");
         }
     }
+    else
+    {
+        file.Open(dateipfad);
+        
+        wxString tmp_standardkonfiguration_text = standardkonfiguration_text;
+        while(tmp_standardkonfiguration_text != _T(""))
+        {
+            file.AddLine(tmp_standardkonfiguration_text.BeforeFirst(_T('\n')));
+            tmp_standardkonfiguration_text = tmp_standardkonfiguration_text.AfterFirst(_T('\n'));
+        }
+        file.Write(); // Aenderungen anwenden
+    }
+
 }
 
 wxString Konfiguration::parsecfgvalue(wxString searchstring)
@@ -68,5 +81,10 @@ bool Konfiguration::edit_cfg_replace(wxString alterwert, wxString neuerwert, boo
     
     int i = konfiguration_text.Replace(alterwert,neuerwert);
     if(i >0) {erfolg = true;}
+    
+    // fuer Standardkonfiguration 
+    i = standardkonfiguration_text.Replace(alterwert,neuerwert);
+    if(i >0) {erfolg = true;}
+    
     return erfolg;
 }
