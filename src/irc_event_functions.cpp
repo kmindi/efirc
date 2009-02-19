@@ -66,7 +66,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             {
                 // Fenster auswählen
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-                wxString version = _T("efirc:0.3.testing(") + _T(wxString(wxVERSION_STRING)) + _T("):Windoofs");
+                wxString version = _T("efirc:") + wxGetApp().efirc_version_string + _T("(") + _T(wxString(wxVERSION_STRING)) + _T("):Windoofs");
                 wxGetApp().irc->send_ctcp_version(user.mb_str(), version.mb_str());
             }
             else
@@ -221,7 +221,7 @@ void irc_motd(const irc_msg_data *msg_data, void *cp)
 void irc_endofmotd(const irc_msg_data *msg_data, void *cp)
 {
     // den in der Konfigurationsdatei genannten Kanal betreten
-    wxGetApp().irc->send_join(wxGetApp().raum.mb_str());
+    wxGetApp().irc->send_join(wxGetApp().config->parsecfgvalue(_T("irc_channel")).mb_str());
 }
 
 // Benutzerliste einlesen

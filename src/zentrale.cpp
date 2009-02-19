@@ -26,12 +26,28 @@ END_EVENT_TABLE()
 
 bool Zentrale::OnInit()
 {
+    efirc_version_string = _T("0.3 testing");
+    
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
     
+    wxString standardkonfiguration_text = standardkonfiguration();
+    config = new Konfiguration(_T("efirc.cfg"), standardkonfiguration_text);
+    
+    // Laufzeitkonfiguration anpassen
+    Konfiguration_anpassen();
+    
+    
     // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
     //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    //irc = new IRCInterface(_T("6667"),_T("irc.eu-irc.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+
+    irc = new IRCInterface(
+    config->parsecfgvalue(_T("irc_port")),
+    config->parsecfgvalue(_T("irc_server")),
+    config->parsecfgvalue(_T("irc_nickname")),
+    config->parsecfgvalue(_T("irc_username")),
+    config->parsecfgvalue(_T("irc_realname")),
+    _T("PASS"));
     
     
     // FENSTER
@@ -41,7 +57,8 @@ bool Zentrale::OnInit()
     
     // erste Instanz der Fenster-klasse erzeugen.
     // VERBINDUNG ZUR KONFIGURATION
-    raum = _T("#efirc");
+    //raum = _T("#efirc");
+    raum = config->parsecfgvalue(_T("irc_channel"));
     neuesFenster(raum);
     
     
@@ -52,14 +69,108 @@ bool Zentrale::OnInit()
     
     
     // TEST FUNKTIONEN
-
+   
     return TRUE;
 } 
-
 
 void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
 {
     wxGetApp().neuesFenster(event.GetString());
+}
+
+//Konfigurationsfunktionen
+
+//Standardkonfigurationsinhalt
+wxString Zentrale::standardkonfiguration()
+{
+    wxString standardkonfiguration_text;
+    
+    // Verbindungsinformationen
+    standardkonfiguration_text =  _T("irc_server = irc.freenode.net\n");
+    standardkonfiguration_text += _T("irc_port = 6667\n");
+    standardkonfiguration_text += _T("irc_channel = #efirc\n");
+    standardkonfiguration_text += _T("irc_username = efirc\n");
+    standardkonfiguration_text += _T("irc_realname = efirc v.[efirc_version]\n");
+    standardkonfiguration_text += _T("irc_nickname = user_[efirc_random_string]\n");
+
+    // Farben
+    standardkonfiguration_text += _T("colour_background = #000000\n");
+    standardkonfiguration_text += _T("colour_topic_background = #000000\n");
+    standardkonfiguration_text += _T("colour_topic_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_output_messages_background = #000000\n");
+    standardkonfiguration_text += _T("colour_output_messages_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_input_messages_background = #000000\n");
+    standardkonfiguration_text += _T("colour_input_messages_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_channel_users_background = #000000\n");
+    standardkonfiguration_text += _T("colour_channel_users_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_button_background = #008000\n");
+    standardkonfiguration_text += _T("colour_button_foreground = #00c000\n");
+
+    // Texte
+    standardkonfiguration_text += _T("text_language = en\n");
+    standardkonfiguration_text += _T("text_title = efirc [efirc_version]\n");
+    standardkonfiguration_text += _T("text_quit_message = tschuess\n");
+
+    // Schriftarten
+    standardkonfiguration_text += _T("font_topic = \n");
+    standardkonfiguration_text += _T("font_output_messages = \n");
+    standardkonfiguration_text += _T("font_input_messages = \n");
+    standardkonfiguration_text += _T("font_channel_users = \n");
+    standardkonfiguration_text += _T("font_button = \n");
+
+    // Standardtexte
+    standardkonfiguration_text += _T("local_changenick = %param1's new nick is %param2\n");
+    standardkonfiguration_text += _T("local_joinself = You joined the channel\n");
+    standardkonfiguration_text += _T("local_join = %param1 joined the channel\n");
+    standardkonfiguration_text += _T("local_leave = %param1 left\n");
+    standardkonfiguration_text += _T("local_quit = %param1 left the network (\"%param2\")\n");
+    standardkonfiguration_text += _T("local_kickself = You were kicked by %param1\n");
+    standardkonfiguration_text += _T("local_kick = %param1 was kicked by %param2\n");
+    standardkonfiguration_text += _T("local_nickinuseinfo = This nickname is already in use\n");
+    standardkonfiguration_text += _T("local_newnickinfo = Your new nick is %param1\n");
+    standardkonfiguration_text += _T("local_whoisaway = %param1 is currently away (\"%param2\")\n");
+    standardkonfiguration_text += _T("local_whoischan = %param1 is on %param2\n");
+    standardkonfiguration_text += _T("local_whoisidle = %param1 is inactive since %param2 Sekunden\n");
+    standardkonfiguration_text += _T("local_topic = Topic: %param1\n");
+    standardkonfiguration_text += _T("local_quitself = You left the IRC-Network with the message \"%param1\"\n");
+    standardkonfiguration_text += _T("local_unaway = Removed your away status\n");
+    standardkonfiguration_text += _T("local_away = You are marked as being away (%param1)\n");
+    standardkonfiguration_text += _T("local_mode = %param1 set mode %param2\n");
+
+
+    // Platzhalter ersetzen 
+    // [efirc_version]
+    standardkonfiguration_text.Replace(_T("[efirc_version]"), efirc_version_string.mb_str());
+    // [efirc_random_string]
+    standardkonfiguration_text.Replace(_T("[efirc_random_string]"), zufallstext(4).mb_str());
+    
+    return standardkonfiguration_text;
+    
+}
+
+wxString Zentrale::zufallstext(int anzahl_zeichen)
+{
+    wxString rndstring;
+    // Zufallsgenerator initialisieren
+    srand(time(NULL));
+
+    for(int i = 1; i <= anzahl_zeichen; i++)
+    {
+        rndstring += wxChar(65 + rand()%26);
+    }
+    
+    return rndstring;
+}
+
+// Konfiguration anpassen
+void Zentrale::Konfiguration_anpassen()
+{
+    // Platzhalter ersetzen 
+    
+    // [efirc_version]
+    config->edit_cfg_replace(_T("[efirc_version]"), efirc_version_string.mb_str());
+    // [efirc_random_string]
+    config->edit_cfg_replace(_T("[efirc_random_string]"), zufallstext(4).mb_str());
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
@@ -171,7 +282,6 @@ Fenster* Zentrale::fenster(wxString name)
         }
     }
 }
-
 
 void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 {

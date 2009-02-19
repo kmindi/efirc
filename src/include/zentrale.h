@@ -9,6 +9,7 @@
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <thread.h>
+#include <config.h>
 #include <ui.h>
 #include <irc.h>
 #include <event.h>
@@ -21,12 +22,15 @@ class Zentrale : public wxApp
         
         virtual bool OnInit();
         
+        wxString efirc_version_string;
+        
         friend class Thread; 
         // muss ein Freund sein, damit die erstellten Threads 
         // auf die privaten Thread funktionen zugreifen koennen
         
         IRCInterface *irc; //zeiger zum IRCInterface erzeugen
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
+        Konfiguration *config; // Zeiger zur Konfiguration
         
         void fensterzerstoeren(int);
         void fensterzerstoeren(wxString);
@@ -49,6 +53,11 @@ class Zentrale : public wxApp
         
         int OnExit();
         
+        //Konfiguration
+        wxString standardkonfiguration();
+        wxString zufallstext(int anzahl_zeichen = 4);
+        void Konfiguration_anpassen();
+        
         
         void BefehlVerarbeiten(int fensternummer, wxString befehl);
         void NachrichtSenden(int fensternummer, wxString nachricht);
@@ -57,6 +66,8 @@ class Zentrale : public wxApp
         void connect_thread();
         void recv_thread();
         void call_thread();
+        
+        
         
         
         //IRC FUNKTIONEN
