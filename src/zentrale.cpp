@@ -90,7 +90,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_port = 6667\n");
     standardkonfiguration_text += _T("irc_channel = #efirc\n");
     standardkonfiguration_text += _T("irc_username = efirc\n");
-    standardkonfiguration_text += _T("irc_realname = efirc v.[efirc_version]\n");
+    standardkonfiguration_text += _T("irc_realname = ") + wxGetUserId() + _T("\n");
     standardkonfiguration_text += _T("irc_nickname = user_[efirc_random_string]\n");
 
     // Farben
@@ -137,13 +137,6 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_away = You are marked as being away (%param1)\n");
     standardkonfiguration_text += _T("local_mode = %param1 set mode %param2\n");
 
-
-    // Platzhalter ersetzen 
-    // [efirc_version]
-    standardkonfiguration_text.Replace(_T("[efirc_version]"), efirc_version_string.mb_str());
-    // [efirc_random_string]
-    standardkonfiguration_text.Replace(_T("[efirc_random_string]"), zufallstext(4).mb_str());
-    
     return standardkonfiguration_text;
     
 }

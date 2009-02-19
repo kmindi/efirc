@@ -7,6 +7,7 @@
 #include <wx/app.h>
 #include <wx/version.h> // fuer Versionsinformationen von wxWidgets
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
+#include <wx/utils.h> // fuer BS, Benutzer und Netzwerkfunktionen
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <thread.h>
 #include <config.h>
