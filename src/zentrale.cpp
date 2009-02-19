@@ -161,9 +161,9 @@ void Zentrale::Konfiguration_anpassen()
     // Platzhalter ersetzen 
     
     // [efirc_version]
-    config->edit_cfg_replace(_T("[efirc_version]"), efirc_version_string.mb_str());
+    config->edit_cfg_replace(_T("[efirc_version]"), efirc_version_string);
     // [efirc_random_string]
-    config->edit_cfg_replace(_T("[efirc_random_string]"), zufallstext(4).mb_str());
+    config->edit_cfg_replace(_T("[efirc_random_string]"), zufallstext(4));
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
