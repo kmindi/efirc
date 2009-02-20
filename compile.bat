@@ -18,8 +18,8 @@ echo.
 cd bin
 move ..\src\efirc.exe efirc.exe
 
-rem echo ...Stripping...
-rem strip --strip-all efirc.exe
+echo ...Stripping...
+strip --strip-all efirc.exe
 
 rem echo ...c0mprim!sing...
 rem upx --best efirc.exe
