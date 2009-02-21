@@ -20,13 +20,13 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     Center();
     
     // Objekte erzeugen
-    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(442,4), wxSize(111,284), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
+    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(608,4), wxSize(111,384), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
     WxList_benutzerliste->InsertColumn(0, _T("Benutzerliste"), wxLIST_FORMAT_LEFT, -1);
     
-    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(434,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
-    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,292), wxSize(434,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
-    WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(442,292), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(434,260), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
+    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
+    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,392), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
+    WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(608,392), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));    
     
     
     SetIcon(wxIcon(icon));
