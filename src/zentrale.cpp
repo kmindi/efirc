@@ -90,7 +90,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_port = 6667\n");
     standardkonfiguration_text += _T("irc_channel = #efirc\n");
     standardkonfiguration_text += _T("irc_username = efirc\n");
-    standardkonfiguration_text += _T("irc_realname = ") + wxGetUserId() + _T("\n");
+    standardkonfiguration_text += _T("irc_realname = [efirc_real_name]\n");
     standardkonfiguration_text += _T("irc_nickname = user_[efirc_random_string]\n");
 
     // Farben
@@ -165,6 +165,8 @@ void Zentrale::Konfiguration_anpassen()
     config->edit_cfg_replace(_T("[efirc_version]"), efirc_version_string);
     // [efirc_random_string]
     config->edit_cfg_replace(_T("[efirc_random_string]"), zufallstext(4));
+    // [efirc_real_name]
+    config->edit_cfg_replace(_T("[efirc_real_name]"), wxGetUserId());
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
