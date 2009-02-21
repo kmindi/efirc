@@ -232,17 +232,20 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     
     else if(local == _T("P_ACTION"))
     {
-        WxEdit_ausgabefeld->AppendText(_T("[ "));
+        WxEdit_ausgabefeld->AppendText(_T("[ *") + param1 + _T(" "));
+        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" ") + param2);
+        WxEdit_ausgabefeld->AppendText(param2);
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
         WxEdit_ausgabefeld->AppendText(_T(" ]"));
     }
     
     else if(local == _T("ACTION"))
     {
+        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" "));
+        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
         WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" ") + param2);
+        WxEdit_ausgabefeld->AppendText(param2);
         WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     }
         

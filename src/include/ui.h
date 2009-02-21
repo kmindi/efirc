@@ -26,8 +26,6 @@ class Fenster : public wxFrame
         
         void ObjekteAnpassen();
         
-        wxTextAttr defaultstyle; // TextAttribut fuer das voreingestellte Aussehen deklarieren
-        
         enum
         {
             ID_WxList_benutzerliste = 1007,
