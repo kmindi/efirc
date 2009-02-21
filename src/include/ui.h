@@ -24,6 +24,8 @@ class Fenster : public wxFrame
         wxTextCtrl *WxEdit_eingabefeld;
         wxTextCtrl *WxEdit_ausgabefeld;
         
+        void ObjekteAnpassen();
+        
         wxTextAttr defaultstyle; // TextAttribut fuer das voreingestellte Aussehen deklarieren
         
         enum

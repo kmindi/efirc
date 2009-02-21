@@ -33,8 +33,7 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
     
     // OBJEKTE ANPASSEN, VERBINDUNG ZUR KONFIGURATION
     // IN EIGENE FUNKTION AUSLAGERN
-    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxBLACK)); // voreingestelltes Aussehen setzen ...
-    defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle(); // ... und speichern
+    ObjekteAnpassen();
     
     // Ereignisse verknuepfen
     
@@ -72,6 +71,41 @@ Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const
         SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
 }
 
+// Farben aus der Konfiguration lesen und bei allen Objekten anpassen
+void Fenster::ObjekteAnpassen()
+{
+    SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_background"))));
+    
+    WxEdit_thema->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_background"))));
+    WxEdit_thema->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_foreground"))));
+    
+    WxEdit_eingabefeld->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_input_messages_background"))));
+    WxEdit_eingabefeld->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_input_messages_foreground"))));
+    
+    WxList_benutzerliste->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_channel_users_background"))));
+    WxList_benutzerliste->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_channel_users_foreground"))));
+    
+    WxButton_senden->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_background"))));
+    WxButton_senden->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_foreground"))));
+    
+    WxEdit_thema->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_topic"))));
+    WxEdit_eingabefeld->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_input_messages"))));
+    WxList_benutzerliste->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_channel_users"))));
+    WxButton_senden->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_button"))));
+    
+    // Ausgabefeld wird extra behandelt, weil die Fehler-Funktion Farbe verwendet und danach den Default Style wieder herstellen muss
+    WxEdit_ausgabefeld->SetDefaultStyle
+    (
+        wxTextAttr
+        (
+            wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_foreground"))),
+            wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))),
+            wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_output_messages")))
+        )
+    );
+    // Hintergrund an dem kein Text steht muss seperat eingestellt werden
+    WxEdit_ausgabefeld->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))));
+}
 
 // Ereignissabhaengige Funktionen
 
@@ -302,8 +336,10 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
     strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
     wxString prefix(timestamp, wxConvUTF8);
     
-    // Aussehen aendern (Farbe)
-    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(*wxRED, *wxBLUE));
+    // Aussehen aendern
+    // zuvor gesetzten style speichern...
+    wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
     
         // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen    
         WxEdit_ausgabefeld->AppendText(_T("\n")+prefix+_T(" (!) "));
@@ -319,7 +355,7 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
         if(fehlernummer == 3)
             WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
         
-    // Voreingestelltes Aussehen wiederherstellen (Farbe wieder entfernen)
+    // ...voreingestelltes Aussehen wiederherstellen
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
 }
 

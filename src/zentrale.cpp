@@ -96,15 +96,16 @@ wxString Zentrale::standardkonfiguration()
     // Farben
     standardkonfiguration_text += _T("colour_background = #000000\n");
     standardkonfiguration_text += _T("colour_topic_background = #000000\n");
-    standardkonfiguration_text += _T("colour_topic_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_topic_foreground = #00C000\n");
     standardkonfiguration_text += _T("colour_output_messages_background = #000000\n");
-    standardkonfiguration_text += _T("colour_output_messages_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_output_messages_foreground = #00C000\n");
     standardkonfiguration_text += _T("colour_input_messages_background = #000000\n");
-    standardkonfiguration_text += _T("colour_input_messages_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_input_messages_foreground = #00C000\n");
     standardkonfiguration_text += _T("colour_channel_users_background = #000000\n");
-    standardkonfiguration_text += _T("colour_channel_users_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_channel_users_foreground = #00C000\n");
     standardkonfiguration_text += _T("colour_button_background = #008000\n");
-    standardkonfiguration_text += _T("colour_button_foreground = #00c000\n");
+    standardkonfiguration_text += _T("colour_button_foreground = #00C000\n");
+    standardkonfiguration_text += _T("colour_error = #FF0000\n");
 
     // Texte
     standardkonfiguration_text += _T("text_language = en\n");
