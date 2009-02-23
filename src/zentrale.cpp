@@ -340,9 +340,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             raum = fenstername[fensternummer];
         }
         
-        // wxGetApp().irc->send_invite(nickname.mb_str(),raum.mb_str());
-        // NOCH NICHT IM CPPIRC
-        
+        wxGetApp().irc->send_invite(nickname.mb_str(), raum.mb_str());
     }
     
     if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
