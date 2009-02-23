@@ -120,24 +120,35 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("font_button = \n");
 
     // Standardtexte
-    standardkonfiguration_text += _T("local_changenick = %param1's new nick is %param2\n");
-    standardkonfiguration_text += _T("local_joinself = You joined the channel\n");
-    standardkonfiguration_text += _T("local_join = %param1 joined the channel\n");
-    standardkonfiguration_text += _T("local_leave = %param1 left\n");
-    standardkonfiguration_text += _T("local_quit = %param1 left the network (\"%param2\")\n");
-    standardkonfiguration_text += _T("local_kickself = You were kicked by %param1\n");
-    standardkonfiguration_text += _T("local_kick = %param1 was kicked by %param2\n");
-    standardkonfiguration_text += _T("local_nickinuseinfo = This nickname is already in use\n");
-    standardkonfiguration_text += _T("local_newnickinfo = Your new nick is %param1\n");
-    standardkonfiguration_text += _T("local_whoisaway = %param1 is currently away (\"%param2\")\n");
-    standardkonfiguration_text += _T("local_whoischan = %param1 is on %param2\n");
-    standardkonfiguration_text += _T("local_whoisidle = %param1 is inactive since %param2 Sekunden\n");
-    standardkonfiguration_text += _T("local_topic = Topic: %param1\n");
-    standardkonfiguration_text += _T("local_quitself = You left the IRC-Network with the message \"%param1\"\n");
-    standardkonfiguration_text += _T("local_unaway = Removed your away status\n");
-    standardkonfiguration_text += _T("local_away = You are marked as being away (%param1)\n");
-    standardkonfiguration_text += _T("local_mode = %param1 set mode %param2\n");
+    // S =s elber, fuer Nachrichten die man selber geschrieben hat
+    // P = privat, fuer Nachrichten die nicht an einen Raum, sondern an einen selber geschrieben wurden.
+    standardkonfiguration_text += _T("local_P_PRIVMSG = [ <%param1> %param2 ]\n");
+    standardkonfiguration_text += _T("local_S_P_PRIVMSG = [ <%param1->%param2> %param3 ]\n");
+    standardkonfiguration_text += _T("local_PRIVMSG = <%param1> %param2\n");
+    standardkonfiguration_text += _T("local_PRIVMSG_NOSENDER = %param2\n");
+    standardkonfiguration_text += _T("local_ACTION = *%param1 [italic]%param2[/italic]\n");
+    standardkonfiguration_text += _T("local_P_ACTION = [ *%param1 [italic]%param2[/italic] ]\n");
+    standardkonfiguration_text += _T("local_TOPIC = The topic is: %param1\n");
+    standardkonfiguration_text += _T("local_TOPIC_CHANGE = %param2 changed the topic to %param1\n");
+    standardkonfiguration_text += _T("local_JOIN = %param1 joined the channel\n");
+    standardkonfiguration_text += _T("local_PART = %param1 has left the channel (%param2)\n");
+    standardkonfiguration_text += _T("local_QUIT = %param1 has left the network (%param2)\n");
+    standardkonfiguration_text += _T("local_INVITE = %param1 invited you to %param2\n");
+    standardkonfiguration_text += _T("local_NICK = %param1 changed his nickname to %param2\n");
+    standardkonfiguration_text += _T("local_MOTD = %param1\n");
+    standardkonfiguration_text += _T("local_CTCP = [ <%param1@CTCP> %param2 ]\n");
+    standardkonfiguration_text += _T("local_S_CTCP = [ <%param1@CTCP->%param2> %param3 ]\n");
+    standardkonfiguration_text += _T("local_MODE = %param1 set mode %param2\n");
+    standardkonfiguration_text += _T("local_AWAY = You have been marked as being away (%param1)\n");
+    standardkonfiguration_text += _T("local_RPL_UNAWAY = You are not longer marked as being away\n");
+    standardkonfiguration_text += _T("local_RPL_NOWAWAY = You have been marked as being away\n");
+    standardkonfiguration_text += _T("local_WHOIS_USER = [ WHOIS: %param1 (%param2@%param3 - %param4) ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_AWAY = [ WHOIS: %param1 is away %param2 ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_CHANNEL = [ WHOIS: %param1 is in %param2 ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_IDLE = [ WHOIS: %param1 is idle since %param2 seconds ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
 
+    
     return standardkonfiguration_text;
     
 }
@@ -360,7 +371,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
         
         irc->send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
-        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
     }
     
     if(befehl_name.Upper() == _T("AWAY"))
@@ -368,13 +379,11 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         if(befehl_parameter == _T(""))
         {
             irc->send_away();
-            zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"));
         }
         else
         {
             irc->send_away(befehl_parameter.mb_str());
             zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
-            
         }
     }
     

@@ -187,142 +187,50 @@ void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxSt
 
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)
 {
-    //VERBINDUNG ZUR KONFIGURATION
-    // Nachrichten an den eigenen Nickname in [  ] anzeigen, alles ausser das Prefix
-    
     // Zeitstempel erzeugen
     char timestamp[12];
     time_t raw_time;
     tm *local_time;
     time(&raw_time);
     local_time = localtime(&raw_time);
-    strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
+    strftime(timestamp, 12, "[%H:%M:%S]", local_time);
     wxString prefix(timestamp, wxConvUTF8);
     
     // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-    WxEdit_ausgabefeld->AppendText(_T("\n") + prefix + _T(" "));
+    prefix = _T("\n") + prefix + _T(" ");
+    
+    // Aus Konfiguration Nachrichtformat auslesen
+    wxString nachricht = wxGetApp().config->parsecfgvalue(_T("local_") + local);
+    
+    // Parameter in der Nachricht mit den uebergebenen Parametern ersetzen
+    nachricht.Replace(_T("%param1"),param1);
+    nachricht.Replace(_T("%param2"),param2);
+    nachricht.Replace(_T("%param3"),param3);
+    nachricht.Replace(_T("%param4"),param4);
+    
+    // Besondere Textformatierungen beachten und anwenden
+        // Wenn [italic] gefunden wurde:
+        if(nachricht.Contains(_T("[italic]")) && nachricht.Contains(_T("[/italic]")))
+        {
+            int pos = nachricht.Find(_T("[italic]"));
+            //alles vor italic ausgeben
+                WxEdit_ausgabefeld->AppendText(prefix + nachricht.Left(pos));
+            //alles italic formatiert ausgeben
+                wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+                WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
+                
+                WxEdit_ausgabefeld->AppendText(nachricht.Mid(pos + 8, nachricht.Find(_T("[/italic]")) - pos - 8));
+                
+                WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+            //alles nach italic ausgeben
+                WxEdit_ausgabefeld->AppendText(nachricht.Mid(nachricht.Find(_T("[/italic]")) + 9));
+            // Nachricht nicht nochmal ausgeben
+                return;
+        }
 
-    // locale abfragen
-    // MIT SWITCH / CASE 
-    
-    if(local == _T("P_PRIVMSG"))
-    {
-        if(param3 == _T(""))
-        {
-            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("> ") + param2 + _T(" ]"));
-        }
-        else
-        // wenn 3 Parameter uebergeben wurden, dann hat man selbst eine Nachricht an einen Benutzer geschrieben
-        {
-            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("->") + param2 + _T("> ") + param3 + _T(" ]"));
-        }
-    }
-    
-    else if(local == _T("PRIVMSG"))
-    {
-        if(param1 == _T(""))
-        {
-            WxEdit_ausgabefeld->AppendText(param2);
-        }
-        else
-        {
-            WxEdit_ausgabefeld->AppendText(_T("<") + param1 + _T("> ") + param2);
-        }
-    }
-    
-    else if(local == _T("P_ACTION"))
-    {
-        WxEdit_ausgabefeld->AppendText(_T("[ *") + param1 + _T(" "));
-        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-        WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(param2);
-        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-        WxEdit_ausgabefeld->AppendText(_T(" ]"));
-    }
-    
-    else if(local == _T("ACTION"))
-    {
-        WxEdit_ausgabefeld->AppendText(_T("*") + param1 + _T(" "));
-        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-        WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
-        WxEdit_ausgabefeld->AppendText(param2);
-        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-    }
-        
-    else if(local == _T("TOPIC"))
-    {
-        if(param2 == _T(""))
-        {
-            WxEdit_ausgabefeld->AppendText(_T("Das Thema ist: ") + param1);
-        }
-        else
-        {
-            WxEdit_ausgabefeld->AppendText(_T("*") + param2 + _T(" hat das Thema geaendert: ") + param1);
-        }
-    }
-    
-    else if(local == _T("JOIN"))
-        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat den Raum betreten"));
-        
-    else if(local == _T("PART"))
-        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat den Raum verlassen (") + param2 + _T(")"));
-    
-    else if(local == _T("QUIT"))
-        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat das IRC-Netzwerk verlassen (") + param2 + _T(")"));
-        
-    else if(local == _T("INVITE"))
-        WxEdit_ausgabefeld->AppendText(param1 + _T(" hat dich in den folgenden Raum eingeladen: ") + param2);
-        
-    else if(local == _T("MOTD"))
-        WxEdit_ausgabefeld->AppendText(param1);
-    
-    else if(local == _T("CTCP"))
-    {
-         if(param3 == _T(""))
-        {
-            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("@[CTCP]> ") + param2 + _T(" ]"));
-        }
-        else
-        // wenn 3 Parameter uebergeben wurden, dann hat man selbst eine Nachricht an einen Benutzer geschrieben
-        {
-            WxEdit_ausgabefeld->AppendText(_T("[ <") + param1 + _T("@[CTCP]->") + param2 + _T("> ") + param3 + _T(" ]"));
-        }
-    }
-       
-    else if(local == _T("MODE"))
-    {
-        WxEdit_ausgabefeld->AppendText(param1 + _T(" setzt Modus: ") + param2);
-    }
-    
-    else if(local == _T("AWAY"))
-    {
-        // ES WIRD EINE LEERE ZEILE AUSGEGEBEN WENN MAN DEN STATUS WIEDER AUF VERFUEGBAR SETZT
-        if(param1 != _T(""))
-            WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt abwesend: ") + param1);
-    }
-    
-    else if(local == _T("RPL_UNAWAY"))
-        WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt nicht mehr abwesend"));
-
-    else if(local == _T("RPL_NOWAWAY"))
-        WxEdit_ausgabefeld->AppendText(_T("Sie sind jetzt als abwesend markiert"));
-    
-    // Whois Antworten
-    else if(local == _T("WHOIS_BENUTZER"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" (") + param2 + _T("@") + param3 + _T(" - ") + param4 + _T(") ]"));
-    
-    else if(local == _T("WHOIS_ABWESEND"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist abwesend: ") + param2 + _T(" ]"));
-        
-    else if(local == _T("WHOIS_RAEUME"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist in: ") + param2 + _T(" ]"));
-        
-    else if(local == _T("WHOIS_UNTAETIG"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ist untaetig seit: ") + param2 + _T(" ]"));
-        
-    else if(local == _T("WHOIS_SERVERNACHRICHT"))
-        WxEdit_ausgabefeld->AppendText(_T("[ WHOIS: ") + param1 + _T(" ") + param2 + _T(" ") + param3 + _T(" ]"));
-        
+    // Nachricht nur ausgeben wenn sie nicht leer ist
+    if(nachricht != _T(""))
+    WxEdit_ausgabefeld->AppendText(prefix + nachricht);
 }
 
 void Fenster::Fehler(int fehlernummer, wxString param1)
@@ -336,7 +244,7 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
     tm *local_time;
     time(&raw_time);
     local_time = localtime(&raw_time);
-    strftime(timestamp, 12, "[%H:%M:%S] ", local_time);
+    strftime(timestamp, 12, "[%H:%M:%S]", local_time);
     wxString prefix(timestamp, wxConvUTF8);
     
     // Aussehen aendern
@@ -365,7 +273,15 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
 {
     WxEdit_thema->SetValue(thema);
-    NachrichtAnhaengen(_T("TOPIC"),thema,benutzer);
+    if(benutzer == _T(""))
+    {
+        NachrichtAnhaengen(_T("TOPIC"),thema,benutzer);
+    }
+    else
+    {
+        NachrichtAnhaengen(_T("TOPIC_CHANGE"),thema,benutzer);
+    }
+    
 }
 
 void Fenster::AusgabefeldLeeren()

@@ -32,7 +32,14 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
             }
             else
             {
-                wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG"),user,text);
+                if(user == _T(""))
+                {
+                    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),user,text);
+                }
+                else
+                {
+                    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG"),user,text);
+                }
             }
     }
     
@@ -327,9 +334,9 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
             else
             // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
             {
-                wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer,neuername);
+                wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer, neuername);
                 // nachricht anzeigen
-                //wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen("NICK",benutzer);
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer);
             }
         }
     }
@@ -338,14 +345,8 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
 // Nickname wird bereits genutzt
 void irc_nickinuse(const irc_msg_data *msg_data, void *cp)
 {
-    // WENN DER FEHLER SCHON BEIM VERBINDEN AUFTRITT 
-    // WIRD DER NEUE NAME NICHT VOM SERVER NOCHMAL GESENDET
-    // MAN KANN ALSO NICHT MIT irc_nick DADRAUF REAGIEREN
-    
-    
     // VERBINDUNG ZUR KONFIGURATION
     // Fehlermeldung anzeigen (alternativ irc_error aufrufen hier.
-    
     
     //statt diesem irc_error aufrufen
         wxString fehler(msg_data->cmd, wxConvUTF8);
@@ -356,10 +357,14 @@ void irc_nickinuse(const irc_msg_data *msg_data, void *cp)
         }
         wxGetApp().fenstersuchen(wxGetApp().irc->WantedNick)->Fehler(2,fehler);
      //statt diesem irc_error aufrufen
-     
-     
-    wxGetApp().irc->WantedNick += _T("_"); // _ an den namen anhaengen
-    wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick.mb_str());
+    
+
+    // WENN DER FEHLER SCHON BEIM VERBINDEN AUFTRITT 
+    // WIRD DER NEUE NAME NICHT VOM SERVER NOCHMAL GESENDET
+    // MAN KANN ALSO NICHT MIT irc_nick DADRAUF REAGIEREN    
+    
+    //wxGetApp().irc->WantedNick += _T("_"); // _ an den namen anhaengen
+    //wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick.mb_str());
 }
 
 // Einladung in einen Raum
@@ -382,7 +387,8 @@ void irc_topic(const irc_msg_data *msg_data, void *cp)
 void irc_requestedtopic(const irc_msg_data *msg_data, void *cp)
 {
    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-   wxGetApp().fenster(empfaenger)->ThemaAendern(wxString(msg_data->params_a[1], wxConvUTF8));
+   wxString benutzer(msg_data->nick, wxConvUTF8);
+   wxGetApp().fenster(empfaenger)->ThemaAendern(wxString(msg_data->params_a[1], wxConvUTF8), benutzer);
 }
 
 // Verschiedene Fehlermeldungen anzeigen
@@ -428,7 +434,7 @@ void irc_whoisuser(const irc_msg_data *msg_data, void *cp)
     wxString host(msg_data->params_a[3], wxConvUTF8);
     wxString name(msg_data->params_a[5], wxConvUTF8);
     
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_BENUTZER"),nick,user,host,name);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_USER"),nick,user,host,name);
 }
 
 void irc_whoisaway(const irc_msg_data *msg_data, void *cp)
@@ -436,7 +442,7 @@ void irc_whoisaway(const irc_msg_data *msg_data, void *cp)
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
     wxString nick(msg_data->params_a[1], wxConvUTF8);
     wxString text(msg_data->params_a[2], wxConvUTF8);
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_ABWESEND"),nick,text);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_AWAY"),nick,text);
 }
 
 void irc_whoischan(const irc_msg_data *msg_data, void *cp)
@@ -446,7 +452,7 @@ void irc_whoischan(const irc_msg_data *msg_data, void *cp)
     wxString chans(msg_data->params_a[2], wxConvUTF8);
 
     // Rechte noch beachten ([@|+]#channel)???
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_RAEUME"),nick,chans);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_CHANNEL"),nick,chans);
 }
 
 void irc_whoisidle(const irc_msg_data *msg_data, void *cp)
@@ -455,7 +461,7 @@ void irc_whoisidle(const irc_msg_data *msg_data, void *cp)
     wxString nick(msg_data->params_a[1], wxConvUTF8);
     wxString sekunden(msg_data->params_a[2], wxConvUTF8);
 
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_UNTAETIG"),nick,sekunden);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_IDLE"),nick,sekunden);
 }
 
 void irc_whoisserver(const irc_msg_data *msg_data, void *cp)
@@ -464,9 +470,5 @@ void irc_whoisserver(const irc_msg_data *msg_data, void *cp)
     wxString nick(msg_data->params_a[1], wxConvUTF8);
     wxString server(msg_data->params_a[2], wxConvUTF8);
     wxString servernachricht(msg_data->params_a[3], wxConvUTF8);
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERNACHRICHT"),nick,server,servernachricht);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
 }
-
-
-
-
