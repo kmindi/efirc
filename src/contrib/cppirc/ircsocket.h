@@ -83,7 +83,7 @@ class IRCSocket
 	public:
 		IRCSocket(unsigned int, const char *, const char *,
 			const char *, const char *, const char *,
-			FILE *);
+			const char *, int = 3);
 		~IRCSocket(void);
 
 		int connected;

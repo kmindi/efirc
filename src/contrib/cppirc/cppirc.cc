@@ -4,7 +4,7 @@
 /* create an ircsocket - our interface for the irc protocol */
 IRCSocket ircsocket(6667, "chat.freenode.net", "efirc-dev101",
 	"efirc-dev101", "efirc-dev101", "pass",
-	fopen("/dev/stdout", "w"));
+	"");
 //	"efirc-dev101", "efirc-dev101", "pass",
 //	fopen("cppirc.log", "w"));
 

@@ -9,7 +9,7 @@
 /* Constructor (connect to server) */
 IRCSocket::IRCSocket(unsigned int port, const char *server,
 	const char *nick, const char *user, const char *real,
-	const char *pass, FILE *log)
+	const char *pass, const char *log_path, int log_level)
 {
 	#ifdef WIN32 /* see msdn WSAStartup */
 	WORD wVersionRequested;
@@ -47,10 +47,17 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	strlcpy(_IRCUSER, user, sizeof(_IRCUSER));
 	strlcpy(_IRCREAL, real, sizeof(_IRCREAL));
 	strlcpy(_IRCPASS, pass, sizeof(_IRCPASS));
-	_DBGSTR = log;
 	_DBGSPACE = 15;
-	_DBGLEVEL = 3;
+	_DBGLEVEL = log_level;
 	_DBGRECON = 1;
+
+	_DBGSTR = fopen(log_path, "w");
+	if(_DBGSTR == NULL) {
+		_DBGSTR = stdout;
+
+		debug(3, "IRCSocket", "Couldn't open stream. (%s)\n",
+			strerror(errno));
+	}
 
 	#ifdef WIN32
 	err = WSAStartup(wVersionRequested, &wsaData);

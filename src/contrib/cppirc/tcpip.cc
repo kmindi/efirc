@@ -197,8 +197,17 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 void
 IRCSocket::recv_raw(void)
 {
-	/* length of recvd buffer */
-	size_t bl, ol, l;
+	size_t ol, l;
+
+	/*
+	 * read(2) return values
+	 *
+	 * >0: the number of bytes actually read
+	 *  0: EOF
+	 * -1: error (errno is set)
+	 */
+	ssize_t bl;
+
 	/* buffer to put raw message in */
 	char buf[R_BUFSIZE];
 	char *c, *o, *n;
