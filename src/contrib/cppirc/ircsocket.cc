@@ -174,9 +174,9 @@ IRCSocket::call_cmd(void)
 	int (IRCSocket::*function)(const char *buf), s;
 	const char *buf;
 
-	while(1) {
-		debug(0, "call_cmd", "Calling command.\n");
+	debug(0, "call_cmd", "Calling commands.\n");
 
+	while(1) {
 		/* any commands left in queue? */
 		if(cmds > 0) {
 			buf = cbp->buf;
@@ -207,10 +207,7 @@ IRCSocket::call_cmd(void)
 
 				reconnect();
 			}
-		} else
-			/* minor log-level */
-			debug(0, "call_cmd", "No more commands in"
-				" queue.\n");
+		}
 
 		/* don't hurry */
 		#ifdef WIN32

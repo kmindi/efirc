@@ -333,14 +333,22 @@ IRCSocket::send_raw(const char *fmt, ...)
 int
 IRCSocket::sock_send(const char *buf)
 {
-	int status;
 	size_t l;
+
+	/*
+	 * send(2) return values
+	 *
+	 * >=0: the number of characters sent
+	 *  -1: error
+	 */
+	ssize_t bl;
+
 	char tmp[W_BUFSIZE];
 
 	/* length of string to send */
 	l = strlen(buf) + 2;
 
-	debug(0, "sock_send", "Sending Message (%s)\n", buf);
+	debug(2, "sock_send", "Sending message. (%s)\n", buf);
 
 	/* we have a size maximum in the IRC proto */
 	if(l <= sizeof(tmp)) {
@@ -363,12 +371,12 @@ IRCSocket::sock_send(const char *buf)
 	 * sock : socket descriptor
 	 * 0    : default flags
 	 */
-	status = send(sock, tmp, l, 0);
+	bl = send(sock, tmp, l, 0);
 
 	/* check status and return send's return value */
-	if(status > -1)
+	if(bl > -1)
 		debug(1, "sock_send", "Sent raw data."
-			" (%i)\n", status);
+			" (%i)\n", bl);
 	else
 		#ifdef WIN32
 		debug(3, "sock_send", "Couldn't send raw data."
@@ -378,27 +386,33 @@ IRCSocket::sock_send(const char *buf)
 			" (%s)\n", strerror(errno));
 		#endif
 
-	return status;
+	return bl;
 }
 
 int
 IRCSocket::sock_recv(char *buf)
 {
-	int status;
+	/*
+	 * recv(2) return values
+	 *
+	 * >=0: the number of bytes received
+	 *  -1: error
+	 */
+	ssize_t bl;
 
 	/*
-	 * send() is used to receive a message
+	 * recv() is used to receive a message
 	 * from a socket. the socket must be
 	 * connected.
 	 *
 	 * sock : socket descriptor
 	 * 0    : default flags
 	 */
-	status = recv(sock, buf, R_BUFSIZE, 0);
+	bl = recv(sock, buf, R_BUFSIZE, 0);
 
-	if(status > -1)
+	if(bl > -1)
 		debug(1, "sock_recv", "Received raw data."
-			" (%i)\n", status);
+			" (%i)\n", bl);
 	else
 		#ifdef WIN32
 		debug(3, "sock_send", "Couldn't receive raw data."
@@ -408,7 +422,7 @@ IRCSocket::sock_recv(char *buf)
 			" (%s)\n", strerror(errno));
 		#endif
 
-	return status;
+	return bl;
 }
 
 void
