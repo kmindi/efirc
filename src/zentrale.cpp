@@ -94,17 +94,17 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_nickname = user_%random_string\n");
 
     // Farben
-    standardkonfiguration_text += _T("colour_background = #000000\n");
-    standardkonfiguration_text += _T("colour_topic_background = #000000\n");
-    standardkonfiguration_text += _T("colour_topic_foreground = #00C000\n");
-    standardkonfiguration_text += _T("colour_output_messages_background = #000000\n");
-    standardkonfiguration_text += _T("colour_output_messages_foreground = #00C000\n");
-    standardkonfiguration_text += _T("colour_input_messages_background = #000000\n");
-    standardkonfiguration_text += _T("colour_input_messages_foreground = #00C000\n");
-    standardkonfiguration_text += _T("colour_channel_users_background = #000000\n");
-    standardkonfiguration_text += _T("colour_channel_users_foreground = #00C000\n");
-    standardkonfiguration_text += _T("colour_button_background = #008000\n");
-    standardkonfiguration_text += _T("colour_button_foreground = #00C000\n");
+    standardkonfiguration_text += _T("colour_background = #510000\n");
+    standardkonfiguration_text += _T("colour_topic_background = #EEEEEE\n");
+    standardkonfiguration_text += _T("colour_topic_foreground = #000000\n");
+    standardkonfiguration_text += _T("colour_output_messages_background = #EEEEEE\n");
+    standardkonfiguration_text += _T("colour_output_messages_foreground = #000000\n");
+    standardkonfiguration_text += _T("colour_input_messages_background = #EEEEEE\n");
+    standardkonfiguration_text += _T("colour_input_messages_foreground = #000000\n");
+    standardkonfiguration_text += _T("colour_channel_users_background = #EEEEEE\n");
+    standardkonfiguration_text += _T("colour_channel_users_foreground = #000000\n");
+    standardkonfiguration_text += _T("colour_button_background = #EEEEEE\n");
+    standardkonfiguration_text += _T("colour_button_foreground = #640C0C\n");
     standardkonfiguration_text += _T("colour_error = #FF0000\n");
 
     // Texte
