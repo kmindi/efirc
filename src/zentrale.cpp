@@ -90,8 +90,8 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_port = 6667\n");
     standardkonfiguration_text += _T("irc_channel = #efirc\n");
     standardkonfiguration_text += _T("irc_username = efirc\n");
-    standardkonfiguration_text += _T("irc_realname = [efirc_real_name]\n");
-    standardkonfiguration_text += _T("irc_nickname = user_[efirc_random_string]\n");
+    standardkonfiguration_text += _T("irc_realname = %real_name\n");
+    standardkonfiguration_text += _T("irc_nickname = user_%random_string\n");
 
     // Farben
     standardkonfiguration_text += _T("colour_background = #000000\n");
@@ -109,7 +109,7 @@ wxString Zentrale::standardkonfiguration()
 
     // Texte
     standardkonfiguration_text += _T("text_language = en\n");
-    standardkonfiguration_text += _T("text_title = efirc [efirc_version]\n");
+    standardkonfiguration_text += _T("text_title = efirc %efirc_version\n");
     standardkonfiguration_text += _T("text_quit_message = tschuess\n");
 
     // Schriftarten
@@ -173,11 +173,11 @@ void Zentrale::Konfiguration_anpassen()
     // Platzhalter ersetzen 
     
     // [efirc_version]
-    config->edit_cfg_replace(_T("[efirc_version]"), efirc_version_string);
+    config->edit_cfg_replace(_T("%efirc_version"), efirc_version_string);
     // [efirc_random_string]
-    config->edit_cfg_replace(_T("[efirc_random_string]"), zufallstext(4));
+    config->edit_cfg_replace(_T("%random_string"), zufallstext(4));
     // [efirc_real_name]
-    config->edit_cfg_replace(_T("[efirc_real_name]"), wxGetUserId());
+    config->edit_cfg_replace(_T("%real_name"), wxGetUserId());
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
