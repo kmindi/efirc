@@ -208,6 +208,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
     
+    nachricht.Trim(false);
+    nachricht.Trim();
+    
     // Besondere Textformatierungen beachten und anwenden
         // Wenn [italic] gefunden wurde:
         if(nachricht.Contains(_T("[italic]")) && nachricht.Contains(_T("[/italic]")))

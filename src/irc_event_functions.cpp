@@ -182,8 +182,13 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
 void irc_welcome(const irc_msg_data *msg_data, void *cp)
 {
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString text(msg_data->params_a[1], wxConvUTF8);
-    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""),text);
+    wxString nachricht = _T("");
+    for(int i = 1; i < msg_data->params_i; i++)
+    {
+        nachricht += _T(" ");
+        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+    }
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
     
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
     if(wxString(msg_data->cmd, wxConvUTF8) == _T("001"))
@@ -199,6 +204,19 @@ void irc_welcome(const irc_msg_data *msg_data, void *cp)
             }
         }
     }
+}
+
+// RPL_ISUPPORT
+void irc_isupport(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString nachricht = _T("");
+    for(int i = 1; i < msg_data->params_i; i++)
+    {
+        nachricht += _T(" ");
+        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+    }
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
 }
 
 void irc_mode(const irc_msg_data *msg_data, void *cp)
@@ -353,14 +371,14 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer,neuername);
                 wxGetApp().irc->CurrentNick = neuername;
                 wxGetApp().zgr_fenster[i]->TitelSetzen(wxGetApp().fenstername[i],neuername);
-                // nachricht anzeigen
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer, neuername);
             }
             else
             // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
             {
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer, neuername);
                 // nachricht anzeigen
-                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer);
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer, neuername);
             }
         }
     }

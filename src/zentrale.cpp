@@ -443,6 +443,7 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 // sie bekannt gemacht sein
 void irc_pmsg(const irc_msg_data *msg_data, void *cp);
 void irc_welcome(const irc_msg_data *msg_data, void *cp);
+void irc_isupport(const irc_msg_data *msg_data, void *cp);
 void irc_mode(const irc_msg_data *msg_data, void *cp);
 void irc_endofmotd(const irc_msg_data *msg_data, void *cp);
 void irc_motd(const irc_msg_data *msg_data, void *cp);
@@ -476,6 +477,7 @@ void Zentrale::connect_thread()
     irc->add_link("002", &irc_welcome);
     irc->add_link("003", &irc_welcome);
     irc->add_link("004", &irc_welcome);
+    irc->add_link("005", &irc_isupport);
     irc->add_link("PRIVMSG", &irc_pmsg);
     irc->add_link("NOTICE", &irc_pmsg);
     
