@@ -177,6 +177,30 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
 
 }
 
+
+// Willkommensnachrichten 001 002 003 und 004
+void irc_welcome(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString text(msg_data->params_a[1], wxConvUTF8);
+    wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""),text);
+    
+    // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
+    if(wxString(msg_data->cmd, wxConvUTF8) == _T("001"))
+    {
+        // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
+        for(int i = 0; i<10; i++)
+        {
+            if(!(wxGetApp().zgr_fenster[i]==NULL))
+            // nicht in nicht vorhandenen Fenstern
+            {
+                    wxGetApp().irc->CurrentNick = empfaenger;
+                    wxGetApp().zgr_fenster[i]->TitelSetzen(wxGetApp().fenstername[i], empfaenger);
+            }
+        }
+    }
+}
+
 void irc_mode(const irc_msg_data *msg_data, void *cp)
 {
     // NOCH HERAUSSUCHEN WENN +o und +v (=> @ und + vor nickname bzw chanop und voice)
@@ -357,14 +381,9 @@ void irc_nickinuse(const irc_msg_data *msg_data, void *cp)
         }
         wxGetApp().fenstersuchen(wxGetApp().irc->WantedNick)->Fehler(2,fehler);
      //statt diesem irc_error aufrufen
-    
 
-    // WENN DER FEHLER SCHON BEIM VERBINDEN AUFTRITT 
-    // WIRD DER NEUE NAME NICHT VOM SERVER NOCHMAL GESENDET
-    // MAN KANN ALSO NICHT MIT irc_nick DADRAUF REAGIEREN    
-    
-    //wxGetApp().irc->WantedNick += _T("_"); // _ an den namen anhaengen
-    //wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick.mb_str());
+    wxGetApp().irc->WantedNick += _T("_"); // _ an den namen anhaengen
+    wxGetApp().irc->send_nick(wxGetApp().irc->WantedNick.mb_str());
 }
 
 // Einladung in einen Raum
