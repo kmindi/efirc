@@ -10,7 +10,7 @@ IRCInterface::IRCInterface(wxString port, wxString server,
                            wxString pass)
              : IRCSocket(atoi(port.mb_str()), server.mb_str(),
                          nick.mb_str(), user.mb_str(), real.mb_str(),
-                         pass.mb_str(), "cppirc.log")
+                         pass.mb_str(), "cppirc.log",2)
 {
     CurrentNick = nick;
     WantedNick = nick;

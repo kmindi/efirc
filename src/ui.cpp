@@ -174,15 +174,23 @@ void Fenster::NachrichtSenden()
 // OEFFENTLICHE FUNKTIONEN
 void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxString port)
 {
-    // VERBINDUNG ZUR KONFIGURATION
     if(nick = _T("")) 
         nick = wxGetApp().irc->CurrentNick;
     if(hostname = _T("")) 
         hostname = wxGetApp().irc->CurrentHostname;
     if(port = _T(""))
         port = wxGetApp().irc->CurrentPort;
-        
-    SetTitle(_T("efirc [") + nick + _T("@") + hostname + _T(":") + port + _T("/") + titel + _T("]"));
+    
+    // Aus Konfiguration Titelformat auslesen
+    wxString titel_text = wxGetApp().config->parsecfgvalue(_T("text_title"));
+    
+    // Parameter ersetzen
+    titel_text.Replace(_T("%param1"),nick);
+    titel_text.Replace(_T("%param2"),hostname);
+    titel_text.Replace(_T("%param3"),port);
+    titel_text.Replace(_T("%param4"),titel);
+    
+    SetTitle(_T("efirc ") + titel_text);
 }
 
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)

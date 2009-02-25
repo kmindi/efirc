@@ -109,7 +109,7 @@ wxString Zentrale::standardkonfiguration()
 
     // Texte
     standardkonfiguration_text += _T("text_language = en\n");
-    standardkonfiguration_text += _T("text_title = efirc %efirc_version\n");
+    standardkonfiguration_text += _T("text_title = %efirc_version - [%param1@%param2:%param3/%param4]\n");
     standardkonfiguration_text += _T("text_quit_message = tschuess\n");
 
     // Schriftarten
@@ -298,11 +298,33 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
     
+    
     if(befehl_name.Upper() == _T("QUIT"))
     {
-        wxString quitmessage = _T("ef!rc");
-        irc->disconnect_server(quitmessage.mb_str());
-        // ALLE FENSTER ZERSTOEREN
+        wxString quitmessage = _T("");
+        
+        if(befehl_parameter == _T(""))
+        {
+            quitmessage = config->parsecfgvalue(_T("text_quit_message"));
+        }
+        else
+        {
+            quitmessage = befehl_parameter;
+        }
+        
+        irc->disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
+        
+        Sleep(30); // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
+        
+        // Alle Fenster zerstoeren
+        for(int i = 0; i<10; i++)
+        {
+            if(!(wxGetApp().zgr_fenster[i]==NULL))
+            // nicht in nicht vorhandenen Fenstern
+            {
+                zgr_fenster[i]->Destroy();
+            }
+        }
     }
 
     if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
@@ -575,6 +597,6 @@ void Zentrale::call_thread()
 
 int Zentrale::OnExit()
 {
-    wxString quitmessage = _T("ef!rc");
+    wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
     irc->disconnect_server(quitmessage.mb_str());
 }
