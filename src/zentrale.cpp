@@ -52,7 +52,7 @@ bool Zentrale::OnInit()
     
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
-    for(int i=0;i<10;i++) { zgr_fenster[i]=NULL; }
+    for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
     
     
     // erste Instanz der Fenster-klasse erzeugen.
@@ -187,12 +187,12 @@ void Zentrale::neuesFenster(wxString namedesfensters)
     
     // nach freier Nummer suchen
     int i = 0;
-    for(int j = 0; j < 10 ; j++)
+    for(int j = 0; j < max_fenster ; j++)
     {
-        if(fenstername[j] == namedesfensters)
+        if(fenstername[j].Upper() == namedesfensters.Upper())
         fenstererzeugt = true;
     }
-    while(fenstererzeugt == false && i < 10)
+    while(fenstererzeugt == false && i < max_fenster)
     {
         if(zgr_fenster[i] == NULL)
         {
@@ -228,9 +228,9 @@ void Zentrale::fensterzerstoeren(int fensternummer)
 
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
 {
-    for(int i = 0;i<10;i++)
+    for(int i = 0;i < max_fenster;i++)
     {
-        if(fenstername[i] == namedesfensters)
+        if(fenstername[i].Upper() == namedesfensters.Upper())
         {
             zgr_fenster[i]->Destroy();
             zgr_fenster[i] = NULL;
@@ -245,7 +245,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
     Fenster *zgr = NULL; // Zeiger auf Fenster
     
     // Wenn der Name der aktuelle Nickname ist, dann wird die Nachricht im obersten Fenster angezeigt
-    if(name == irc->CurrentNick)
+    if(name.Upper() == irc->CurrentNick.Upper())
     {
         // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
         // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
@@ -254,13 +254,13 @@ Fenster* Zentrale::fenstersuchen(wxString name)
     else
     {
         int i = 0; // laufende Nummer auf 0 setzen
-        while(i < 10 && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
+        while(i < max_fenster && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
         {
-            if(fenstername[i] == name) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
+            if(fenstername[i].Upper() == name.Upper()) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
             {
                 return zgr_fenster[i];
             }
-            if(i == 9)
+            if(i == max_fenster - 1)
             // falls keine uebereinstimmung gefunden wurde, Fehler ausgeben und oberstes Fenster als Ausgabe setzten
             {
                 // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
@@ -280,9 +280,9 @@ Fenster* Zentrale::fenster(wxString name)
 {
     while(1)
     {
-        for(int i = 0; i<10; i++)
+        for(int i = 0; i < max_fenster; i++)
         {
-            if(fenstername[i] == name)
+            if(fenstername[i].Upper() == name.Upper())
             {
                 return zgr_fenster[i];
             }
@@ -317,7 +317,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         Sleep(30); // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
         
         // Alle Fenster zerstoeren
-        for(int i = 0; i<10; i++)
+        for(int i = 0; i < max_fenster; i++)
         {
             if(!(wxGetApp().zgr_fenster[i]==NULL))
             // nicht in nicht vorhandenen Fenstern

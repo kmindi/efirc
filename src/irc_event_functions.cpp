@@ -25,7 +25,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
     
     if (!(text.StartsWith(prefix) && text.EndsWith(prefix)))
     {
-            if(empfaenger == wxGetApp().irc->CurrentNick) 
+            if(empfaenger.Upper() == wxGetApp().irc->CurrentNick.Upper()) 
             // wenn man selber der empfaenger ist
             {
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("P_PRIVMSG"),user,text);
@@ -56,7 +56,7 @@ void irc_pmsg(const irc_msg_data *msg_data, void *cp)
         
         if(ctcp_befehl == _T("ACTION"))
         {
-            if(empfaenger == wxGetApp().irc->CurrentNick)
+            if(empfaenger.Upper() == wxGetApp().irc->CurrentNick.Upper())
             {
                 wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("P_ACTION"),user,ctcp_text);
             }
@@ -194,7 +194,7 @@ void irc_welcome(const irc_msg_data *msg_data, void *cp)
     if(wxString(msg_data->cmd, wxConvUTF8) == _T("001"))
     {
         // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
-        for(int i = 0; i<10; i++)
+        for(int i = 0; i < max_fenster; i++)
         {
             if(!(wxGetApp().zgr_fenster[i]==NULL))
             // nicht in nicht vorhandenen Fenstern
@@ -289,7 +289,7 @@ void irc_join(const irc_msg_data *msg_data, void *cp)
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
     wxString benutzer(msg_data->nick, wxConvUTF8);
 
-    if(benutzer == wxGetApp().irc->CurrentNick)
+    if(benutzer.Upper() == wxGetApp().irc->CurrentNick.Upper())
     // Wenn man selber der Benutzer ist, dann hat man den Raum betreten
     // Deshalb wird hier das Fenster erst erstellt und nicht schon bei der Befehlsabfrage
     // es kann ja auch sein, dass man im Raum gebannt ist oder aehnliches 
@@ -314,7 +314,7 @@ void irc_leave(const irc_msg_data *msg_data, void *cp)
     wxString nachricht(msg_data->params_a[1], wxConvUTF8);
     wxString benutzer(msg_data->nick, wxConvUTF8);
     
-    if(benutzer == wxGetApp().irc->CurrentNick)
+    if(benutzer.Upper() == wxGetApp().irc->CurrentNick.Upper())
     // wenn man selber den Raum verlaesst
     {
         wxGetApp().fensterzerstoeren(empfaenger);
@@ -335,7 +335,7 @@ void irc_quit(const irc_msg_data *msg_data, void *cp)
     bool benutzer_entfernt = false;
 
     // IN JEDEM FENSTER ENTFERNEN
-    for(int i = 0; i<10; i++)
+    for(int i = 0; i < max_fenster; i++)
     {
         benutzer_entfernt = false; // In diesem Fenster wurde noch nicht versucht den Benutzer zu entfernen
         
@@ -360,12 +360,12 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
     wxString neuername(msg_data->params_a[0], wxConvUTF8);
 
     // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
-    for(int i = 0; i<10; i++)
+    for(int i = 0; i < max_fenster; i++)
     {
         if(!(wxGetApp().zgr_fenster[i]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
-            if(benutzer == wxGetApp().irc->CurrentNick || benutzer == wxGetApp().irc->WantedNick)
+            if(benutzer.Upper() == wxGetApp().irc->CurrentNick.Upper() || benutzer.Upper() == wxGetApp().irc->WantedNick.Upper())
             // Wenn man selber der Benutzer ist, dann muss der eigene Nick geaendert werden
             {
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer,neuername);

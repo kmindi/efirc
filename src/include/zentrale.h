@@ -4,6 +4,8 @@
 #ifndef _ZENTRALE_
 #define _ZENTRALE_
 
+const int max_fenster = 10;
+
 #include <wx/app.h>
 #include <wx/version.h> // fuer Versionsinformationen von wxWidgets
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
