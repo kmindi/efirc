@@ -190,7 +190,7 @@ void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxSt
     titel_text.Replace(_T("%param3"),port);
     titel_text.Replace(_T("%param4"),titel);
     
-    SetTitle(_T("efirc ") + titel_text);
+    SetTitle(titel_text + _T("efirc ") + wxGetApp().efirc_version_string);
 }
 
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)
