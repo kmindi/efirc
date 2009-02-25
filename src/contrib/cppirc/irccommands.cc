@@ -30,6 +30,12 @@ IRCSocket::auth(const char *nick, const char *user, const char *real,
 	send_user(user, real);
 }
 
+void
+IRCSocket::auth(void)
+{
+	auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+}
+
 /* send final QUIT message to server */
 void
 IRCSocket::send_quit(const char *quitmsg)

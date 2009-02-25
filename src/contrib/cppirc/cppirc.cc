@@ -40,9 +40,8 @@ main(int argc, const char* argv[])
 {
 	pthread_t ti;
 
-	ircsocket.connect_server(6667, "chat.freenode.net");
-	ircsocket.auth("efirc-dev101", "efirc-dev101", "efirc-dev101",
-		"pass");
+	ircsocket.connect_server();
+	ircsocket.auth();
 
 	/* MAIN!!!1einself11! */
 	pthread_create(&ti, NULL, &listen, NULL);

@@ -109,15 +109,17 @@ class IRCSocket
 		void del_cmd(void);
 		void call_cmd(void);
 
-		void reconnect();
+		void reconnect(void);
 
 		void connect_server(unsigned int, const char *);
+		void connect_server(void);
 		void disconnect_server(const char *);
 
 		void recv_raw(void);
 
 		void auth(const char *, const char *, const char *,
 			const char *);
+		void auth(void);
 		void send_join(const char *);
 		void send_quit(const char *);
 		void send_pass(const char *);
@@ -134,7 +136,8 @@ class IRCSocket
 		void send_ctcp_ping(const char *, const char *);
 		void send_ctcp_time(const char *, const char *);
 		void send_ctcp_errmsg(const char *, const char *);
-		void send_ctcp(const char *, const char *, const char *);
+		void send_ctcp(const char *, const char *,
+			const char *);
 		void send_topic(const char *);
 		void send_topic(const char *, const char *);
 		void send_part(const char *);

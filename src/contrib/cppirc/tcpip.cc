@@ -112,7 +112,7 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 			" resolving host. (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Failure while"
-			" resolving host. (%s)\n", strerror(errno));
+			" resolving host. (%s)\n", hstrerror(h_errno));
 		#endif
 
 		connecting = 0;
@@ -145,7 +145,8 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 			" (%d)\n", WSAGetLastError());
 		#else
 		debug(3, "connect_server", "Failure while"
-			" resolving address. (%s)\n", strerror(errno));
+			" resolving address."
+			" (%s)\n", hstrerror(h_errno));
 		#endif
 
 		connecting = 0;
@@ -191,6 +192,12 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	/* have any error been missed? */
 	connected = 1;
 	connecting = 0;
+}
+
+void
+IRCSocket::connect_server(void)
+{
+	connect_server(_IRCPORT, _IRCSERV);
 }
 
 /* recveive messages from IRC server */
@@ -476,8 +483,8 @@ IRCSocket::reconnect(void)
 	authed = 0;
 
 	/* reconnect using default values */
-	connect_server(_IRCPORT, _IRCSERV);
-	auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+	connect_server();
+	auth();
 
 	/* increment sleep time if connect failed */
 	if(!connected)

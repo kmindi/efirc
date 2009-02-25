@@ -22,8 +22,8 @@ void
 IRCInterface::connect()
 {
     // Verbindung zum Server aufbauen und authentifizieren
-    connect_server(_IRCPORT, _IRCSERV);
-    auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+    connect_server();
+    auth();
 }
 
 IRCInterface::~IRCInterface()
