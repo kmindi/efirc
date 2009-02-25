@@ -108,7 +108,6 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("colour_error = #FF0000\n");
 
     // Texte
-    standardkonfiguration_text += _T("text_language = en\n");
     standardkonfiguration_text += _T("text_title = %param4 [%param1@%param2:%param3] - \n");
     standardkonfiguration_text += _T("text_quit_message = tschuess\n");
 
