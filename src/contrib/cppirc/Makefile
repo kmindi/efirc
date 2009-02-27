@@ -1,7 +1,7 @@
 OBJS= io.o irccommands.o ircsocket.o tcpip.o
 RANLIB= ranlib
 
-libircsocket.a: $(OBJS)
+libircinterface.a: $(OBJS)
 	$(AR) $(ARFLAGS) $(@) $(^)
 	$(RANLIB) $(@)
 
@@ -13,4 +13,4 @@ $(OBJS): ircsocket.h
 sstring.o: sstring.h
 
 clean:
-	-rm $(OBJS) libircsocket.a libsstring.a cppirc
+	-rm $(OBJS) libircinterface.a libsstring.a cppirc

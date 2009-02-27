@@ -24,10 +24,8 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 
 	/* peer address */
 	sockaddr_in addr;
-	in_addr ip_addr;
 	/* host reference */
 	hostent *host;
-	char *h_name;
 
 	/* now connecting */
 	connecting = 1;
@@ -124,40 +122,9 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 	memcpy(&addr.sin_addr.s_addr, host->h_addr_list[0],
 	   host->h_length);
 
-	/* we need a copy of this */
-	ip_addr = addr.sin_addr;
-	/* the real hostname of the host we are connecting */
-	#ifdef WIN32
-	//host = gethostbyaddr(&ip_addr, sizeof(ip_addr), PF_INET);
-	#else
-	host = gethostbyaddr(&ip_addr, sizeof(ip_addr), PF_INET);
-	#endif
-
-	/* check gethost status */
-	if(host != NULL)
-		/* got response */
-		debug(1, "connect_server", "Got host.\n");
-	else {
-		/* an error ocurred */
-		#ifdef WIN32
-		debug(3, "connect_server", "Failure while"
-			" resolving address."
-			" (%d)\n", WSAGetLastError());
-		#else
-		debug(3, "connect_server", "Failure while"
-			" resolving address."
-			" (%s)\n", hstrerror(h_errno));
-		#endif
-
-		connecting = 0;
-
-		return;
-	}
-
-	h_name = host->h_name;
-
 	debug(0, "connect_server", "Connecting server."
-		" [%s (%s):%i]\n", inet_ntoa(ip_addr), h_name, port);
+		" [%s (%s):%i]\n", inet_ntoa(addr.sin_addr),
+		host->h_name, port);
 
 	/*
 	 * connect() initiates a connection on a socket. It attempts to
