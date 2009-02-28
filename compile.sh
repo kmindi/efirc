@@ -19,4 +19,4 @@ fi
 
 # Fenster offen halten, um
 # moegliche Fehler zu analysieren
-echo error (see build.log for details)
+echo "error (see build.log for details)"
