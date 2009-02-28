@@ -313,7 +313,12 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         
         irc->disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
         
-        Sleep(30); // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
+        // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
+        #ifdef linux
+        sleep(0.003);
+        #else
+        Sleep(30);
+        #endif
         
         // Alle Fenster zerstoeren
         for(int i = 0; i < max_fenster; i++)

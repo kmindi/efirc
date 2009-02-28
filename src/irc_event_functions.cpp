@@ -371,14 +371,14 @@ void irc_nick(const irc_msg_data *msg_data, void *cp)
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer,neuername);
                 wxGetApp().irc->CurrentNick = neuername;
                 wxGetApp().zgr_fenster[i]->TitelSetzen(wxGetApp().fenstername[i],neuername);
-                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer, neuername);
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
             else
             // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
             {
                 wxGetApp().zgr_fenster[i]->BenutzerAendern(benutzer, neuername);
                 // nachricht anzeigen
-                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen("NICK", benutzer, neuername);
+                wxGetApp().zgr_fenster[i]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
         }
     }
