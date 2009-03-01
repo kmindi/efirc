@@ -6,14 +6,14 @@
 # ans Ende der Datei springen
 # und den Programmaufruf
 # auslassen
-if [ $? -ne 1 ]; then
+if [ $? -ne 2 ]; then
 	cd bin
-	cp ../src/efirc efirc > /dev/null
+	cp ../src/efirc efirc
 
 	strip --strip-all efirc
 
-	read -p "run efirc? ([y]es or any key) " input
-	if [ "$input" = "y" ]; then (./efirc &); fi
+	read -p "run efirc? (`n' to abort) " input
+	if [ "$input" != "n" ]; then (./efirc &); fi
 	exit
 fi
 

@@ -13,8 +13,8 @@ copy ..\src\efirc.exe efirc.exe > NUL
 
 strip --strip-all efirc.exe
 
-set /p input="run efirc.exe? ([y]es or any key) "
-if "%input%" == "y" start efirc.exe
+set /p input="run efirc.exe? (`n' to abort) "
+if NOT "%input%" == "n" start efirc.exe
 exit
 
 rem Fenster offen halten, um
