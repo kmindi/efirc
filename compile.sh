@@ -12,7 +12,7 @@ if [ $? -ne 2 ]; then
 
 	strip --strip-all efirc
 
-	read -p "run efirc? (`n' to abort) " input
+	read -p "run efirc? (\`n' to abort) " input
 	if [ "$input" != "n" ]; then (./efirc &); fi
 	exit
 fi
