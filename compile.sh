@@ -1,6 +1,6 @@
 # set +v
 
-(make -C src/contrib/cppirc -f Makefile.linux libircinterface.a libsstring.a && make -C src -f Makefile.linux efirc.exe) 2> build.log
+(make -C src/contrib/cppirc -f Makefile.linux libircinterface.a libsstring.a && make -C src -f Makefile.linux efirc) 2> build.log
 
 # ERRORLEVEL abfragen und ggf.
 # ans Ende der Datei springen
@@ -8,12 +8,12 @@
 # auslassen
 if [ $? -ne 1 ]; then
 	cd bin
-	cp ../src/efirc.exe efirc.exe > /dev/null
+	cp ../src/efirc efirc > /dev/null
 
-	strip --strip-all efirc.exe
+	strip --strip-all efirc
 
-	read -p "run efirc.exe? ([y]es or any key) " input
-	if [ "$input" = "y" ]; then (./efirc.exe &); fi
+	read -p "run efirc? ([y]es or any key) " input
+	if [ "$input" = "y" ]; then (./efirc &); fi
 	exit
 fi
 

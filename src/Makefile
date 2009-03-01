@@ -6,3 +6,6 @@ efirc.exe: $(OBJS) zentrale.cpp contrib/cppirc/libircinterface.a contrib/cppirc/
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) zentrale.cpp $(LDLIBS)
 
 irc.o irc_event_functions.o: contrib/cppirc/ircinterface.h
+
+clean:
+	$(RM) $(OBJS) efirc.exe
