@@ -282,7 +282,7 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
                 WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
                 break;
             case 4:
-                WxEdit_ausgabefeld->AppendText(_T("Befehl nicht implementiert: ") + param1);
+                WxEdit_ausgabefeld->AppendText(_T("Befehl nicht implementiert oder zu wenig Parameter angegeben: ") + param1);
                 break;
             default:
                 WxEdit_ausgabefeld->AppendText(_T("Nicht definierter Fehler aufgetreten"));
