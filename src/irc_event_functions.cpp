@@ -509,3 +509,16 @@ void irc_whoisserver(const irc_msg_data *msg_data, void *cp)
     wxString servernachricht(msg_data->params_a[3], wxConvUTF8);
     wxGetApp().fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
 }
+
+// allgemeine Funktion fuer Befehle die noch nicht eingebaut wurden, aber trotzdem angezeigt werden koennen
+void irc_notimplemented(const irc_msg_data *msg_data, void *cp)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString fehler(msg_data->cmd, wxConvUTF8);
+    for(int i = 0; i < msg_data->params_i; i++)
+    {
+        fehler += _T(" ");
+        fehler += wxString(msg_data->params_a[i], wxConvUTF8);
+    }
+    wxGetApp().fenstersuchen(empfaenger)->Fehler(4,fehler);
+}

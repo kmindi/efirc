@@ -266,16 +266,29 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
         // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen    
         WxEdit_ausgabefeld->AppendText(_T("\n")+prefix+_T(" (!) "));
         
-        wxString fehlernummer_str;
+        wxString fehlernummer_str =_T("");
         fehlernummer_str << fehlernummer;
         param1 = _T("(") + fehlernummer_str + _T(") (") + param1 + _T(")");
         // Fehlernummern abfragen
-        if(fehlernummer == 1)
-            WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden") + param1);
-        if(fehlernummer == 2)
-            WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten ") + param1);
-        if(fehlernummer == 3)
-            WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
+        switch(fehlernummer)
+        {
+            case 1:
+                WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden") + param1); 
+                break;
+            case 2:
+                WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten ") + param1);
+                break;
+            case 3:
+                WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
+                break;
+            case 4:
+                WxEdit_ausgabefeld->AppendText(_T("Befehl nicht implementiert: ") + param1);
+                break;
+            default:
+                WxEdit_ausgabefeld->AppendText(_T("Nicht definierter Fehler aufgetreten"));
+                break;
+        }
+        
         
     // ...voreingestelltes Aussehen wiederherstellen
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
