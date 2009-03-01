@@ -16,7 +16,7 @@ class IRC : public IRCInterface
         wxString CurrentHostname;
         wxString CurrentPort;
         wxString WantedNick;
-    
+
         IRC(wxString, wxString, wxString, wxString, wxString, wxString);
         ~IRC();
 

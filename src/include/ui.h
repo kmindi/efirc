@@ -23,9 +23,9 @@ class Fenster : public wxFrame
         wxTextCtrl *WxEdit_thema;
         wxTextCtrl *WxEdit_eingabefeld;
         wxTextCtrl *WxEdit_ausgabefeld;
-        
+
         void ObjekteAnpassen();
-        
+
         enum
         {
             ID_WxList_benutzerliste = 1007,
@@ -34,39 +34,39 @@ class Fenster : public wxFrame
             ID_WxEdit_eingabefeld = 1003,
             ID_WxEdit_ausgabefeld = 1001,
         };
-        
+
         void OnClose(wxCloseEvent& event);
         void WxButton_sendenClick(wxCommandEvent& event);
         void BeiAktivierung(wxActivateEvent& event);
         void NachrichtSenden();
-        
+
         wxString eingabe_geschichte[50];
         //Autocomplete.
-        
+
 
         DECLARE_EVENT_TABLE()
         void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
         void WxEdit_eingabefeldFokus(wxKeyEvent& event);
-        
+
     public:
         int fensternummer;
-        Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER ); 
-        
-        
+        Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER );
+
+
         void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
         void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));
         void Fehler(int fehlernummer = 0, wxString param1 = _T(""));
         void ThemaAendern(wxString thema, wxString benutzer=_T(""));
         void AusgabefeldLeeren();
-        
+
         //Benutzerlistenfunktionen
         void BenutzerHinzufuegen(wxString benutzerliste = _T(""));
         bool BenutzerEntfernen(wxString benutzer = _T(""));
         void BenutzerAendern(wxString altername, wxString neuername);
         //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
-        
-        
-        
+
+
+
 };
 
 #endif

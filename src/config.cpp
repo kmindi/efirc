@@ -14,7 +14,7 @@ void Konfiguration::opencfg(wxString dateipfad)
     bool datei_ist_nicht_vorhanden = file.Create(dateipfad); // Create liefert false wenn die Datei schon vorhanden ist
     wxString zeile;
     konfiguration_text = _T("");
-    
+
     if(!datei_ist_nicht_vorhanden)
     {
         file.Open(dateipfad);
@@ -26,7 +26,7 @@ void Konfiguration::opencfg(wxString dateipfad)
     else
     {
         file.Open(dateipfad);
-        
+
         wxString tmp_standardkonfiguration_text = standardkonfiguration_text;
         while(tmp_standardkonfiguration_text != _T(""))
         {
@@ -46,7 +46,7 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
         unsigned int beginn_auslesen = konfiguration_text.Find(searchstring + _T(" = ")) + searchstring.Len() + 3;
         wxString tmp_wert = konfiguration_text.Mid(beginn_auslesen); // alles nach der Position auslesen
         tmp_wert = tmp_wert.BeforeFirst(_T('\n'));
-        
+
         return tmp_wert;
     }
     else
@@ -57,7 +57,7 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
             unsigned int beginn_auslesen = standardkonfiguration_text.Find(searchstring + _T(" = ")) + searchstring.Len() + 3;
             wxString tmp_wert = standardkonfiguration_text.Mid(beginn_auslesen); // alles nach der Position auslesen
             tmp_wert = tmp_wert.BeforeFirst(_T('\n'));
-            
+
             return tmp_wert;
         }
     }
@@ -69,8 +69,8 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
 bool Konfiguration::edit_cfg(wxString option, wxString neuerwert, bool aenderungenspeichern)
 {
     bool erfolg = false;
-    
-    
+
+
     return erfolg;
 }
 
@@ -78,13 +78,13 @@ bool Konfiguration::edit_cfg(wxString option, wxString neuerwert, bool aenderung
 bool Konfiguration::edit_cfg_replace(wxString alterwert, wxString neuerwert, bool aenderungenspeichern)
 {
     bool erfolg = false;
-    
+
     int i = konfiguration_text.Replace(alterwert,neuerwert);
     if(i >0) {erfolg = true;}
-    
-    // fuer Standardkonfiguration 
+
+    // fuer Standardkonfiguration
     i = standardkonfiguration_text.Replace(alterwert,neuerwert);
     if(i >0) {erfolg = true;}
-    
+
     return erfolg;
 }

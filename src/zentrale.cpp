@@ -27,16 +27,16 @@ END_EVENT_TABLE()
 bool Zentrale::OnInit()
 {
     efirc_version_string = _T("0.3 testing");
-    
+
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
-    
+
     wxString standardkonfiguration_text = standardkonfiguration();
     config = new Konfiguration(_T("efirc.cfg"), standardkonfiguration_text);
-    
+
     // Laufzeitkonfiguration anpassen
     Konfiguration_anpassen();
-    
-    
+
+
     // irc zeigt auf die IRC-Instanz
     //irc = new IRC(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
     //irc = new IRC(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
@@ -48,30 +48,30 @@ bool Zentrale::OnInit()
     config->parsecfgvalue(_T("irc_username")),
     config->parsecfgvalue(_T("irc_realname")),
     _T("PASS"));
-    
-    
+
+
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
     for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
-    
-    
+
+
     // erste Instanz der Fenster-klasse erzeugen.
     // VERBINDUNG ZUR KONFIGURATION
     //raum = _T("#efirc");
     raum = config->parsecfgvalue(_T("irc_channel"));
     neuesFenster(raum);
-    
-    
+
+
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
-    connect_thread(); 
-    
-    
-    
+    connect_thread();
+
+
+
     // TEST FUNKTIONEN
-   
+
     return TRUE;
-} 
+}
 
 void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
 {
@@ -84,7 +84,7 @@ void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
 wxString Zentrale::standardkonfiguration()
 {
     wxString standardkonfiguration_text;
-    
+
     // Verbindungsinformationen
     standardkonfiguration_text =  _T("irc_server = irc.freenode.net\n");
     standardkonfiguration_text += _T("irc_port = 6667\n");
@@ -147,9 +147,9 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_IDLE = [ WHOIS: %param1 is idle since %param2 seconds ]\n");
     standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
 
-    
+
     return standardkonfiguration_text;
-    
+
 }
 
 wxString Zentrale::zufallstext(int anzahl_zeichen)
@@ -162,15 +162,15 @@ wxString Zentrale::zufallstext(int anzahl_zeichen)
     {
         rndstring += wxChar(65 + rand()%26);
     }
-    
+
     return rndstring;
 }
 
 // Konfiguration anpassen
 void Zentrale::Konfiguration_anpassen()
 {
-    // Platzhalter ersetzen 
-    
+    // Platzhalter ersetzen
+
     // [efirc_version]
     config->edit_cfg_replace(_T("%efirc_version"), efirc_version_string);
     // [efirc_random_string]
@@ -183,7 +183,7 @@ void Zentrale::Konfiguration_anpassen()
 void Zentrale::neuesFenster(wxString namedesfensters)
 {
     bool fenstererzeugt = false;
-    
+
     // nach freier Nummer suchen
     int i = 0;
     for(int j = 0; j < max_fenster ; j++)
@@ -201,21 +201,21 @@ void Zentrale::neuesFenster(wxString namedesfensters)
                 zgr_fenster[i]->fensternummer = i;
                 zgr_fenster[i]->Show(TRUE); // Fenster in den Vordergrund holen
                 SetTopWindow(zgr_fenster[i]); // Fenster zum obersten Objekt machen
-                
+
                 // Anpassungsfunktionen:
                 zgr_fenster[i]->TitelSetzen(namedesfensters); // Titel anpassen
-                
+
                 fenstererzeugt = true;
         }
         i++;
     }
-    
+
     if(fenstererzeugt == false)
     {
         //oberstes fenster heraussuchen , dazu aktuellen Nickname als Parameter uebergeben
         fenstersuchen(irc->CurrentNick)->Fehler(1,namedesfensters);
     }
-    
+
 }
 
 void Zentrale::fensterzerstoeren(int fensternummer)
@@ -242,13 +242,13 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
 Fenster* Zentrale::fenstersuchen(wxString name)
 {
     Fenster *zgr = NULL; // Zeiger auf Fenster
-    
+
     // Wenn der Name der aktuelle Nickname ist, dann wird die Nachricht im obersten Fenster angezeigt
     if(name.Upper() == irc->CurrentNick.Upper())
     {
-        // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
+        // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen
         // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
-        return dynamic_cast<Fenster*>(GetTopWindow()); 
+        return dynamic_cast<Fenster*>(GetTopWindow());
     }
     else
     {
@@ -262,7 +262,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
             if(i == max_fenster - 1)
             // falls keine uebereinstimmung gefunden wurde, Fehler ausgeben und oberstes Fenster als Ausgabe setzten
             {
-                // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen 
+                // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen
                 // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
                 zgr = dynamic_cast<Fenster*>(GetTopWindow());
                 zgr->Fehler(3,name);
@@ -271,7 +271,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
             i++;
         }
     }
-} 
+}
 
 // Gibt  IMMER einen Zeiger auf ein Fenster zurueck
 // DARF nur mit VORHANDENEN Fenstern benutzt werden
@@ -292,16 +292,16 @@ Fenster* Zentrale::fenster(wxString name)
 void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 {
     //fenstername[fensternummer]
-    
+
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
-    
-    
+
+
     if(befehl_name.Upper() == _T("QUIT"))
     {
         wxString quitmessage = _T("");
-        
+
         if(befehl_parameter == _T(""))
         {
             quitmessage = config->parsecfgvalue(_T("text_quit_message"));
@@ -310,16 +310,16 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         {
             quitmessage = befehl_parameter;
         }
-        
+
         irc->disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
-        
+
         // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
         #ifdef linux
         sleep(0.003);
         #else
         Sleep(30);
         #endif
-        
+
         // Alle Fenster zerstoeren
         for(int i = 0; i < max_fenster; i++)
         {
@@ -338,7 +338,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
         return;
     }
-    
+
     if(befehl_name.Upper() == _T("PART") || befehl_name.Upper() == _T("LEAVE"))
     {
         if(befehl_parameter == _T(""))
@@ -351,29 +351,29 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         }
         return;
     }
-    
+
     if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
     {
             irc->send_nick(befehl_parameter.mb_str()); // Nickname senden
-            irc->WantedNick = befehl_parameter; 
+            irc->WantedNick = befehl_parameter;
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
             return;
     }
-    
+
     if(befehl_name.Upper() == _T("INVITE") && befehl_parameter != _T(""))
     {
         wxString nickname = befehl_parameter.BeforeFirst(leerzeichen);
         wxString raum = befehl_parameter.AfterFirst(leerzeichen);
-        
+
         if(raum == _T(""))
         {
             raum = fenstername[fensternummer];
         }
-        
+
         wxGetApp().irc->send_invite(nickname.mb_str(), raum.mb_str());
         return;
     }
-    
+
     if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
     {
         // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
@@ -382,7 +382,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
         return;
     }
-    
+
     if(befehl_name.Upper() == _T("TOPIC"))
     {
         if(befehl_parameter == _T(""))
@@ -400,12 +400,12 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
-        
+
         irc->send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
         return;
     }
-    
+
     if(befehl_name.Upper() == _T("AWAY"))
     {
         if(befehl_parameter == _T(""))
@@ -419,33 +419,33 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         }
         return;
     }
-    
-    
+
+
     if(befehl_name.Upper() == _T("CTCP") && befehl_parameter != _T(""))
     {
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
-        
+
         irc->send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
-        
+
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
         return;
     }
-    
-    
+
+
     if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
     {
         irc->send_whois(befehl_parameter.mb_str());
         return;
     }
-    
+
     // sonstige Befehle
     if(befehl_name.Upper() == _T("CLEAR"))
     {
         zgr_fenster[fensternummer]->AusgabefeldLeeren();
         return;
     }
-    
+
 }
 
 void Zentrale::NachrichtSenden(int fensternummer, wxString nachricht)
@@ -477,7 +477,7 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 // THREADS
 // THREADS
 // THREADS
-// Bevor die Funktionen die mit der IRC-Schnittstelle verbunden werden verwendet werden, muessen 
+// Bevor die Funktionen die mit der IRC-Schnittstelle verbunden werden verwendet werden, muessen
 // sie bekannt gemacht sein
 void irc_pmsg(const irc_msg_data *msg_data, void *cp);
 void irc_welcome(const irc_msg_data *msg_data, void *cp);
@@ -520,13 +520,13 @@ void Zentrale::connect_thread()
     //irc->add_link("KICK", &irc_kick);
     irc->add_link("INVITE", &irc_invite);
     irc->add_link("MODE", &irc_mode);
-    
+
     irc->add_link("001", &irc_welcome);
     irc->add_link("002", &irc_welcome);
     irc->add_link("003", &irc_welcome);
     irc->add_link("004", &irc_welcome);
     irc->add_link("005", &irc_isupport);
-    
+
     irc->add_link("301", &irc_whoisaway);
     irc->add_link("305", &irc_unaway);
     irc->add_link("306", &irc_nowaway);
@@ -534,13 +534,13 @@ void Zentrale::connect_thread()
     irc->add_link("312", &irc_whoisserver);
     irc->add_link("317", &irc_whoisidle);
     irc->add_link("319", &irc_whoischan);
-    
+
     irc->add_link("372", &irc_motd);
     irc->add_link("376", &irc_endofmotd);
     irc->add_link("332", &irc_topic);
     irc->add_link("TOPIC", &irc_requestedtopic);
     irc->add_link("353", &irc_userlist);
-    
+
 
     // FEHLER
     // Fehler Antworten
@@ -588,15 +588,15 @@ void Zentrale::connect_thread()
     irc->add_link("491", &irc_error);
     irc->add_link("501", &irc_error);
     irc->add_link("502", &irc_error);
-    
-    
+
+
     irc->connect();
-    
+
     Thread *thread = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
     Thread *thread2 = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten
     if (thread->Create() == wxTHREAD_NO_ERROR) { thread->Run(); }
     if (thread2->Create() == wxTHREAD_NO_ERROR) { thread2->Run(); }
-    
+
 }
 
 // Thread-Funktion fuer recv_raw-Schleife

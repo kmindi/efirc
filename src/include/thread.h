@@ -10,11 +10,11 @@
 // MIT KONSTRUKTORPARAMETER, ZEIGER AUF FUNKTION IN DER ZENTRALE
 // DIESE FUNKTION WIRD IN ENTRY AUFGERUFEN
 
-class Thread : public wxThread 
+class Thread : public wxThread
 {
     private:
         void (Zentrale::*adresse)();
-    
+
     public:
         Thread(void (Zentrale::*fkt_zum_aufrufen)());
         ~Thread();

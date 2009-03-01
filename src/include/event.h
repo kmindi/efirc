@@ -6,7 +6,7 @@
 
 #include <wx/event.h>
 
-class Ereignisverwalter : public wxEvtHandler 
+class Ereignisverwalter : public wxEvtHandler
 {
     public:
     void BeiNeuesFenster(wxCommandEvent& event);
