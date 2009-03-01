@@ -1,6 +1,6 @@
 # set +v
 
-(make -C src/contrib/cppirc libircinterface.a libsstring.a && make -C src -f Makefile.linux efirc.exe) 2> build.log
+(make -C src/contrib/cppirc -f Makefile.linux libircinterface.a libsstring.a && make -C src -f Makefile.linux efirc.exe) 2> build.log
 
 # ERRORLEVEL abfragen und ggf.
 # ans Ende der Datei springen

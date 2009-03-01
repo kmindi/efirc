@@ -1,4 +1,4 @@
-#include "ircsocket.h"
+#include "ircinterface.h"
 
 /****************************
  *
@@ -7,7 +7,7 @@
  ****************************/
 
 int
-IRCSocket::debug(int level, const char *sender, const char *fmt, ...)
+IRCInterface::debug(int level, const char *sender, const char *fmt, ...)
 {
 	/* return if level is below wanted level */
 	if(level < _DBGLEVEL)

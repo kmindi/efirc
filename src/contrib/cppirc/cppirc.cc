@@ -1,8 +1,8 @@
-#include <ircsocket.h>
+#include <ircinterface.h>
 #include <pthread.h>
 
 /* create an ircsocket - our interface for the irc protocol */
-IRCSocket ircsocket(6667, "chat.freenode.net", "efirc-dev101",
+IRCInterface ircsocket(6667, "chat.freenode.net", "efirc-dev101",
 	"efirc-dev101", "efirc-dev101", "pass",
 	"", 2);
 //	"efirc-dev101", "efirc-dev101", "pass",
@@ -19,7 +19,7 @@ listen(void* arg)
 void
 check(const irc_msg_data* msg_data, void* irc_socket)
 {
-	IRCSocket* irc = (IRCSocket*)irc_socket;
+	IRCInterface* irc = (IRCInterface*)irc_socket;
 
 	//printf("%s\n", msg_data->params);
 	irc->send_privmsg("#efirc", msg_data->params);
@@ -28,7 +28,7 @@ check(const irc_msg_data* msg_data, void* irc_socket)
 void
 pong(const irc_msg_data* msg_data, void* irc_socket)
 {
-	IRCSocket* irc = (IRCSocket*)irc_socket;
+	IRCInterface* irc = (IRCInterface*)irc_socket;
 
 	printf("%s\n", msg_data->params);
 	//irc->send_privmsg("#efirc", msg_data->params);

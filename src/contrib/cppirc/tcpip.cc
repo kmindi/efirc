@@ -1,4 +1,4 @@
-#include "ircsocket.h"
+#include "ircinterface.h"
 
 /****************************
  *
@@ -8,7 +8,7 @@
 
 /* connect server:port */
 void
-IRCSocket::connect_server(unsigned int port, const char *server)
+IRCInterface::connect_server(unsigned int port, const char *server)
 {
 	/* dont connect if already connected */
 	if(connected) {
@@ -162,14 +162,14 @@ IRCSocket::connect_server(unsigned int port, const char *server)
 }
 
 void
-IRCSocket::connect_server(void)
+IRCInterface::connect_server(void)
 {
 	connect_server(_IRCPORT, _IRCSERV);
 }
 
 /* recveive messages from IRC server */
 void
-IRCSocket::recv_raw(void)
+IRCInterface::recv_raw(void)
 {
 	size_t ol, l;
 
@@ -266,7 +266,7 @@ IRCSocket::recv_raw(void)
 
 /* send raw message */
 void
-IRCSocket::send_raw(const char *fmt, ...)
+IRCInterface::send_raw(const char *fmt, ...)
 {
 	char tmp[W_BUFSIZE];
 // TODO len check
@@ -294,7 +294,7 @@ IRCSocket::send_raw(const char *fmt, ...)
 	vsnprintf(tmp, sizeof(tmp), fmt, ap);
 
 	/* add to queue */
-	add_cmd(tmp, &IRCSocket::sock_send);
+	add_cmd(tmp, &IRCInterface::sock_send);
 
 	/*
 	 * normal return from the function
@@ -305,7 +305,7 @@ IRCSocket::send_raw(const char *fmt, ...)
 }
 
 int
-IRCSocket::sock_send(const char *buf)
+IRCInterface::sock_send(const char *buf)
 {
 	size_t l;
 
@@ -364,7 +364,7 @@ IRCSocket::sock_send(const char *buf)
 }
 
 int
-IRCSocket::sock_recv(char *buf)
+IRCInterface::sock_recv(char *buf)
 {
 	/*
 	 * recv(2) return values
@@ -400,7 +400,7 @@ IRCSocket::sock_recv(char *buf)
 }
 
 void
-IRCSocket::disconnect_server(const char *quit_msg)
+IRCInterface::disconnect_server(const char *quit_msg)
 {
 	/* do not reconnect () */
 	_DBGRECON = 0;
@@ -415,7 +415,7 @@ IRCSocket::disconnect_server(const char *quit_msg)
 }
 
 void
-IRCSocket::reconnect(void)
+IRCInterface::reconnect(void)
 {
 	/* when someone's connecting wait */
 	if(connecting || reconnecting) {

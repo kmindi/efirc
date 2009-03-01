@@ -51,10 +51,10 @@ struct irc_msg_data {
 };
 
 /*
- * The IRCSocket provides funtions to connect and disconnect
+ * The IRCInterface provides funtions to connect and disconnect
  * an IRC Server, send and recv raw messages and parse them.
  */
-class IRCSocket
+class IRCInterface
 {
 	/*
 	 * struct containing link information
@@ -76,15 +76,15 @@ class IRCSocket
 	 */
 	struct irc_queue_cmd {
 		char *buf;
-		int (IRCSocket::*function)(const char *);
+		int (IRCInterface::*function)(const char *);
 		irc_queue_cmd *next;
 	};
 
 	public:
-		IRCSocket(unsigned int, const char *, const char *,
+		IRCInterface(unsigned int, const char *, const char *,
 			const char *, const char *, const char *,
 			const char *, int = 3);
-		~IRCSocket(void);
+		~IRCInterface(void);
 
 		int connected;
 		FILE *_DBGSTR;
@@ -105,7 +105,7 @@ class IRCSocket
 		void act_link(const irc_msg_data*);
 
 		void add_cmd(const char *,
-			int (IRCSocket::*function)(const char *));
+			int (IRCInterface::*function)(const char *));
 		void del_cmd(void);
 		void call_cmd(void);
 

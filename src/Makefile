@@ -4,3 +4,5 @@ LDLIBS= -lircinterface -lsstring -mwindows -lwxmsw28 -lwsock32 -luuid -lcomctl32
 
 efirc.exe: $(OBJS) zentrale.cpp contrib/cppirc/libircinterface.a contrib/cppirc/libsstring.a 
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) zentrale.cpp $(LDLIBS)
+
+irc.o irc_event_functions.o: contrib/cppirc/ircinterface.h

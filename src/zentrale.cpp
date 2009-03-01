@@ -37,11 +37,11 @@ bool Zentrale::OnInit()
     Konfiguration_anpassen();
     
     
-    // dem Zeiger irc eine Instanz des IRCInterfaces zuweisen
-    //irc = new IRCInterface(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    //irc = new IRCInterface(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    // irc zeigt auf die IRC-Instanz
+    //irc = new IRC(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
+    //irc = new IRC(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
 
-    irc = new IRCInterface(
+    irc = new IRC(
     config->parsecfgvalue(_T("irc_port")),
     config->parsecfgvalue(_T("irc_server")),
     config->parsecfgvalue(_T("irc_nickname")),

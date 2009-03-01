@@ -1,0 +1,27 @@
+OBJS= io.o irccommands.o ircsocket.o tcpip.o
+LDLIBS= -lircinterface -lsstring -lws2_32
+RANLIB= ranlib
+
+ifdef DEBUG
+CXXFLAGS+= -g -Wall
+endif
+
+.DEFAULT_GOAL:= libircinterface.a
+
+cppirc.exe: libircinterface.a libsstring.a cppirc.cc
+	$(CXX) $(CXXFLAGS) -o $(@) -I. -L. cppirc.cc $(LDLIBS)
+
+libircinterface.a: $(OBJS)
+	$(AR) $(ARFLAGS) $(@) $(?)
+	$(RANLIB) $(@)
+
+libsstring.a: sstring.o
+	$(AR) $(ARFLAGS) $(@) $(?)
+	$(RANLIB) $(@)
+
+$(OBJS): ircinterface.h
+sstring.o: sstring.h
+
+clean:
+	-$(RM) $(OBJS) sstring.o libircinterface.a libsstring.a \
+	cppirc.exe

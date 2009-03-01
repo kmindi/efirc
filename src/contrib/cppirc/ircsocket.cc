@@ -1,4 +1,4 @@
-#include "ircsocket.h"
+#include "ircinterface.h"
 
 /****************************
  *
@@ -7,7 +7,7 @@
  ****************************/
 
 /* Constructor (connect to server) */
-IRCSocket::IRCSocket(unsigned int port, const char *server,
+IRCInterface::IRCInterface(unsigned int port, const char *server,
 	const char *nick, const char *user, const char *real,
 	const char *pass, const char *log_path, int log_level)
 {
@@ -55,7 +55,7 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	if(_DBGSTR == NULL) {
 		_DBGSTR = stdout;
 
-		debug(3, "IRCSocket", "Couldn't open stream. (%s)\n",
+		debug(3, "IRCInterface", "Couldn't open stream. (%s)\n",
 			strerror(errno));
 	}
 
@@ -63,12 +63,13 @@ IRCSocket::IRCSocket(unsigned int port, const char *server,
 	err = WSAStartup(wVersionRequested, &wsaData);
 
 	if(err != 0)
-		debug(3, "IRCSocket", "WSAStartup failed. (%d)\n", err);
+		debug(3, "IRCInterface", "WSAStartup failed. (%d)\n",
+			err);
 	#endif
 }
 
 /* Destructor (disconnect from server) */
-IRCSocket::~IRCSocket()
+IRCInterface::~IRCInterface()
 {
 	/* disconnect from IRC server by sending QUIT */
 	if(connected)
@@ -91,8 +92,8 @@ IRCSocket::~IRCSocket()
  * function : function to be called
  */
 void
-IRCSocket::add_cmd(const char *buf,
-	int (IRCSocket::*function)(const char *buf))
+IRCInterface::add_cmd(const char *buf,
+	int (IRCInterface::*function)(const char *buf))
 {
 	/* buffer legnth */
 	int l;
@@ -131,10 +132,10 @@ IRCSocket::add_cmd(const char *buf,
 
 /* remove current command from queue */
 void
-IRCSocket::del_cmd(void)
+IRCInterface::del_cmd(void)
 {
 	char *buf;
-	int (IRCSocket::*function)(const char *buf);
+	int (IRCInterface::*function)(const char *buf);
 	/* NEW botton item */
 	irc_queue_cmd *nbp;
 
@@ -169,9 +170,9 @@ IRCSocket::del_cmd(void)
 
 /* call current command in queue */
 void
-IRCSocket::call_cmd(void)
+IRCInterface::call_cmd(void)
 {
-	int (IRCSocket::*function)(const char *buf), s;
+	int (IRCInterface::*function)(const char *buf), s;
 	const char *buf;
 
 	debug(0, "call_cmd", "Calling commands.\n");
@@ -226,7 +227,7 @@ IRCSocket::call_cmd(void)
  *            arrives
  */
 void
-IRCSocket::add_link(const char *cmd,
+IRCInterface::add_link(const char *cmd,
 	void (*function)(const irc_msg_data*, void*))
 {
 	/* command length */
@@ -263,7 +264,7 @@ IRCSocket::add_link(const char *cmd,
 
 /* unlink */
 void
-IRCSocket::del_link(const char *cmd,
+IRCInterface::del_link(const char *cmd,
 	void (*function)(const irc_msg_data*, void*))
 {
 	irc_act_link *cp;
@@ -310,7 +311,7 @@ IRCSocket::del_link(const char *cmd,
 
 /* call function for event */
 void
-IRCSocket::act_link(const irc_msg_data *msg_data)
+IRCInterface::act_link(const irc_msg_data *msg_data)
 {
 	irc_act_link *cp;
 
@@ -343,7 +344,7 @@ IRCSocket::act_link(const irc_msg_data *msg_data)
 
 /* cut IRC reply */
 char *
-IRCSocket::parse(char *msg)
+IRCInterface::parse(char *msg)
 {
 	/* substring */
 	char *sstr;
@@ -384,7 +385,7 @@ IRCSocket::parse(char *msg)
 
 /* parse IRC reply */
 void
-IRCSocket::parse_msg(char *msg)
+IRCInterface::parse_msg(char *msg)
 {
 	int i;
 	size_t l;
@@ -536,7 +537,7 @@ IRCSocket::parse_msg(char *msg)
 }
 
 void
-IRCSocket::cpsub(char **dst, char **src, char sep)
+IRCInterface::cpsub(char **dst, char **src, char sep)
 {
 	int l;
 	char *t;

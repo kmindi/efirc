@@ -1,15 +1,15 @@
 // irc.h
-// definiert die Klasse IRCInterface
+// definiert die Klasse IRC
 
-#ifndef _IRCInterface_
-#define _IRCInterface_
+#ifndef _IRC_
+#define _IRC_
 
 #include <wx/string.h>
-#include <ircsocket.h>
+#include <ircinterface.h>
 
 using namespace std;
 
-class IRCInterface : public IRCSocket
+class IRC : public IRCInterface
 {
     public:
         wxString CurrentNick;
@@ -17,8 +17,8 @@ class IRCInterface : public IRCSocket
         wxString CurrentPort;
         wxString WantedNick;
     
-        IRCInterface(wxString, wxString, wxString, wxString, wxString, wxString);
-        ~IRCInterface();
+        IRC(wxString, wxString, wxString, wxString, wxString, wxString);
+        ~IRC();
 
         void connect();
 };
