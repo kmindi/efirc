@@ -6,7 +6,7 @@
 # ans Ende der Datei springen
 # und den Programmaufruf
 # auslassen
-if [ $? -ne 2 ]; then
+if [ $? -eq 0 ]; then
 	cd bin
 	cp ../src/efirc efirc
 
