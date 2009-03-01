@@ -520,5 +520,5 @@ void irc_notimplemented(const irc_msg_data *msg_data, void *cp)
         fehler += _T(" ");
         fehler += wxString(msg_data->params_a[i], wxConvUTF8);
     }
-    wxGetApp().fenstersuchen(empfaenger)->Fehler(4,fehler);
+    wxGetApp().fenstersuchen(empfaenger)->Fehler(5,fehler);
 }

@@ -284,6 +284,9 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
             case 4:
                 WxEdit_ausgabefeld->AppendText(_T("Befehl nicht implementiert oder zu wenig Parameter angegeben: ") + param1);
                 break;
+            case 5:
+                WxEdit_ausgabefeld->AppendText(_T("IRC Befehl nicht implementiert: ") + param1);
+                break;
             default:
                 WxEdit_ausgabefeld->AppendText(_T("Nicht definierter Fehler aufgetreten"));
                 break;

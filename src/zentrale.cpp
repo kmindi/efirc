@@ -329,14 +329,12 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
                 zgr_fenster[i]->Destroy();
             }
         }
-        
     }
 
     else if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
     {
         irc->send_join(befehl_parameter.mb_str());
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
-        
     }
 
     else if(befehl_name.Upper() == _T("PART") || befehl_name.Upper() == _T("LEAVE"))
@@ -349,7 +347,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         {
             irc->send_part(befehl_parameter.mb_str());
         }
-        
     }
 
     else if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
@@ -357,7 +354,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             irc->send_nick(befehl_parameter.mb_str()); // Nickname senden
             irc->WantedNick = befehl_parameter;
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
-            
     }
 
     else if(befehl_name.Upper() == _T("INVITE") && befehl_parameter != _T(""))
@@ -371,7 +367,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         }
 
         wxGetApp().irc->send_invite(nickname.mb_str(), raum.mb_str());
-        
     }
 
     else if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
@@ -380,7 +375,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
         irc->send_privmsg(fenstername[fensternummer].mb_str(), me_text.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
-        
     }
 
     else if(befehl_name.Upper() == _T("TOPIC"))
@@ -393,7 +387,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         {
             irc->send_topic(fenstername[fensternummer].mb_str(),befehl_parameter.mb_str());
         }
-        
     }
 
     else if((befehl_name.Upper() == _T("QUERY") || befehl_name.Upper() == _T("MSG")) && befehl_parameter != _T(""))
@@ -403,7 +396,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
         irc->send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
-        
     }
 
     else if(befehl_name.Upper() == _T("AWAY"))
@@ -417,7 +409,6 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             irc->send_away(befehl_parameter.mb_str());
             zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
         }
-        
     }
 
     else if(befehl_name.Upper() == _T("CTCP") && befehl_parameter != _T(""))
@@ -428,20 +419,17 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         irc->send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
 
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
-        
     }
 
     else if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
     {
         irc->send_whois(befehl_parameter.mb_str());
-        
     }
 
     // sonstige Befehle
     else if(befehl_name.Upper() == _T("CLEAR"))
     {
         zgr_fenster[fensternummer]->AusgabefeldLeeren();
-        
     }
     
     // Wenn der Befehl nicht gefunden wurde oder zu wenig parameter uebergeben wurden
