@@ -14,9 +14,10 @@ if [ $? -eq 0 ]; then
 
 	read -p "run efirc? (\`n' to abort) " input
 	if [ "$input" != "n" ]; then (./efirc &); fi
-	exit
+	exit 0
 fi
 
 # Fenster offen halten, um
 # moegliche Fehler zu analysieren
 echo "error (see build.log for details)"
+exit 1

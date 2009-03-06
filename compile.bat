@@ -15,7 +15,7 @@ strip --strip-all efirc.exe
 
 set /p input="run efirc.exe? (`n' to abort) "
 if NOT "%input%" == "n" start efirc.exe
-exit
+exit 0
 
 rem Fenster offen halten, um
 rem moegliche Fehler zu analysieren
