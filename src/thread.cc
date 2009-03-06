@@ -1,4 +1,4 @@
-// thread.cpp
+// thread.cc
 // implementiert die Klasse Thread
 
 #include <zentrale.h>

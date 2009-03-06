@@ -1,4 +1,4 @@
-// ui.cpp
+// ui.cc
 // Implementiert die Fensterklasse
 
 #include <ui.h>

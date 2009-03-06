@@ -1,4 +1,4 @@
-// irc.cpp
+// irc.cc
 // implementiert die Klasse IRC
 
 #include <irc.h>

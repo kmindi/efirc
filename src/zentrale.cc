@@ -1,4 +1,4 @@
-// zentrale.cpp
+// zentrale.cc
 // Implementiert die Klasse Zentrale
 
 #include <zentrale.h>

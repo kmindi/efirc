@@ -2,8 +2,8 @@ OBJS= irc.o ui.o thread.o config.o irc_event_functions.o
 CXXFLAGS+= `wx-config --cxxflags` -Lcontrib/cppirc -Iinclude -Icontrib/cppirc
 LDLIBS= `wx-config --libs` -lircinterface -lsstring
 
-efirc: $(OBJS) zentrale.cpp contrib/cppirc/libircinterface.a contrib/cppirc/libsstring.a
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) zentrale.cpp $(LDLIBS)
+efirc: $(OBJS) zentrale.cc contrib/cppirc/libircinterface.a contrib/cppirc/libsstring.a
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) zentrale.cc $(LDLIBS)
 
 irc.o irc_event_functions.o: contrib/cppirc/ircinterface.h
 

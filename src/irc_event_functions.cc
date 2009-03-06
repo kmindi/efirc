@@ -1,4 +1,4 @@
-// irc_event_functions.cpp
+// irc_event_functions.cc
 // enthaelt die Funktionen die mit der IRC-Schnittstelle verbunden werden und von dort aufgerufen werden
 // FUNKTIONEN SOLLEN MITGLIEDER VON ZENTRALE SEIN
 #include <zentrale.h>
@@ -6,7 +6,7 @@
 DECLARE_APP(Zentrale) //braucht man fuer wxGetApp um damit auf die funktionen der Zentrale zuzugreifen
 
 
-// Benutzerdefiniertes Ereignis muss hier auch bekannt sein, definiert wird es in zentrale.cpp
+// Benutzerdefiniertes Ereignis muss hier auch bekannt sein, definiert wird es in zentrale.cc
 DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
 
 
