@@ -315,7 +315,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
         // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
         #ifdef linux
-        sleep(0.003);
+        usleep(30000);
         #else
         Sleep(30);
         #endif
