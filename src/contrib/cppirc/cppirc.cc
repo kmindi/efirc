@@ -17,22 +17,29 @@ listen(void* arg)
 }
 
 void
-check(const irc_msg_data* msg_data, void* irc_socket)
+check(const irc_msg_data *msg_data, void *irc_socket)
 {
-	IRCInterface* irc = (IRCInterface*)irc_socket;
+	IRCInterface *irc = (IRCInterface *)irc_socket;
 
 	//printf("%s\n", msg_data->params);
 	irc->send_privmsg("#efirc", msg_data->params);
 }
 
 void
-pong(const irc_msg_data* msg_data, void* irc_socket)
+pong(const irc_msg_data *msg_data, void *irc_socket)
 {
-	IRCInterface* irc = (IRCInterface*)irc_socket;
+	IRCInterface *irc = (IRCInterface *)irc_socket;
 
 	printf("%s\n", msg_data->params);
 	//irc->send_privmsg("#efirc", msg_data->params);
 	irc->send_pong(msg_data->params);
+}
+
+void
+print(const irc_msg_data *msg_data, void *irc_socket)
+{
+	printf("%s %s %s\n", msg_data->sender, msg_data->cmd,
+		msg_data->params);
 }
 
 int
@@ -56,6 +63,8 @@ main(int argc, const char* argv[])
 	/* connect to a server
 	ircsocket.send_join("#efirc");
 	ircsocket.send_privmsg("#efirc", "hi"); */
+
+	ircsocket.set_default_link_function(&print);
 
 	ircsocket.call_cmd();
 	pthread_join(ti, NULL);

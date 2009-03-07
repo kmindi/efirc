@@ -29,6 +29,9 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 	cbp = NULL;
 	ctp = NULL;
 
+	/* function to be called when no matching link can be found */
+	default_link_function = NULL;
+
 	/* yet no */
 	connected = 0;
 	reconnecting = 0;
@@ -228,7 +231,7 @@ IRCInterface::call_cmd(void)
  */
 void
 IRCInterface::add_link(const char *cmd,
-	void (*function)(const irc_msg_data*, void*))
+	void (*function)(const irc_msg_data *, void *))
 {
 	/* command length */
 	int l;
@@ -265,7 +268,7 @@ IRCInterface::add_link(const char *cmd,
 /* unlink */
 void
 IRCInterface::del_link(const char *cmd,
-	void (*function)(const irc_msg_data*, void*))
+	void (*function)(const irc_msg_data *, void *))
 {
 	irc_act_link *cp;
 	irc_act_link *pp;
@@ -313,17 +316,22 @@ IRCInterface::del_link(const char *cmd,
 void
 IRCInterface::act_link(const irc_msg_data *msg_data)
 {
+	int s;
 	irc_act_link *cp;
 
 	debug(0, "act_link", "Activating link. (%s)\n",
 		msg_data->cmd);
 
+	/* no matching function found yet */
+	s = 0;
 	/* beginning at bottom */
 	cp = abp;
 
 	while(cp != NULL) {
 		/* found match? - act link */
 		if(!strcmp(cp->cmd, msg_data->cmd)) {
+			s = 1;
+
 			/*
 			 * call function with specified parameters, such
 			 * as pointer to us
@@ -338,8 +346,23 @@ IRCInterface::act_link(const irc_msg_data *msg_data)
 		cp = cp->next;
 	}
 
+	if(s == 0 && default_link_function != NULL)
+	{
+		default_link_function(msg_data, this);
+
+		debug(1, "act_link", "Activated default. (%i)\n",
+			default_link_function);
+	}
+
 	/* carefully */
 	debug(1, "act_link", "No (more?) links.\n");
+}
+
+void
+IRCInterface::set_default_link_function(void (*function)(
+const irc_msg_data *, void *))
+{
+	default_link_function = function;
 }
 
 /* cut IRC reply */

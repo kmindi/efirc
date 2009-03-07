@@ -64,7 +64,7 @@ class IRCInterface
 	 */
 	struct irc_act_link {
 		char *cmd;
-		void (*function)(const irc_msg_data*, void*);
+		void (*function)(const irc_msg_data *, void *);
 		irc_act_link *next;
 	};
 
@@ -99,13 +99,16 @@ class IRCInterface
 		char _IRCPASS[W_BUFSIZE];
 
 		void add_link(const char *,
-			void (*function)(const irc_msg_data*, void*));
+			void (*)(const irc_msg_data *, void *));
 		void del_link(const char *,
-			void (*function)(const irc_msg_data*, void*));
-		void act_link(const irc_msg_data*);
+			void (*)(const irc_msg_data *, void *));
+		void act_link(const irc_msg_data *);
+
+		void set_default_link_function(void (*)(
+			const irc_msg_data *, void *));
 
 		void add_cmd(const char *,
-			int (IRCInterface::*function)(const char *));
+			int (IRCInterface::*)(const char *));
 		void del_cmd(void);
 		void call_cmd(void);
 
@@ -158,6 +161,9 @@ class IRCInterface
 		irc_act_link *atp;
 		irc_queue_cmd *cbp;
 		irc_queue_cmd *ctp;
+
+		void (*default_link_function)(const irc_msg_data *,
+			void *);
 
 		int debug(int, const char *, const char *, ...);
 		int sock_send(const char *);
