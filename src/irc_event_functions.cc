@@ -28,31 +28,21 @@ END_EVENT_TABLE()
 void irc_allgemein(const irc_msg_data *msg_data, void *cp)
 {
     wxCommandEvent eventCustom(wxEVT_NEUER_IRC_BEFEHL); // Neues Ereignis erzeugen
-    
-    IRC_NACHRICHT *zgr_ircn = new IRC_NACHRICHT(msg_data);
+    IRC_NACHRICHT *zgr_ircn = new IRC_NACHRICHT(msg_data); // Instanz der IRC_NACHRICHT-Klasse erstellen und merken
     eventCustom.SetClientData(zgr_ircn); // Dem Ereignis die Position der Daten mitteilen
-    wxPostEvent(wxGetApp().Ereignisvw, eventCustom);
-    
-    
-    //irc_msg_data *zgr_md = new irc_msg_data; // Zeiger auf eine neue irc_msg_data-Struktur erzeugen
-    //*zgr_md = *msg_data; // Uebergebene Daten an die neue Position schreiben
-    
-    //eventCustom.SetClientData(zgr_md); // Dem Ereignis die Position der Daten mitteilen
-    //wxPostEvent(wxGetApp().Ereignisvw, eventCustom);
+    wxPostEvent(wxGetApp().Ereignisvw, eventCustom); // Ereignis ausloesen, bzw in die Abarbeitungswarteschlange einreihen
 }
 
 
 void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
 {
     // Daten aus dem Ereignis einem eigenen Zeiger zuweisen.
-    //const IRC_NACHRICHT *msg_data = (irc_msg_data *)event.GetClientData();
     
     const IRC_NACHRICHT *msg_data = (IRC_NACHRICHT *)event.GetClientData();
     
     // Feld fuer Befehle, damit man mit switch case default durchgehen kann
     
     wxString cmd(msg_data->cmd, wxConvUTF8); // Befehl in Variable speichern
-    //cmd = cmd.Upper(); // Befehl ist jetzt gross geschrieben
     
     // Befehle Abfragen und entsprechende Funktionen aufrufen
     
