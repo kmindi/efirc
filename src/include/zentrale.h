@@ -28,6 +28,7 @@ class Zentrale : public wxApp
         wxString efirc_version_string;
 
         friend class Thread;
+        friend class Ereignisverwalter;
         // muss ein Freund sein, damit die erstellten Threads
         // auf die privaten Thread funktionen zugreifen koennen
 
@@ -70,13 +71,31 @@ class Zentrale : public wxApp
         void recv_thread();
         void call_thread();
 
-
-
-
-        //IRC FUNKTIONEN
-        //void irc_pmsg(const irc_msg_data *msg_data, void *cp);
-
-
+        // IRC FUNKTIONEN
+        void irc_pmsg(const IRC_NACHRICHT *);
+        void irc_welcome(const IRC_NACHRICHT *msg_data);
+        void irc_isupport(const IRC_NACHRICHT *msg_data);
+        void irc_mode(const IRC_NACHRICHT *msg_data);
+        void irc_endofmotd(const IRC_NACHRICHT *msg_data);
+        void irc_motd(const IRC_NACHRICHT *msg_data);
+        void irc_topic(const IRC_NACHRICHT *msg_data);
+        void irc_requestedtopic(const IRC_NACHRICHT *msg_data);
+        void irc_error(const IRC_NACHRICHT *msg_data);
+        void irc_pong(const IRC_NACHRICHT *msg_data);
+        void irc_whoisuser(const IRC_NACHRICHT *msg_data);
+        void irc_whoisaway(const IRC_NACHRICHT *msg_data);
+        void irc_whoischan(const IRC_NACHRICHT *msg_data);
+        void irc_whoisidle(const IRC_NACHRICHT *msg_data);
+        void irc_whoisserver(const IRC_NACHRICHT *msg_data);
+        void irc_userlist(const IRC_NACHRICHT *msg_data);
+        void irc_join(const IRC_NACHRICHT *msg_data);
+        void irc_leave(const IRC_NACHRICHT *msg_data);
+        void irc_quit(const IRC_NACHRICHT *msg_data);
+        void irc_nick(const IRC_NACHRICHT *msg_data);
+        void irc_nickinuse(const IRC_NACHRICHT *msg_data);
+        void irc_unaway(const IRC_NACHRICHT *msg_data);
+        void irc_nowaway(const IRC_NACHRICHT *msg_data);
+        void irc_invite(const IRC_NACHRICHT *msg_data);
 };
 
 #endif

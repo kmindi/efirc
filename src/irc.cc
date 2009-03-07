@@ -6,7 +6,7 @@
 using namespace std;
 
 IRC::IRC(wxString port, wxString server, wxString nick, wxString user, wxString real, wxString pass)
-    : IRCInterface(atoi(port.mb_str()), server.mb_str(), nick.mb_str(), user.mb_str(), real.mb_str(), pass.mb_str(), "cppirc.log",2)
+    : IRCInterface(atoi(port.mb_str()), server.mb_str(), nick.mb_str(), user.mb_str(), real.mb_str(), pass.mb_str(), "cppirc.log",1)
 {
     CurrentNick = nick;
     WantedNick = nick;

@@ -7,23 +7,6 @@
 // mit DECLARE_APP(Zentrale/) und wxGetApp() kann auf Funktionen dieser Klasse zugegrifffen werden
 IMPLEMENT_APP(Zentrale) // erstellt main funktion
 
-
-// Benutzerdefinierte Ereignisse deklarieren und definieren
-DECLARE_EVENT_TYPE(wxEVT_NEUES_FENSTER, 7777)
-DEFINE_EVENT_TYPE(wxEVT_NEUES_FENSTER)
-
-#define EVT_NEUES_FENSTER(id, fn) \
-    DECLARE_EVENT_TABLE_ENTRY( \
-        wxEVT_NEUES_FENSTER, id, wxID_ANY, \
-        (wxObjectEventFunction)(wxEventFunction) wxStaticCastEvent( wxCommandEventFunction, &fn ), \
-        (wxObject *) NULL \
-    ),
-
-
-BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
-    EVT_NEUES_FENSTER(wxID_ANY, Ereignisverwalter::BeiNeuesFenster)
-END_EVENT_TABLE()
-
 bool Zentrale::OnInit()
 {
     efirc_version_string = _T("0.3 testing");
@@ -71,11 +54,6 @@ bool Zentrale::OnInit()
     // TEST FUNKTIONEN
 
     return TRUE;
-}
-
-void Ereignisverwalter::BeiNeuesFenster(wxCommandEvent& event)
-{
-    wxGetApp().neuesFenster(event.GetString());
 }
 
 //Konfigurationsfunktionen
@@ -477,119 +455,13 @@ void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
 // THREADS
 // THREADS
 // THREADS
-// Bevor die Funktionen die mit der IRC-Schnittstelle verbunden werden verwendet werden, muessen
-// sie bekannt gemacht sein
-void irc_pmsg(const irc_msg_data *msg_data, void *cp);
-void irc_welcome(const irc_msg_data *msg_data, void *cp);
-void irc_isupport(const irc_msg_data *msg_data, void *cp);
-void irc_mode(const irc_msg_data *msg_data, void *cp);
-void irc_endofmotd(const irc_msg_data *msg_data, void *cp);
-void irc_motd(const irc_msg_data *msg_data, void *cp);
-void irc_topic(const irc_msg_data *msg_data, void *cp);
-void irc_requestedtopic(const irc_msg_data *msg_data, void *cp);
-void irc_error(const irc_msg_data *msg_data, void *cp);
-void irc_pong(const irc_msg_data *msg_data, void *cp);
-void irc_whoisuser(const irc_msg_data *msg_data, void *cp);
-void irc_whoisaway(const irc_msg_data *msg_data, void *cp);
-void irc_whoischan(const irc_msg_data *msg_data, void *cp);
-void irc_whoisidle(const irc_msg_data *msg_data, void *cp);
-void irc_whoisserver(const irc_msg_data *msg_data, void *cp);
-void irc_userlist(const irc_msg_data *msg_data, void *cp);
-void irc_join(const irc_msg_data *msg_data, void *cp);
-void irc_leave(const irc_msg_data *msg_data, void *cp);
-void irc_quit(const irc_msg_data *msg_data, void *cp);
-void irc_nick(const irc_msg_data *msg_data, void *cp);
-void irc_nickinuse(const irc_msg_data *msg_data, void *cp);
-void irc_unaway(const irc_msg_data *msg_data, void *cp);
-void irc_nowaway(const irc_msg_data *msg_data, void *cp);
-void irc_invite(const irc_msg_data *msg_data, void *cp);
-void irc_notimplemented(const irc_msg_data *msg_data, void *cp);
-// SOLLEN MITGLIEDER VON ZENTRALE SEIN; DANN DURCH zentrale.h SCHON BEKANNT
+void irc_allgemein(const irc_msg_data *msg_data, void *cp);
 
 void Zentrale::connect_thread()
 {
-    // Ereignisverknüpfung
-    // TODO wirklich Ereignisse implementieren
-    irc->add_link("PRIVMSG", &irc_pmsg);
-    irc->add_link("NOTICE", &irc_pmsg);
-    irc->add_link("JOIN", &irc_join);
-    irc->add_link("PART", &irc_leave);
-    irc->add_link("QUIT", &irc_quit);
-    irc->add_link("NICK", &irc_nick);
-    irc->add_link("PING", &irc_pong);
-    //irc->add_link("KICK", &irc_kick);
-    irc->add_link("INVITE", &irc_invite);
-    irc->add_link("MODE", &irc_mode);
-
-    irc->add_link("001", &irc_welcome);
-    irc->add_link("002", &irc_welcome);
-    irc->add_link("003", &irc_welcome);
-    irc->add_link("004", &irc_welcome);
-    irc->add_link("005", &irc_isupport);
-
-    irc->add_link("301", &irc_whoisaway);
-    irc->add_link("305", &irc_unaway);
-    irc->add_link("306", &irc_nowaway);
-    irc->add_link("311", &irc_whoisuser);
-    irc->add_link("312", &irc_whoisserver);
-    irc->add_link("317", &irc_whoisidle);
-    irc->add_link("319", &irc_whoischan);
-
-    irc->add_link("372", &irc_motd);
-    irc->add_link("376", &irc_endofmotd);
-    irc->add_link("332", &irc_topic);
-    irc->add_link("TOPIC", &irc_requestedtopic);
-    irc->add_link("353", &irc_userlist);
-
-
-    // FEHLER
-    // Fehler Antworten
-    irc->add_link("401", &irc_error);
-    irc->add_link("402", &irc_error);
-    irc->add_link("403", &irc_error);
-    irc->add_link("404", &irc_error);
-    irc->add_link("405", &irc_error);
-    irc->add_link("406", &irc_error);
-    irc->add_link("407", &irc_error);
-    irc->add_link("409", &irc_error);
-    irc->add_link("411", &irc_error);
-    irc->add_link("412", &irc_error);
-    irc->add_link("413", &irc_error);
-    irc->add_link("414", &irc_error);
-    irc->add_link("421", &irc_error);
-    irc->add_link("422", &irc_error);
-    irc->add_link("423", &irc_error);
-    irc->add_link("424", &irc_error);
-    irc->add_link("431", &irc_error);
-    irc->add_link("432", &irc_error);
-    irc->add_link("433", &irc_nickinuse);
-    irc->add_link("436", &irc_error);
-    irc->add_link("441", &irc_error);
-    irc->add_link("442", &irc_error);
-    irc->add_link("443", &irc_error);
-    irc->add_link("444", &irc_error);
-    irc->add_link("445", &irc_error);
-    irc->add_link("446", &irc_error);
-    irc->add_link("451", &irc_error);
-    irc->add_link("461", &irc_error);
-    irc->add_link("462", &irc_error);
-    irc->add_link("463", &irc_error);
-    irc->add_link("464", &irc_error);
-    irc->add_link("465", &irc_error);
-    irc->add_link("467", &irc_error);
-    irc->add_link("471", &irc_error);
-    irc->add_link("472", &irc_error);
-    irc->add_link("473", &irc_error);
-    irc->add_link("474", &irc_error);
-    irc->add_link("475", &irc_error);
-    irc->add_link("481", &irc_error);
-    irc->add_link("482", &irc_error);
-    irc->add_link("483", &irc_error);
-    irc->add_link("491", &irc_error);
-    irc->add_link("501", &irc_error);
-    irc->add_link("502", &irc_error);
-
-
+    
+    irc->set_default_link_function(&irc_allgemein);
+    
     irc->connect();
 
     Thread *thread = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
