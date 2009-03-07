@@ -124,6 +124,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_CHANNEL = [ WHOIS: %param1 is in %param2 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_IDLE = [ WHOIS: %param1 is idle since %param2 seconds ]\n");
     standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = [ WHOIS: %param1 is actually using host %param2 ]\n");
 
 
     return standardkonfiguration_text;

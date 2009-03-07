@@ -176,6 +176,21 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_whoisserver(msg_data);
         }
         
+        // WHOIS - BENUTZT HOST
+        else if(cmd == _T("338"))
+        {
+            wxGetApp().irc_whoisactually(msg_data);
+        }
+        
+        
+        // Nachrichten die nicht angezeigt werden sollen
+        
+        else if(cmd == _T("318") || cmd == _T("366"))
+        {
+            // 318 End of /WHOIS List
+            // 366 End of /NAMES List
+        }
+        
         // wenn keine Uebereinstimmung gefunden wurde, Fehler anzeigen
         else
         {
@@ -670,6 +685,14 @@ void Zentrale::irc_whoisserver(const IRC_NACHRICHT *msg_data)
     wxString server(msg_data->params_a[2], wxConvUTF8);
     wxString servernachricht(msg_data->params_a[3], wxConvUTF8);
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
+}
+
+void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString nick(msg_data->params_a[1], wxConvUTF8);
+    wxString server(msg_data->params_a[2], wxConvUTF8);
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"),nick,server);
 }
 
 // Verschiedene Fehlermeldungen anzeigen
