@@ -1,6 +1,6 @@
 # set +v
 
-(cd src/contrib/cppirc && make -f Makefile.linux libircinterface.a libsstring.a && \
+(cd src/contrib/cppirc && make -f GNUmakefile.linux libircinterface.a libsstring.a && \
 cd ../.. && make -f Makefile.linux efirc) 2> build.log
 
 # ERRORLEVEL abfragen und ggf.
