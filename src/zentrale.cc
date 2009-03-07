@@ -314,7 +314,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         irc->disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
 
         // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
-        #ifdef linux
+        #if defined linux || defined __unix__
         usleep(30000);
         #else
         Sleep(30);
