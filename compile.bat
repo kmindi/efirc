@@ -1,6 +1,6 @@
 @echo off
 
-(mingw32-make.exe -C src/contrib/cppirc -f Makefile.win libircinterface.a libsstring.a && mingw32-make.exe -C src efirc.exe) 2> build.log
+(cd src/contrib/cppirc && mingw32-make.exe -f Makefile.win libircinterface.a libsstring.a && cd ../.. && mingw32-make.exe efirc.exe) 2> build.log
 
 rem ERRORLEVEL abfragen und ggf.
 rem ans Ende der Datei springen
