@@ -46,7 +46,7 @@ main(int argc, const char* argv[])
 	/* MAIN!!!1einself11! */
 	pthread_create(&ti, NULL, &listen, NULL);
 
-	/* some client features examples 
+	/* some client features examples
 	ircsocket.add_link("PRIVMSG", &check);
 	ircsocket.add_link("332", &check);
 	ircsocket.add_link("353", &check);
