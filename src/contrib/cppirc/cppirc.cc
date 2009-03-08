@@ -64,7 +64,7 @@ main(int argc, const char* argv[])
 	ircsocket.send_join("#efirc");
 	ircsocket.send_privmsg("#efirc", "hi"); */
 
-	ircsocket.set_default_link_function(&print);
+	//ircsocket.set_default_link_function(&print);
 
 	ircsocket.call_cmd();
 	pthread_join(ti, NULL);

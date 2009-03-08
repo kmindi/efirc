@@ -192,21 +192,12 @@ IRCInterface::recv_raw(void)
 
 	debug(0, "recv_raw", "Receiving raw messages.\n");
 
-	/* recv, recv, recv,... */
 	while(1) {
-		/*
-		 * read() attempts to read bytes of data from
-		 * an object into a buffer.
-		 *
-		 * socket    : references object
-		 * buf       : buffer read into
-		 * BUFSIZE   : bytes to read
-		 */
-		#ifdef WIN32
-		bl = recv(sock, buf, sizeof(buf), 0);
-		#else
-		bl = read(sock, buf, sizeof(buf));
-		#endif
+		/* initialise buffer with NULs */
+		bzero(buf, sizeof(buf));
+
+		/* receive message from the server connected to */
+		bl = sock_recv(buf, sizeof(buf));
 
 		/* has server gone away? are we disconnected? */
 		if(bl > 0) {
@@ -233,23 +224,15 @@ IRCInterface::recv_raw(void)
 			/* (cut and) parse message(s) */
 			c = parse(n);
 
-			delete o;
+			delete[] o;
 
 			/* ignored message part */
 			l = strlen(c) + 1;
 			o = new char[l];
 			strlcpy(o, c, l);
 
-			delete n;
+			delete[] n;
 		} else {
-			#ifdef WIN32
-			debug(3, "recv_raw", "Couldn't receive"
-				" message. (%d)\n", WSAGetLastError());
-			#else
-			debug(3, "recv_raw", "Couldn't receive"
-				" message. (%s)\n", strerror(errno));
-			#endif
-
 			if(!_DBGRECON) {
 				debug(3, "recv_raw", "Reconnecting"
 					" disabled.\n");
@@ -334,6 +317,7 @@ IRCInterface::sock_send(const char *buf)
 	} else {
 		debug(3, "sock_send", "Message too long."
 			" (%i/%i)\n", l, sizeof(tmp));
+
 		return -1;
 	}
 
@@ -364,7 +348,7 @@ IRCInterface::sock_send(const char *buf)
 }
 
 int
-IRCInterface::sock_recv(char *buf)
+IRCInterface::sock_recv(char *buf, size_t len)
 {
 	/*
 	 * recv(2) return values
@@ -382,7 +366,7 @@ IRCInterface::sock_recv(char *buf)
 	 * sock : socket descriptor
 	 * 0    : default flags
 	 */
-	bl = recv(sock, buf, R_BUFSIZE, 0);
+	bl = recv(sock, buf, len, 0);
 
 	if(bl > -1)
 		debug(1, "sock_recv", "Received raw data."

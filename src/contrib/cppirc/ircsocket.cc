@@ -157,7 +157,7 @@ IRCInterface::del_cmd(void)
 			buf, function);
 
 		/* NOW removing command in queue (1.) */
-		delete cbp->buf;
+		delete[] cbp->buf;
 		delete cbp;
 
 		/* setting new bottom (may not exist) */
@@ -447,11 +447,9 @@ IRCInterface::parse_msg(char *msg)
 		w = msg_data->sender;
 		cpsub(&msg_data->nick, &w, '!');
 		if(w == NULL) { /* is server command */
-			msg_data->nick = new char[1];
 			msg_data->user = new char[1];
 			msg_data->host = new char[1];
 
-			*msg_data->nick = '\0';
 			*msg_data->user = '\0';
 			*msg_data->host = '\0';
 
@@ -547,15 +545,15 @@ IRCInterface::parse_msg(char *msg)
 	act_link(msg_data);
 
 	/* free allocated mem */
-	delete msg_data->sender;
-	delete msg_data->cmd;
-	delete msg_data->params;
+	delete[] msg_data->sender;
+	delete[] msg_data->cmd;
+	delete[] msg_data->params;
 	for(i = 0; i < msg_data->params_i; i++)
-		delete msg_data->params_a[i];
+		delete[] msg_data->params_a[i];
 	delete[] msg_data->params_a;
-	delete msg_data->host;
-	delete msg_data->nick;
-	delete msg_data->user;
+	delete[] msg_data->host;
+	delete[] msg_data->nick;
+	delete[] msg_data->user;
 	delete msg_data;
 }
 

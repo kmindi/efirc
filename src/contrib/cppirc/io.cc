@@ -70,8 +70,8 @@ IRCInterface::debug(int level, const char *sender, const char *fmt, ...)
 	/* flush stream */
 	fflush(_DBGSTR);
 
-	delete nfmt;
-	delete d;
+	delete[] nfmt;
+	delete[] d;
 
 	return s;
 }

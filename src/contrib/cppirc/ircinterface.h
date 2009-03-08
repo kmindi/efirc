@@ -167,7 +167,7 @@ class IRCInterface
 
 		int debug(int, const char *, const char *, ...);
 		int sock_send(const char *);
-		int sock_recv(char *);
+		int sock_recv(char *, size_t);
 
 		void send_raw(const char *, ...);
 		char *parse(char *);
