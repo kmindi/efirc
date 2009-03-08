@@ -30,11 +30,14 @@ class IRC_NACHRICHT
             
             for(int i = 0; i < params_i; i++)
             {
-                params_a[i] = msg_data->params_a[i];
+                params_a[i] = wxString(msg_data->params_a[i], wxConvUTF8);
             }
         }
         
-        ~IRC_NACHRICHT() {}
+        ~IRC_NACHRICHT() 
+        {
+            delete[] params_a;
+        }
         
         wxString sender, cmd, params, host, nick, user;
         wxString *params_a;

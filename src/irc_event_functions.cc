@@ -621,7 +621,7 @@ void Zentrale::irc_requestedtopic(const IRC_NACHRICHT *msg_data)
 // Auf Ping mit Pong antworten
 void Zentrale::irc_pong(const IRC_NACHRICHT *msg_data)
 {
-    irc->send_pong(msg_data->params_a[0]);
+    irc->send_pong(msg_data->params_a[0].mb_str());
 }
 
 // RPL_UNAWAY / 305

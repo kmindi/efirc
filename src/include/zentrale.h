@@ -48,8 +48,8 @@ class Zentrale : public wxApp
         // --------------------------------------------------------------------------
 
         // MAXIMALE ANZAHL DER RAEUME PER VARIABLE FESTSETZEN
-        Fenster *zgr_fenster[10]; // feld fuer zeiger auf maximal 10 instanzen
-        wxString fenstername[10];
+        Fenster *zgr_fenster[max_fenster]; // feld fuer zeiger auf maximal 10 instanzen
+        wxString fenstername[max_fenster];
         wxString raum; // fuer join nach motd, temporaer
         void neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
 
