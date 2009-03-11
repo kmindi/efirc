@@ -194,7 +194,7 @@ IRCInterface::recv_raw(void)
 
 	while(1) {
 		/* initialise buffer with NULs */
-		bzero(buf, sizeof(buf));
+		memset(buf, '\0', sizeof(buf));
 
 		/* receive message from the server connected to */
 		bl = sock_recv(buf, sizeof(buf));
@@ -326,10 +326,14 @@ IRCInterface::sock_send(const char *buf)
 	 * to another socket. the socket must be
 	 * connected.
 	 *
-	 * sock : socket descriptor
-	 * 0    : default flags
+	 * sock         : socket descriptor
+	 * MSG_NOSIGNAL : do not generate SIGPIPE on EOF
 	 */
+	#ifdef WIN32
 	bl = send(sock, tmp, l, 0);
+	#else
+	bl = send(sock, tmp, l, MSG_NOSIGNAL);
+	#endif
 
 	/* check status and return send's return value */
 	if(bl > -1)
