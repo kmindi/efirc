@@ -90,7 +90,6 @@ class Zentrale : public wxApp
         void irc_motd(const IRC_NACHRICHT *msg_data);
         void irc_topic(const IRC_NACHRICHT *msg_data);
         void irc_requestedtopic(const IRC_NACHRICHT *msg_data);
-        void irc_error(const IRC_NACHRICHT *msg_data);
         void irc_pong(const IRC_NACHRICHT *msg_data);
         void irc_whoisuser(const IRC_NACHRICHT *msg_data);
         void irc_whoisaway(const IRC_NACHRICHT *msg_data);
@@ -107,6 +106,9 @@ class Zentrale : public wxApp
         void irc_unaway(const IRC_NACHRICHT *msg_data);
         void irc_nowaway(const IRC_NACHRICHT *msg_data);
         void irc_invite(const IRC_NACHRICHT *msg_data);
+        void irc_einfach(const IRC_NACHRICHT *msg_data);
+        void irc_fehler(const IRC_NACHRICHT *msg_data);
+        void irc_unbekannt(const IRC_NACHRICHT *msg_data);
 };
 
 #endif

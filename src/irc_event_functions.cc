@@ -51,6 +51,7 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
     const IRC_NACHRICHT *msg_data = (IRC_NACHRICHT *)event.GetClientData();
     
     // Feld fuer Befehle, damit man mit switch case default durchgehen kann
+    // Fuer hoehere Geschwindigkeit und einfachere Anpassbarkeit
     
     wxString cmd(msg_data->cmd, wxConvUTF8); // Befehl in Variable speichern
     
@@ -194,17 +195,36 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         
         
         // Nachrichten die nicht angezeigt werden sollen
-        
         else if(cmd == _T("318") || cmd == _T("366"))
         {
             // 318 End of /WHOIS List
             // 366 End of /NAMES List
         }
         
+        // Abfrage nach Nachrichten die einfach nur ausgegeben werden sollen.
+        else if(cmd == _T("042") || cmd == _T("250") || cmd == _T("251") || cmd == _T("252") || cmd == _T("253") || cmd == _T("254") | cmd == _T("255"))
+        {
+            // 042 Unique ID
+            // 250 RPL_STATSCONN
+            // 251 RPL_LUSERCLIENT
+            // 252 RPL_LUSEROP
+            // 253 RPL_LUSERUNKOWN
+            // 254 RPL_LUSERCHANNELS
+            // 255 RPL_LUSERME
+            
+            wxGetApp().irc_einfach(msg_data);
+        }
+        
+        // Abfrage nach ERR_* Antworten
+        else if(cmd == _T("300"))
+        {
+            wxGetApp().irc_fehler(msg_data);
+        }
+        
         // wenn keine Uebereinstimmung gefunden wurde, Fehler anzeigen
         else
         {
-            wxGetApp().irc_error(msg_data);
+            wxGetApp().irc_unbekannt(msg_data);
         }     
         
         // Angeforderten Speicher wieder freigeben
@@ -705,8 +725,37 @@ void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"),nick,server);
 }
 
-// Verschiedene Fehlermeldungen anzeigen
-void Zentrale::irc_error(const IRC_NACHRICHT *msg_data)
+// ERR_*-Nachrichten
+// Verschiedene Fehlermeldungen anzeigen 
+void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString fehler(msg_data->cmd, wxConvUTF8);
+    for(int i = 0; i < msg_data->params_i; i++)
+    {
+        fehler += _T(" ");
+        fehler += wxString(msg_data->params_a[i], wxConvUTF8);
+    }
+    fenstersuchen(empfaenger)->Fehler(2,fehler);
+}
+
+
+// Einfache Anzeige von Nachrichten
+void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString nachricht = _T("");
+    for(int i = 1; i < msg_data->params_i; i++)
+    // beginnend bei eins, damit der eigene Nickname nicht angezeigt wird.
+    {
+        nachricht += _T(" ");
+        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+    }
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
+}
+
+// Fehler anzeigen. Nachricht wurde nicht behandelt bzw, Befehl nicht abgefragt
+void Zentrale::irc_unbekannt(const IRC_NACHRICHT *msg_data)
 {
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
     wxString fehler(msg_data->cmd, wxConvUTF8);
