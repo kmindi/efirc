@@ -21,9 +21,7 @@
 #include <netdb.h>
 #endif
 
-#if defined WIN32 || defined linux
 #include "sstring.h"
-#endif
 
 #include <stdio.h>
 #include <time.h>
@@ -87,67 +85,68 @@ class IRCInterface
 		~IRCInterface(void);
 
 		int connected;
+		int disconnected;
 		FILE *_DBGSTR;
 		int _DBGLEVEL;
 		int _DBGRECON;
 		unsigned int _IRCPORT;
-		size_t _DBGSPACE;
 		char _IRCSERV[HOSTSIZE];
 		char _IRCNICK[W_BUFSIZE];
 		char _IRCUSER[W_BUFSIZE];
 		char _IRCREAL[W_BUFSIZE];
 		char _IRCPASS[W_BUFSIZE];
 
-		void add_link(const char *,
+		void irc_add_link_queue_entry(const char *,
 			void (*)(const irc_msg_data *, void *));
-		void del_link(const char *,
+		void irc_delete_link_queue_entry(const char *,
 			void (*)(const irc_msg_data *, void *));
-		void act_link(const irc_msg_data *);
+		void irc_call_link_queue_entry(const irc_msg_data *);
 
-		void set_default_link_function(void (*)(
+		void irc_set_default_link_function(void (*)(
 			const irc_msg_data *, void *));
 
-		void add_cmd(const char *,
-			int (IRCInterface::*)(const char *));
-		void del_cmd(void);
-		void call_cmd(void);
-
-		void reconnect(void);
-
-		void connect_server(unsigned int, const char *);
-		void connect_server(void);
-		void disconnect_server(const char *);
-
-		void recv_raw(void);
-
-		void auth(const char *, const char *, const char *,
+		void irc_add_command_queue_entry(int (IRCInterface::*)(const char *),
 			const char *);
-		void auth(void);
-		void send_join(const char *);
-		void send_quit(const char *);
-		void send_pass(const char *);
-		void send_nick(const char *);
-		void send_user(const char *, const char *);
-		void send_notice(const char *, const char *);
-		void send_privmsg(const char *, const char *);
-		void send_pong(const char *);
-		void send_ctcp_version(const char *, const char *);
-		void send_ctcp_clientinfo(const char *, const char *);
-		void send_ctcp_finger(const char *, const char *);
-		void send_ctcp_source(const char *, const char *);
-		void send_ctcp_userinfo(const char *, const char *);
-		void send_ctcp_ping(const char *, const char *);
-		void send_ctcp_time(const char *, const char *);
-		void send_ctcp_errmsg(const char *, const char *);
-		void send_ctcp(const char *, const char *,
+		void irc_delete_command_queue_entry(void);
+		void irc_call_command_queue_entries(void);
+
+		void irc_reconnect_server(void);
+
+		void irc_connect_server(const char *, unsigned int);
+		void irc_connect_server(void);
+		void irc_disconnect_server(const char *);
+		void irc_disconnect_server(void);
+
+		void irc_receive_messages(void);
+
+		void irc_auth_client(const char *, const char *, const char *,
 			const char *);
-		void send_topic(const char *);
-		void send_topic(const char *, const char *);
-		void send_part(const char *);
-		void send_whois(const char *);
-		void send_away(void);
-		void send_away(const char *);
-		void send_invite(const char *, const char *);
+		void irc_auth_client(void);
+		void irc_send_join(const char *);
+		void irc_send_quit(const char *);
+		void irc_send_pass(const char *);
+		void irc_send_nick(const char *);
+		void irc_send_user(const char *, const char *);
+		void irc_send_notice(const char *, const char *);
+		void irc_send_privmsg(const char *, const char *);
+		void irc_send_pong(const char *);
+		void irc_send_ctcp_version(const char *, const char *);
+		void irc_send_ctcp_clientinfo(const char *, const char *);
+		void irc_send_ctcp_finger(const char *, const char *);
+		void irc_send_ctcp_source(const char *, const char *);
+		void irc_send_ctcp_userinfo(const char *, const char *);
+		void irc_send_ctcp_ping(const char *, const char *);
+		void irc_send_ctcp_time(const char *, const char *);
+		void irc_send_ctcp_errmsg(const char *, const char *);
+		void irc_send_ctcp(const char *, const char *,
+			const char *);
+		void irc_send_topic(const char *);
+		void irc_send_topic(const char *, const char *);
+		void irc_send_part(const char *);
+		void irc_send_whois(const char *);
+		void irc_send_away(void);
+		void irc_send_away(const char *);
+		void irc_send_invite(const char *, const char *);
 
 	private:
 		int sock;
@@ -165,14 +164,13 @@ class IRCInterface
 		void (*default_link_function)(const irc_msg_data *,
 			void *);
 
-		int debug(int, const char *, const char *, ...);
-		int sock_send(const char *);
-		int sock_recv(char *, size_t);
+		int irc_write_message_f(int, const char *, const char *, ...);
+		int irc_send_message(const char *);
+		int irc_receive_message(char *, size_t);
 
-		void send_raw(const char *, ...);
-		char *parse(char *);
-		void parse_msg(char *);
-		void cpsub(char **, char **, char);
+		void irc_send_message_f(const char *, ...);
+		char *irc_parse_server_message(const char *);
+		void irc_parse_irc_message(char *);
 };
 
 #endif /* _IRCSOCKET_H_ */

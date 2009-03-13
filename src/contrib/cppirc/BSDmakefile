@@ -1,5 +1,5 @@
 OBJS= io.o irccommands.o ircsocket.o tcpip.o
-LDLIBS= -lircinterface -lpthread
+LDLIBS= -lircinterface -lsstring -lpthread
 
 .ifdef DEBUG
 CXXFLAGS+= -g -Wall
@@ -11,7 +11,7 @@ CXXFLAGS+= -g -Wall
 .INCLUDES: .h
 .LIBS: .a
 
-cppirc: libircinterface.a cppirc.cc
+cppirc: libircinterface.a libsstring.a cppirc.cc
 	$(CXX) $(CXXFLAGS) -o $(.TARGET) $(.INCLUDES) $(.LIBS) \
 	$(.IMPSRC) $(LDLIBS)
 

@@ -1,3 +1,51 @@
+#include "sstring.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/*
+ * Copy substring from src delimited by sep to dst or make dst an empty
+ * string (NUL terminated, length 0).
+ */
+void
+strsub(char **dst, char **src, char sep)
+{
+	size_t l;
+	char *t, **d = dst, **s = src;
+	char delim[2];
+
+	if(*s == NULL) {
+		*d = (char *)malloc(1);
+		**d = '\0';
+
+		return;
+	}
+
+	delim[0] = sep; delim[1] = '\0';
+
+	/*
+	 * The original value of s is returned and the location of the
+	 * next character after the delimiter character or NULL is
+	 * stored in s.
+	 */
+	t = strsep(s, delim);
+
+	l = strlen(t);
+	*d = (char *)malloc(++l);
+	strlcpy(*d, t, l);
+
+	/*
+	 * replace NUL (strsep(3) replaces the first occurence of any
+	 * character in the string delim with a `\0') with sep (to leave
+	 * src string untouched) if the end of src string wasn't
+	 * reached.
+	 */
+	if(*s != NULL)
+		(*s)[-1] = sep;
+}
+
+#if defined WIN32 || defined linux
 /*	$OpenBSD: strlcpy.c,v 1.11 2006/05/05 15:27:38 millert Exp $	*/
 
 /*
@@ -177,3 +225,5 @@ strsep(char **stringp, const char *delim)
 	}
 	/* NOTREACHED */
 }
+#endif
+

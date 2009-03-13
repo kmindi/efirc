@@ -8,12 +8,12 @@
 
 /* auth new IRC user */
 void
-IRCInterface::auth(const char *nick, const char *user, const char *real,
-	const char *pass)
+IRCInterface::irc_auth_client(const char *nickname, const char *user_name, const char *real_name,
+	const char *password)
 {
 // TODO you aren't allowed to call when already done?
 	if(authed) {
-		debug(3, "auth", "Already authed.\n");
+		irc_write_message_f(3, "irc_auth_client", "Already authed.\n");
 		return;
 	}
 
@@ -25,139 +25,139 @@ IRCInterface::auth(const char *nick, const char *user, const char *real,
 	 * nick and the user- and realname. These data can
 	 * be viewed by calling WHOIS.
 	 */
-	send_pass(pass);
-	send_nick(nick);
-	send_user(user, real);
+	irc_send_pass(password);
+	irc_send_nick(nickname);
+	irc_send_user(user_name, real_name);
 }
 
 void
-IRCInterface::auth(void)
+IRCInterface::irc_auth_client(void)
 {
-	auth(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
+	irc_auth_client(_IRCNICK, _IRCUSER, _IRCREAL, _IRCPASS);
 }
 
 /* send final QUIT message to server */
 void
-IRCInterface::send_quit(const char *quitmsg)
+IRCInterface::irc_send_quit(const char *quit_message)
 {
-	send_raw("QUIT :%s", quitmsg);
+	irc_send_message_f("QUIT :%s", quit_message);
 }
 
 /* send PASS when authing user */
 void
-IRCInterface::send_pass(const char *pass)
+IRCInterface::irc_send_pass(const char *password)
 {
-	send_raw("PASS %s", pass);
+	irc_send_message_f("PASS %s", password);
 }
 
 /* send NICK to change user's nickname */
 void
-IRCInterface::send_nick(const char *nick)
+IRCInterface::irc_send_nick(const char *nickname)
 {
-	send_raw("NICK %s", nick);
+	irc_send_message_f("NICK %s", nickname);
 
 // TODO sometime we DO NOT have this nick
 	/* new nick requested? */
-	if(strcmp(_IRCNICK, nick))
-		strlcpy(_IRCNICK, nick, sizeof(_IRCNICK));
+	if(strcmp(_IRCNICK, nickname))
+		strlcpy(_IRCNICK, nickname, sizeof(_IRCNICK));
 }
 
 /* send USER command to authenticate user */
 void
-IRCInterface::send_user(const char *user, const char *real)
+IRCInterface::irc_send_user(const char *user_name, const char *real_name)
 {
-	send_raw("USER %s host serv :%s", user, real);
+	irc_send_message_f("USER %s host serv :%s", user_name, real_name);
 }
 
 /* send JOIN command and join channel ;) */
 void
-IRCInterface::send_join(const char *chan)
+IRCInterface::irc_send_join(const char *channel_name)
 {
-	send_raw("JOIN %s", chan);
+	irc_send_message_f("JOIN %s", channel_name);
 }
 
 /* send PONG back */
 void
-IRCInterface::send_pong(const char *key)
+IRCInterface::irc_send_pong(const char *keyword)
 {
-	send_raw("PONG %s", key);
+	irc_send_message_f("PONG %s", keyword);
 }
 
 /* CTCP replies */
 void
-IRCInterface::send_ctcp_version(const char *recipient,
+IRCInterface::irc_send_ctcp_version(const char *recipient,
 	const char *version)
 {
-	send_ctcp(recipient, "VERSION", version);
+	irc_send_ctcp(recipient, "VERSION", version);
 }
 
 void
-IRCInterface::send_ctcp_clientinfo(const char *recipient,
-	const char *clientinfo)
+IRCInterface::irc_send_ctcp_clientinfo(const char *recipient,
+	const char *client_info)
 {
-	send_ctcp(recipient, "CLIENTINFO", clientinfo);
+	irc_send_ctcp(recipient, "CLIENTINFO", client_info);
 }
 
 void
-IRCInterface::send_ctcp_finger(const char *recipient,
-	const char *finger)
+IRCInterface::irc_send_ctcp_finger(const char *recipient,
+	const char *fingerprint)
 {
-	send_ctcp(recipient, "FINGER", finger);
+	irc_send_ctcp(recipient, "FINGER", fingerprint);
 }
 
 void
-IRCInterface::send_ctcp_source(const char *recipient,
-	const char *source)
+IRCInterface::irc_send_ctcp_source(const char *recipient,
+	const char *source_info)
 {
-	send_ctcp(recipient, "SOURCE", source);
+	irc_send_ctcp(recipient, "SOURCE", source_info);
 }
 
 void
-IRCInterface::send_ctcp_userinfo(const char *recipient,
-	const char *userinfo)
+IRCInterface::irc_send_ctcp_userinfo(const char *recipient,
+	const char *user_info)
 {
-	send_ctcp(recipient, "USERINFO", userinfo);
+	irc_send_ctcp(recipient, "USERINFO", user_info);
 }
 
 void
-IRCInterface::send_ctcp_ping(const char *recipient, const char *ping)
+IRCInterface::irc_send_ctcp_ping(const char *recipient, const char *keyword)
 {
-	send_ctcp(recipient, "PING", ping);
+	irc_send_ctcp(recipient, "PING", keyword);
 }
 
 void
-IRCInterface::send_ctcp_time(const char *recipient, const char *time)
+IRCInterface::irc_send_ctcp_time(const char *recipient, const char *date_time)
 {
-	send_ctcp(recipient, "TIME", time);
+	irc_send_ctcp(recipient, "TIME", date_time);
 }
 
 void
-IRCInterface::send_ctcp_errmsg(const char *recipient,
-	const char *errmsg)
+IRCInterface::irc_send_ctcp_errmsg(const char *recipient,
+	const char *error_message)
 {
-	send_ctcp(recipient, "ERRMSG", errmsg);
+	irc_send_ctcp(recipient, "ERRMSG", error_message);
 }
 
 void
-IRCInterface::send_ctcp(const char *recipient, const char *type,
-	const char *reply)
+IRCInterface::irc_send_ctcp(const char *recipient, const char *request_type,
+	const char *reply_text)
 {
 	char tmp[W_BUFSIZE];
 
-	snprintf(tmp, sizeof(tmp), "\001%s %s\001", type, reply);
-	send_notice(recipient, tmp);
+	snprintf(tmp, sizeof(tmp), "\001%s %s\001", request_type, reply_text);
+	irc_send_notice(recipient, tmp);
 }
 
 /* the NOTICE command */
 void
-IRCInterface::send_notice(const char *recipient, const char *text)
+IRCInterface::irc_send_notice(const char *recipient, const char *text)
 {
-	send_raw("NOTICE %s :%s", recipient, text);
+	irc_send_message_f("NOTICE %s :%s", recipient, text);
 }
 
 /* the PRIVMSG command */
 void
-IRCInterface::send_privmsg(const char *recipient, const char *text)
+IRCInterface::irc_send_privmsg(const char *recipient, const char *text)
 {
 	int l;
 	char *w, *ap;
@@ -174,57 +174,57 @@ IRCInterface::send_privmsg(const char *recipient, const char *text)
 	 * it
 	 */
 	for(ap = w; (ap = strsep(&w, "\n")) != NULL;)
-		send_raw("PRIVMSG %s :%s", recipient, ap);
+		irc_send_message_f("PRIVMSG %s :%s", recipient, ap);
 
 	delete w;
 }
 
 /* TOPIC */
 void
-IRCInterface::send_topic(const char *chan)
+IRCInterface::irc_send_topic(const char *channel_name)
 {
 	/* requesting topic */
-	send_raw("TOPIC %s", chan);
+	irc_send_message_f("TOPIC %s", channel_name);
 }
 
 void
-IRCInterface::send_topic(const char *chan, const char *text)
+IRCInterface::irc_send_topic(const char *channel_name, const char *text)
 {
 	/* sending new topic */
-	send_raw("TOPIC %s :%s", chan, text);
+	irc_send_message_f("TOPIC %s :%s", channel_name, text);
 }
 
 /* PART */
 void
-IRCInterface::send_part(const char *chan)
+IRCInterface::irc_send_part(const char *channel_name)
 {
-	send_raw("PART %s", chan);
+	irc_send_message_f("PART %s", channel_name);
 }
 
 /* WHOIS */
 void
-IRCInterface::send_whois(const char *nick)
+IRCInterface::irc_send_whois(const char *nickname)
 {
-	send_raw("WHOIS %s", nick);
+	irc_send_message_f("WHOIS %s", nickname);
 }
 
 /* AWAY */
 void
-IRCInterface::send_away(void)
+IRCInterface::irc_send_away(void)
 {
-	send_raw("AWAY");
+	irc_send_message_f("AWAY");
 }
 
 void
-IRCInterface::send_away(const char *msg)
+IRCInterface::irc_send_away(const char *away_text)
 {
-	send_raw("AWAY :%s", msg);
+	irc_send_message_f("AWAY :%s", away_text);
 }
 
 /* INVITE */
 void
-IRCInterface::send_invite(const char *nick, const char *chan)
+IRCInterface::irc_send_invite(const char *nickname, const char *channel_name)
 {
-	send_raw("INVITE %s %s", nick, chan);
+	irc_send_message_f("INVITE %s %s", nickname, channel_name);
 }
 

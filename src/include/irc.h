@@ -28,7 +28,6 @@ class IRC : public IRCInterface
         wxString WantedNick;
 
         IRC(wxString, wxString, wxString, wxString, wxString, wxString);
-        ~IRC();
 
         void connect();
 };

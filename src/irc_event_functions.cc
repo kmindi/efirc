@@ -297,7 +297,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 // Fenster auswählen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString version = _T("efirc:") + efirc_version_string + _T(" (") + wxString(wxVERSION_STRING,wxConvUTF8) + _T("):") + wxGetOsDescription();
-                irc->send_ctcp_version(user.mb_str(), version.mb_str());
+                irc->irc_send_ctcp_version(user.mb_str(), version.mb_str());
             }
             else
             {
@@ -325,7 +325,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 // Fenster auswählen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString quelle = _T("http://efirc.sourceforge.net/");
-                irc->send_ctcp_source(user.mb_str(), quelle.mb_str());
+                irc->irc_send_ctcp_source(user.mb_str(), quelle.mb_str());
             }
             else
             {
@@ -353,7 +353,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 // Fenster auswählen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString antwort = _T("VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME");
-                irc->send_ctcp_clientinfo(user.mb_str(), antwort.mb_str());
+                irc->irc_send_ctcp_clientinfo(user.mb_str(), antwort.mb_str());
             }
             else
             {
@@ -389,7 +389,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 wxString timewxString(timestamp, wxConvUTF8);
                 wxString antwort = timewxString;
 
-                irc->send_ctcp_time(user.mb_str(), antwort.mb_str());
+                irc->irc_send_ctcp_time(user.mb_str(), antwort.mb_str());
             }
             else
             {
@@ -492,7 +492,7 @@ void Zentrale::irc_motd(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_endofmotd(const IRC_NACHRICHT *msg_data)
 {
     // den in der Konfigurationsdatei genannten Kanal betreten
-    irc->send_join(config->parsecfgvalue(_T("irc_channel")).mb_str());
+    irc->irc_send_join(config->parsecfgvalue(_T("irc_channel")).mb_str());
 }
 
 // Benutzerliste einlesen
@@ -621,7 +621,7 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
      //statt diesem irc_error aufrufen
 
     irc->WantedNick += _T("_"); // _ an den namen anhaengen
-    irc->send_nick(irc->WantedNick.mb_str());
+    irc->irc_send_nick(irc->WantedNick.mb_str());
 }
 
 // Einladung in einen Raum
@@ -651,7 +651,7 @@ void Zentrale::irc_requestedtopic(const IRC_NACHRICHT *msg_data)
 // Auf Ping mit Pong antworten
 void Zentrale::irc_pong(const IRC_NACHRICHT *msg_data)
 {
-    irc->send_pong(msg_data->params_a[0].mb_str());
+    irc->irc_send_pong(msg_data->params_a[0].mb_str());
 }
 
 // RPL_UNAWAY / 305

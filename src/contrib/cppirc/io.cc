@@ -7,29 +7,29 @@
  ****************************/
 
 int
-IRCInterface::debug(int level, const char *sender, const char *fmt, ...)
+IRCInterface::irc_write_message_f(int debug_level, const char *caller_name, const char *message_format, ...)
 {
 	/* return if level is below wanted level */
-	if(level < _DBGLEVEL)
+	if(debug_level < _DBGLEVEL)
 		return 1;
 
 	int s, l;
 	char lc;
 	char timestamp[9];
-	char *d, *nfmt;
+	char *nfmt;
 	time_t rt;
 	/* struct containing sec, min, hr,... */
 	tm *lt;
 	/* for more on va_* see below */
 	va_list ap;
-	va_start(ap, fmt);
+	va_start(ap, message_format);
 
 	/* get local time */
 	time(&rt);
 	lt = localtime(&rt);
 
 	/* set up level-indicator */
-	switch(level) {
+	switch(debug_level) {
 		case 0:
 			lc = '.';
 		case 1:
@@ -42,26 +42,20 @@ IRCInterface::debug(int level, const char *sender, const char *fmt, ...)
 			lc = '?';
 	}
 
-	/* set up space */
-	l = _DBGSPACE - strlen(sender) + 1;
-
-	if(l < 0)
-		l = 0;
-
-	d = new char[l];
-	/* fill space with spaces :) */
-	memset(d, ' ', l);
-	d[l - 1] = '\0';
-
 	/* set up timestamp (%H:%M:%S) */
 	strftime(timestamp, 9, "%H:%M:%S", lt);
 
-	/* set up logline */
-	l = strlen(d) + strlen(sender) + strlen(fmt) +
+	/*
+	 * Length has to consider the separators `|' and `\t' as well as
+	 * the debug level number. Therefore 4 bytes extra.
+	 */
+	l = strlen(caller_name) + strlen(message_format) +
 		strlen(timestamp) + 4;
-	nfmt = new char[l];
-	snprintf(nfmt, l, "%s|%c|%s%s%s", timestamp, lc,
-	   sender, d, fmt);
+
+	/* remember NUL termination, too */
+	nfmt = new char[++l];
+	snprintf(nfmt, l, "%s|%c|%s\t%s", timestamp, lc,
+	   caller_name, message_format);
 
 	s = vfprintf(_DBGSTR, nfmt, ap);
 
@@ -71,7 +65,6 @@ IRCInterface::debug(int level, const char *sender, const char *fmt, ...)
 	fflush(_DBGSTR);
 
 	delete[] nfmt;
-	delete[] d;
 
 	return s;
 }

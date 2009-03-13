@@ -34,6 +34,7 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 
 	/* yet no */
 	connected = 0;
+	disconnected = 0;
 	reconnecting = 0;
 	connecting = 0;
 	/* be careful! just telling wheter auth() has been called */
@@ -50,7 +51,6 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 	strlcpy(_IRCUSER, user, sizeof(_IRCUSER));
 	strlcpy(_IRCREAL, real, sizeof(_IRCREAL));
 	strlcpy(_IRCPASS, pass, sizeof(_IRCPASS));
-	_DBGSPACE = 15;
 	_DBGLEVEL = log_level;
 	_DBGRECON = 1;
 
@@ -58,7 +58,7 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 	if(_DBGSTR == NULL) {
 		_DBGSTR = stdout;
 
-		debug(3, "IRCInterface", "Couldn't open stream. (%s)\n",
+		irc_write_message_f(3, "IRCInterface", "Couldn't open stream. (%s)\n",
 			strerror(errno));
 	}
 
@@ -66,7 +66,7 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 	err = WSAStartup(wVersionRequested, &wsaData);
 
 	if(err != 0)
-		debug(3, "IRCInterface", "WSAStartup failed. (%d)\n",
+		irc_write_message_f(3, "IRCInterface", "WSAStartup failed. (%d)\n",
 			err);
 	#endif
 }
@@ -76,16 +76,24 @@ IRCInterface::~IRCInterface()
 {
 	/* disconnect from IRC server by sending QUIT */
 	if(connected)
-		disconnect_server("");
+		irc_disconnect_server();
 
 	/* close socket */
 	#ifdef WIN32
-	shutdown(sock, 2);
+	if(shutdown(sock, 2) == SOCKET_ERROR)
+		irc_write_message_f(3, "~IRCInterface", "Couldn't close"
+			" socket. (%s)\n", WSAGetLastError());
 
 	WSACleanup();
 	#else
-	close(sock);
+	if(close(sock) == -1)
+		irc_write_message_f(3, "~IRCInterface", "Couldn't close"
+			" socket. (%s)\n", strerror(errno));
 	#endif
+
+	if(fclose(_DBGSTR) == -1)
+		irc_write_message_f(3, "~IRCInterface", "Couldn't close"
+			" stream. (%s)\n", strerror(errno));
 }
 
 /*
@@ -95,8 +103,8 @@ IRCInterface::~IRCInterface()
  * function : function to be called
  */
 void
-IRCInterface::add_cmd(const char *buf,
-	int (IRCInterface::*function)(const char *buf))
+IRCInterface::irc_add_command_queue_entry(int (IRCInterface::*function)(const char *),
+	const char *function_parameter)
 {
 	/* buffer legnth */
 	int l;
@@ -107,13 +115,13 @@ IRCInterface::add_cmd(const char *buf,
 	/* struct with command and arguments */
 	ntp = new irc_queue_cmd;
 
-	l = strlen(buf) + 1;
+	l = strlen(function_parameter) + 1;
 
 	/* new command on top */
 	ntp->function = function;
 	ntp->buf = new char[l];
 	/* should be string + \0 */
-	strlcpy(ntp->buf, buf, l);
+	strlcpy(ntp->buf, function_parameter, l);
 	ntp->next = NULL;
 
 	/* new top/bottom */
@@ -126,8 +134,8 @@ IRCInterface::add_cmd(const char *buf,
 	}
 
 	/* print notice (command and args) */
-	debug(1, "add_cmd", "New command in queue."
-		"(%i, %s, %i)\n", cmds, buf, function);
+	irc_write_message_f(1, "irc_add_command_queue_entry", "New command in queue."
+		"(%i, %s, %i)\n", cmds, function_parameter, function);
 
 	/* one more */
 	cmds++;
@@ -135,14 +143,14 @@ IRCInterface::add_cmd(const char *buf,
 
 /* remove current command from queue */
 void
-IRCInterface::del_cmd(void)
+IRCInterface::irc_delete_command_queue_entry(void)
 {
 	char *buf;
 	int (IRCInterface::*function)(const char *buf);
 	/* NEW botton item */
 	irc_queue_cmd *nbp;
 
-	debug(0, "del_cmd", "Removing command.\n");
+	irc_write_message_f(0, "irc_delete_command_queue_entry", "Removing command.\n");
 
 	/*
 	 * DOES command exist? (already checked when called by
@@ -153,7 +161,7 @@ IRCInterface::del_cmd(void)
 		buf = cbp->buf;
 		function = cbp->function;
 
-		debug(1, "del_cmd", "Will be removed. (%s, %i)\n",
+		irc_write_message_f(1, "irc_delete_command_queue_entry", "Will be removed. (%s, %i)\n",
 			buf, function);
 
 		/* NOW removing command in queue (1.) */
@@ -167,20 +175,20 @@ IRCInterface::del_cmd(void)
 		cmds--;
 	} else
 		/* no match found */
-		debug(1, "del_cmd", "No more commands in"
+		irc_write_message_f(1, "irc_delete_command_queue_entry", "No more commands in"
 			" queue.\n");
 }
 
 /* call current command in queue */
 void
-IRCInterface::call_cmd(void)
+IRCInterface::irc_call_command_queue_entries(void)
 {
 	int (IRCInterface::*function)(const char *buf), s;
 	const char *buf;
 
-	debug(0, "call_cmd", "Calling commands.\n");
+	irc_write_message_f(0, "irc_call_command_queue_entry", "Calling commands.\n");
 
-	while(1) {
+	while(!disconnected || cmds > 0) {
 		/* any commands left in queue? */
 		if(cmds > 0) {
 			buf = cbp->buf;
@@ -194,22 +202,22 @@ IRCInterface::call_cmd(void)
 			 * the queue
 			 */
 			if(s > -1) {
-				debug(1, "call_cmd", "Called."
+				irc_write_message_f(1, "irc_call_command_queue_entry", "Called."
 					" (%s, %i)\n", buf, function);
 
-				del_cmd();
+				irc_delete_command_queue_entry();
 			} else { /* trying reconnect */
 				if(!_DBGRECON) {
-					debug(3, "call_cmd",
+					irc_write_message_f(3, "irc_call_command_queue_entry",
 						"Reconnecting"
 						" disabled.\n");
 					break;
 				}
 
-				debug(3, "call_cmd", "Requesting"
+				irc_write_message_f(3, "irc_call_command_queue_entry", "Requesting"
 					" reconnect.\n");
 
-				reconnect();
+				irc_reconnect_server();
 			}
 		}
 
@@ -230,7 +238,7 @@ IRCInterface::call_cmd(void)
  *            arrives
  */
 void
-IRCInterface::add_link(const char *cmd,
+IRCInterface::irc_add_link_queue_entry(const char *irc_command,
 	void (*function)(const irc_msg_data *, void *))
 {
 	/* command length */
@@ -241,11 +249,11 @@ IRCInterface::add_link(const char *cmd,
 
 	ntp = new struct irc_act_link;
 
-	l = strlen(cmd) + 1;
+	l = strlen(irc_command) + 1;
 
 	ntp->function = function;
 	ntp->cmd = new char[l];
-	strlcpy(ntp->cmd, cmd, l);
+	strlcpy(ntp->cmd, irc_command, l);
 	ntp->next = NULL;
 
 	/* pointer to bottom/top */
@@ -258,8 +266,8 @@ IRCInterface::add_link(const char *cmd,
 	}
 
 	/* maybe some debugging needed...this time we trust you */
-	debug(1, "add_link", "New link added. (%i, %s, %i)\n",
-		links, cmd, function);
+	irc_write_message_f(1, "irc_add_link_queue_entry", "New link added. (%i, %s, %i)\n",
+		links, irc_command, function);
 
 	/* one more link */
 	links++;
@@ -267,15 +275,15 @@ IRCInterface::add_link(const char *cmd,
 
 /* unlink */
 void
-IRCInterface::del_link(const char *cmd,
+IRCInterface::irc_delete_link_queue_entry(const char *irc_command,
 	void (*function)(const irc_msg_data *, void *))
 {
 	irc_act_link *cp;
 	irc_act_link *pp;
 	irc_act_link *np;
 
-	debug(0, "del_link", "Deleting link. (%s, %i)\n",
-		cmd, function);
+	irc_write_message_f(0, "irc_delete_link_queue_entry", "Deleting link. (%s, %i)\n",
+		irc_command, function);
 
 	/* start at botton, let pp not be uninitialized */
 	cp = abp;
@@ -283,10 +291,10 @@ IRCInterface::del_link(const char *cmd,
 // TODO there may be more than one matching link (see also act_link()
 	/* link will be removed, but first search for it */
 	while(cp != NULL) {
-		if(!strcmp(cp->cmd, cmd) && cp->function == function) {
+		if(!strcmp(cp->cmd, irc_command) && cp->function == function) {
 			np = cp->next;
 
-			debug(1, "del_link", "Will be deleted.\n");
+			irc_write_message_f(1, "irc_delete_link_queue_entry", "Will be deleted.\n");
 
 			delete cp->cmd;
 			delete cp;
@@ -309,18 +317,18 @@ IRCInterface::del_link(const char *cmd,
 	}
 
 	/* no match found */
-	debug(3, "del_link", "No such link.\n");
+	irc_write_message_f(3, "irc_delete_link_queue_entry", "No such link.\n");
 }
 
 /* call function for event */
 void
-IRCInterface::act_link(const irc_msg_data *msg_data)
+IRCInterface::irc_call_link_queue_entry(const irc_msg_data *irc_message_data)
 {
 	int s;
 	irc_act_link *cp;
 
-	debug(0, "act_link", "Activating link. (%s)\n",
-		msg_data->cmd);
+	irc_write_message_f(0, "irc_call_link_queue_entry", "Activating link. (%s)\n",
+		irc_message_data->cmd);
 
 	/* no matching function found yet */
 	s = 0;
@@ -329,16 +337,16 @@ IRCInterface::act_link(const irc_msg_data *msg_data)
 
 	while(cp != NULL) {
 		/* found match? - act link */
-		if(!strcmp(cp->cmd, msg_data->cmd)) {
+		if(!strcmp(cp->cmd, irc_message_data->cmd)) {
 			s = 1;
 
 			/*
 			 * call function with specified parameters, such
 			 * as pointer to us
 			 */
-			cp->function(msg_data, this);
+			cp->function(irc_message_data, this);
 
-			debug(1, "act_link", "Activated. (%i)\n",
+			irc_write_message_f(1, "irc_call_link_queue_entry", "Activated. (%i)\n",
 				cp->function);
 		}
 
@@ -348,18 +356,18 @@ IRCInterface::act_link(const irc_msg_data *msg_data)
 
 	if(s == 0 && default_link_function != NULL)
 	{
-		default_link_function(msg_data, this);
+		default_link_function(irc_message_data, this);
 
-		debug(1, "act_link", "Activated default. (%i)\n",
+		irc_write_message_f(1, "irc_call_link_queue_entry", "Activated default. (%i)\n",
 			default_link_function);
 	}
 
 	/* carefully */
-	debug(1, "act_link", "No (more?) links.\n");
+	irc_write_message_f(1, "irc_call_link_queue_entry", "No (more?) links.\n");
 }
 
 void
-IRCInterface::set_default_link_function(void (*function)(
+IRCInterface::irc_set_default_link_function(void (*function)(
 const irc_msg_data *, void *))
 {
 	default_link_function = function;
@@ -367,16 +375,16 @@ const irc_msg_data *, void *))
 
 /* cut IRC reply */
 char *
-IRCInterface::parse(char *msg)
+IRCInterface::irc_parse_server_message(const char *server_message)
 {
 	/* substring */
 	char *sstr;
 	/* working with it */
 	char *wstr;
 
-	wstr = (char *)msg;
+	wstr = (char *)server_message;
 
-	debug(0, "parse", "Splitting reply into messages.\n");
+	irc_write_message_f(0, "irc_parse_server_message", "Splitting reply into messages.\n");
 
 	do {
 		/* the raw message may needs to be split up */
@@ -390,15 +398,15 @@ IRCInterface::parse(char *msg)
 			 */
 			*sstr = '\0';
 
-			debug(1, "parse", "Found relevant"
+			irc_write_message_f(1, "irc_parse_server_message", "Found relevant"
 				" messagepart.\n");
 
-			parse_msg(wstr);
+			irc_parse_irc_message(wstr);
 
 			/* increment pointer for another search */
 			wstr = sstr + 2;
 		} else
-			debug(1, "parse", "No (further?) relevant"
+			irc_write_message_f(1, "irc_parse_server_message", "No (further?) relevant"
 				" messagepart.\n");
 	} while(sstr != NULL);
 
@@ -408,7 +416,7 @@ IRCInterface::parse(char *msg)
 
 /* parse IRC reply */
 void
-IRCInterface::parse_msg(char *msg)
+IRCInterface::irc_parse_irc_message(char *irc_message)
 {
 	int i;
 	size_t l;
@@ -417,35 +425,35 @@ IRCInterface::parse_msg(char *msg)
 	/* struct containing sender, command and parameters */
 	irc_msg_data *msg_data = new irc_msg_data;
 
-	w = (char *)msg;
+	w = (char *)irc_message;
 
-	debug(3, "parse_msg", "Parsing message. (%s)\n", msg);
+	irc_write_message_f(3, "irc_parse_irc_message", "Parsing message. (%s)\n", irc_message);
 
 	if(*w == ':') {
-		debug(1, "parse_msg", "Is server or user"
+		irc_write_message_f(1, "irc_parse_irc_message", "Is server or user"
 			" command.\n");
 
 		w++;
 
-		cpsub(&msg_data->sender, &w, ' ');
+		strsub(&msg_data->sender, &w, ' ');
 
-		debug(1, "parse_msg", "Sender is: %s\n",
+		irc_write_message_f(1, "irc_parse_irc_message", "Sender is: %s\n",
 			msg_data->sender);
 
-		cpsub(&msg_data->cmd, &w, ' ');
+		strsub(&msg_data->cmd, &w, ' ');
 
-		debug(1, "parse_msg", "Command is: %s\n",
+		irc_write_message_f(1, "irc_parse_irc_message", "Command is: %s\n",
 			msg_data->cmd);
 
-		cpsub(&msg_data->params, &w, '\0');
+		strsub(&msg_data->params, &w, '\0');
 
-		debug(1, "parse_msg", "Parameters are: %s\n",
+		irc_write_message_f(1, "irc_parse_irc_message", "Parameters are: %s\n",
 			msg_data->params);
 
-		debug(1, "parse_msg", "Parsing sender.\n");
+		irc_write_message_f(1, "irc_parse_irc_message", "Parsing sender.\n");
 
 		w = msg_data->sender;
-		cpsub(&msg_data->nick, &w, '!');
+		strsub(&msg_data->nick, &w, '!');
 		if(w == NULL) { /* is server command */
 			msg_data->user = new char[1];
 			msg_data->host = new char[1];
@@ -453,38 +461,38 @@ IRCInterface::parse_msg(char *msg)
 			*msg_data->user = '\0';
 			*msg_data->host = '\0';
 
-			debug(1, "parse_msg", "Server is: %s\n",
+			irc_write_message_f(1, "irc_parse_irc_message", "Server is: %s\n",
 				msg_data->sender);
 		} else {
-			debug(1, "parse_msg", "Nickname is: %s\n",
+			irc_write_message_f(1, "irc_parse_irc_message", "Nickname is: %s\n",
 				msg_data->nick);
 
-			cpsub(&msg_data->user, &w, '@');
+			strsub(&msg_data->user, &w, '@');
 
-			debug(1, "parse_msg", "Username is: %s\n",
+			irc_write_message_f(1, "irc_parse_irc_message", "Username is: %s\n",
 				msg_data->user);
 
-			cpsub(&msg_data->host, &w, '\0');
+			strsub(&msg_data->host, &w, '\0');
 
-			debug(1, "parse_msg", "Hostname is: %s\n",
+			irc_write_message_f(1, "irc_parse_irc_message", "Hostname is: %s\n",
 				msg_data->host);
 		}
 	} else {
-		debug(1, "parse_msg", "Is server message.\n");
+		irc_write_message_f(1, "irc_parse_irc_message", "Is server message.\n");
 
 // TODO server we're really connected to
 		l = strlen("SERVER") + 1;
 		msg_data->sender = new char[l];
 		strlcpy(msg_data->sender, "SERVER", l);
 
-		cpsub(&msg_data->cmd, &w, ' ');
+		strsub(&msg_data->cmd, &w, ' ');
 
-		debug(1, "parse_msg", "Command is: %s\n",
+		irc_write_message_f(1, "irc_parse_irc_message", "Command is: %s\n",
 			msg_data->cmd);
 
-		cpsub(&msg_data->params, &w, '\0');
+		strsub(&msg_data->params, &w, '\0');
 
-		debug(1, "parse_msg", "Parameters are: %s\n",
+		irc_write_message_f(1, "irc_parse_irc_message", "Parameters are: %s\n",
 			msg_data->params);
 
 		msg_data->host = new char[1];
@@ -500,7 +508,7 @@ IRCInterface::parse_msg(char *msg)
 	msg_data->params_i = 0;
 	w = msg_data->params;
 
-	debug(1, "parse_msg", "Parsing parameters."
+	irc_write_message_f(1, "irc_parse_irc_message", "Parsing parameters."
 		" (%s)\n", msg_data->params);
 
 	/* get the number of parameters not containing text */
@@ -542,7 +550,7 @@ IRCInterface::parse_msg(char *msg)
 			if(*--w == '\0') *w = ' ';
 
 	/* pass msg data and call event matching functions */
-	act_link(msg_data);
+	irc_call_link_queue_entry(msg_data);
 
 	/* free allocated mem */
 	delete[] msg_data->sender;
@@ -555,28 +563,5 @@ IRCInterface::parse_msg(char *msg)
 	delete[] msg_data->nick;
 	delete[] msg_data->user;
 	delete msg_data;
-}
-
-void
-IRCInterface::cpsub(char **dst, char **src, char sep)
-{
-	int l;
-	char *t;
-	char delim[2];
-
-	snprintf(delim, sizeof(delim), "%c", sep);
-
-	t = strsep(src, delim);
-
-	if((*src != NULL || sep == '\0') && t != NULL) {
-		l = strlen(t) + 1;
-		*dst = new char[l];
-		strlcpy(*dst, t, l);
-
-		if(sep != '\0') *(--*src)++ = sep;
-	} else {
-		*dst = new char[1];
-		**dst = '\0';
-	}
 }
 

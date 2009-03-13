@@ -8,14 +8,14 @@
 
 /* connect server:port */
 void
-IRCInterface::connect_server(unsigned int port, const char *server)
+IRCInterface::irc_connect_server(const char *server_hostname, unsigned int server_port)
 {
 	/* dont connect if already connected */
 	if(connected) {
-		debug(3, "connect_server", "Already connected.\n");
+		irc_write_message_f(3, "irc_connect_server", "Already connected.\n");
 		return;
 	} else if(connecting) {
-		debug(3, "connect_server", "Already connecting.\n");
+		irc_write_message_f(3, "irc_connect_server", "Already connecting.\n");
 		return;
 	}
 
@@ -39,7 +39,7 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 	close(sock);
 	#endif
 
-	debug(0, "connect_server", "Creating socket."
+	irc_write_message_f(0, "irc_connect_server", "Creating socket."
 		" (IPv4, Stream Socket)\n");
 
 	/*
@@ -61,7 +61,7 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 	 */
 	if(sock > -1)
 		/* socket created successfully */
-		debug(1, "connect_server", "Created socket."
+		irc_write_message_f(1, "irc_connect_server", "Created socket."
 			" (%i)\n", sock);
 	else {
 		/*
@@ -69,10 +69,10 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 		 * printed and the function exits with 1.
 		 */
 		#ifdef WIN32
-		debug(3, "connect_server", "Couldn't create"
+		irc_write_message_f(3, "irc_connect_server", "Couldn't create"
 			" socket. (%d)\n", WSAGetLastError());
 		#else
-		debug(3, "connect_server", "Couldn't create"
+		irc_write_message_f(3, "irc_connect_server", "Couldn't create"
 			" socket. (%s)\n", strerror(errno));
 		#endif
 
@@ -91,25 +91,25 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 	 * htons() converts peer's 16bit port number to network byte
 	 * order
 	 */
-	addr.sin_port = htons(port);
+	addr.sin_port = htons(server_port);
 
 	/*
 	 * server is our peer's hostname and gethostnyname() returns a
 	 * pointer to an object describing the host by name or address.
 	 */
-	host = gethostbyname(server);
+	host = gethostbyname(server_hostname);
 
 	/* check getaddr status */
 	if(host != NULL)
 		/* got response */
-		debug(1, "connect_server", "Got address.\n");
+		irc_write_message_f(1, "irc_connect_server", "Got address.\n");
 	else {
 		/* an error ocurred */
 		#ifdef WIN32
-		debug(3, "connect_server", "Failure while"
+		irc_write_message_f(3, "irc_connect_server", "Failure while"
 			" resolving host. (%d)\n", WSAGetLastError());
 		#else
-		debug(3, "connect_server", "Failure while"
+		irc_write_message_f(3, "irc_connect_server", "Failure while"
 			" resolving host. (%s)\n", hstrerror(h_errno));
 		#endif
 
@@ -122,9 +122,9 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 	memcpy(&addr.sin_addr.s_addr, host->h_addr_list[0],
 	   host->h_length);
 
-	debug(0, "connect_server", "Connecting server."
+	irc_write_message_f(0, "irc_connect_server", "Connecting server."
 		" [%s (%s):%i]\n", inet_ntoa(addr.sin_addr),
-		host->h_name, port);
+		host->h_name, server_port);
 
 	/*
 	 * connect() initiates a connection on a socket. It attempts to
@@ -139,15 +139,15 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 	/* same as above but only 0 on success */
 	if(s == 0)
 		/* connection attempt has been successfull */
-		debug(1, "connect_server", "Connected to"
+		irc_write_message_f(1, "irc_connect_server", "Connected to"
 			" server.\n");
 	else {
 		/* the attempt hasn't been successfull */
 		#ifdef WIN32
-		debug(3, "connect_server", "Couldn't connect to"
+		irc_write_message_f(3, "irc_connect_server", "Couldn't connect to"
 			" server. (%d)\n", WSAGetLastError());
 		#else
-		debug(3, "connect_server", "Couldn't connect to"
+		irc_write_message_f(3, "irc_connect_server", "Couldn't connect to"
 			" server. (%s)\n", strerror(errno));
 		#endif
 
@@ -162,14 +162,14 @@ IRCInterface::connect_server(unsigned int port, const char *server)
 }
 
 void
-IRCInterface::connect_server(void)
+IRCInterface::irc_connect_server(void)
 {
-	connect_server(_IRCPORT, _IRCSERV);
+	irc_connect_server(_IRCSERV, _IRCPORT);
 }
 
 /* recveive messages from IRC server */
 void
-IRCInterface::recv_raw(void)
+IRCInterface::irc_receive_messages(void)
 {
 	size_t ol, l;
 
@@ -190,19 +190,19 @@ IRCInterface::recv_raw(void)
 	o = new char[1];
 	*o = '\0';
 
-	debug(0, "recv_raw", "Receiving raw messages.\n");
+	irc_write_message_f(0, "irc_receive_messages", "Receiving raw messages.\n");
 
-	while(1) {
+	while(!disconnected) {
 		/* initialise buffer with NULs */
 		memset(buf, '\0', sizeof(buf));
 
 		/* receive message from the server connected to */
-		bl = sock_recv(buf, sizeof(buf));
+		bl = irc_receive_message(buf, sizeof(buf));
 
 		/* has server gone away? are we disconnected? */
 		if(bl > 0) {
 			/* received message, tell length and parse */
-			debug(1, "recv_raw", "Received message."
+			irc_write_message_f(1, "irc_receive_messages", "Received message."
 				" [%s (%i)]\n", "...", bl);
 
 			ol = strlen(o);
@@ -222,7 +222,7 @@ IRCInterface::recv_raw(void)
 				strlcpy(n, buf, l);
 
 			/* (cut and) parse message(s) */
-			c = parse(n);
+			c = irc_parse_server_message(n);
 
 			delete[] o;
 
@@ -234,22 +234,22 @@ IRCInterface::recv_raw(void)
 			delete[] n;
 		} else {
 			if(!_DBGRECON) {
-				debug(3, "recv_raw", "Reconnecting"
+				irc_write_message_f(3, "irc_receive_messages", "Reconnecting"
 					" disabled.\n");
 				break;
 			}
 
-			debug(3, "recv_raw", "Requesting reconnect.\n");
+			irc_write_message_f(3, "irc_receive_messages", "Requesting reconnect.\n");
 
 			/* disconnected...reconnect ;) */
-			reconnect();
+			irc_reconnect_server();
 		}
 	}
 }
 
 /* send raw message */
 void
-IRCInterface::send_raw(const char *fmt, ...)
+IRCInterface::irc_send_message_f(const char *message_format, ...)
 {
 	char tmp[W_BUFSIZE];
 // TODO len check
@@ -272,12 +272,12 @@ IRCInterface::send_raw(const char *fmt, ...)
 	 * fmt - last argument before the
 	 *       variable argument list
 	 */
-	va_start(ap, fmt);
+	va_start(ap, message_format);
 
-	vsnprintf(tmp, sizeof(tmp), fmt, ap);
+	vsnprintf(tmp, sizeof(tmp), message_format, ap);
 
 	/* add to queue */
-	add_cmd(tmp, &IRCInterface::sock_send);
+	irc_add_command_queue_entry(&IRCInterface::irc_send_message, tmp);
 
 	/*
 	 * normal return from the function
@@ -288,7 +288,7 @@ IRCInterface::send_raw(const char *fmt, ...)
 }
 
 int
-IRCInterface::sock_send(const char *buf)
+IRCInterface::irc_send_message(const char *message)
 {
 	size_t l;
 
@@ -303,19 +303,19 @@ IRCInterface::sock_send(const char *buf)
 	char tmp[W_BUFSIZE];
 
 	/* length of string to send */
-	l = strlen(buf) + 2;
+	l = strlen(message) + 2;
 
-	debug(2, "sock_send", "Sending message. (%s)\n", buf);
+	irc_write_message_f(2, "irc_send_message", "Sending message. (%s)\n", message);
 
 	/* we have a size maximum in the IRC proto */
 	if(l <= sizeof(tmp)) {
-		debug(1, "sock_send", "Message size ok."
+		irc_write_message_f(1, "irc_send_message", "Message size ok."
 			" (%i/%i)\n", l, sizeof(tmp));
 
 		/* actual message, cat \r\n */
-		snprintf(tmp, sizeof(tmp), "%s\r\n", buf);
+		snprintf(tmp, sizeof(tmp), "%s\r\n", message);
 	} else {
-		debug(3, "sock_send", "Message too long."
+		irc_write_message_f(3, "irc_send_message", "Message too long."
 			" (%i/%i)\n", l, sizeof(tmp));
 
 		return -1;
@@ -337,14 +337,14 @@ IRCInterface::sock_send(const char *buf)
 
 	/* check status and return send's return value */
 	if(bl > -1)
-		debug(1, "sock_send", "Sent raw data."
+		irc_write_message_f(1, "irc_send_message", "Sent raw data."
 			" (%i)\n", bl);
 	else
 		#ifdef WIN32
-		debug(3, "sock_send", "Couldn't send raw data."
+		irc_write_message_f(3, "irc_send_message", "Couldn't send raw data."
 			" (%d)\n", WSAGetLastError());
 		#else
-		debug(3, "sock_send", "Couldn't send raw data."
+		irc_write_message_f(3, "irc_send_message", "Couldn't send raw data."
 			" (%s)\n", strerror(errno));
 		#endif
 
@@ -352,7 +352,7 @@ IRCInterface::sock_send(const char *buf)
 }
 
 int
-IRCInterface::sock_recv(char *buf, size_t len)
+IRCInterface::irc_receive_message(char *buf, size_t len)
 {
 	/*
 	 * recv(2) return values
@@ -373,14 +373,14 @@ IRCInterface::sock_recv(char *buf, size_t len)
 	bl = recv(sock, buf, len, 0);
 
 	if(bl > -1)
-		debug(1, "sock_recv", "Received raw data."
+		irc_write_message_f(1, "irc_receive_message", "Received raw data."
 			" (%i)\n", bl);
 	else
 		#ifdef WIN32
-		debug(3, "sock_send", "Couldn't receive raw data."
+		irc_write_message_f(3, "irc_receive_message", "Couldn't receive raw data."
 			" (%d)\n", WSAGetLastError());
 		#else
-		debug(3, "sock_recv", "Couldn't receive raw data."
+		irc_write_message_f(3, "irc_receive_message", "Couldn't receive raw data."
 			" (%s)\n", strerror(errno));
 		#endif
 
@@ -388,37 +388,51 @@ IRCInterface::sock_recv(char *buf, size_t len)
 }
 
 void
-IRCInterface::disconnect_server(const char *quit_msg)
+IRCInterface::irc_disconnect_server(const char *quit_message)
 {
 	/* do not reconnect () */
 	_DBGRECON = 0;
 
-	debug(1, "disconnect_server", "Disconnecting.\n");
+	irc_write_message_f(1, "irc_disconnect_server", "Disconnecting.\n");
 
 	/* tell IRC server we're disconnecting */
-	send_quit(quit_msg);
+	irc_send_quit(quit_message);
 
 	/* reset connection state */
 	connected = 0;
+	disconnected = 1;
 }
 
 void
-IRCInterface::reconnect(void)
+IRCInterface::irc_disconnect_server(void)
+{
+	irc_disconnect_server("");
+}
+
+void
+IRCInterface::irc_reconnect_server(void)
 {
 	/* when someone's connecting wait */
 	if(connecting || reconnecting) {
 		if(connecting)
-			debug(3, "reconnect", "Already connecting.\n");
+			irc_write_message_f(3, "irc_reconnect_server", "Already connecting.\n");
 		else if(reconnecting)
-			debug(3, "reconnect", "Already"
+			irc_write_message_f(3, "irc_reconnect_server", "Already"
 				" reconnecting.\n");
 
 		while(connecting || reconnecting) { /* ... */ }
 
 		return;
 	}
+	else if(disconnected)
+	{
+		irc_write_message_f(3, "irc_reconnect_server", "Already"
+			" disconnected.\n");
 
-	debug(3, "reconnect", "Trying reconnect. (%i)\n", sleep_time);
+		return;
+	}
+
+	irc_write_message_f(3, "irc_reconnect_server", "Trying reconnect. (%i)\n", sleep_time);
 
 	reconnecting = 1;
 
@@ -431,15 +445,15 @@ IRCInterface::reconnect(void)
 
 	/* removing all */
 	while(cmds > 0)
-		del_cmd();
+		irc_delete_command_queue_entry();
 
 	/* assuming we're no more connected (new auth) */
 	connected = 0;
 	authed = 0;
 
 	/* reconnect using default values */
-	connect_server();
-	auth();
+	irc_connect_server();
+	irc_auth_client();
 
 	/* increment sleep time if connect failed */
 	if(!connected)

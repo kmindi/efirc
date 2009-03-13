@@ -1,5 +1,6 @@
 #include <ircinterface.h>
 #include <pthread.h>
+#include <signal.h>
 
 /* create an ircsocket - our interface for the irc protocol */
 IRCInterface ircsocket(6667, "chat.freenode.net", "efirc-dev101",
@@ -8,65 +9,73 @@ IRCInterface ircsocket(6667, "chat.freenode.net", "efirc-dev101",
 //	"efirc-dev101", "efirc-dev101", "pass",
 //	fopen("cppirc.log", "w"));
 
+pthread_t ti;
+
 void*
 listen(void* arg)
 {
-	ircsocket.recv_raw();
+	ircsocket.irc_receive_messages();
 
 	return 0;
 }
 
 void
-check(const irc_msg_data *msg_data, void *irc_socket)
+check(const irc_msg_data *irc_message_data, void *irc_socket)
 {
 	IRCInterface *irc = (IRCInterface *)irc_socket;
 
-	//printf("%s\n", msg_data->params);
-	irc->send_privmsg("#efirc", msg_data->params);
+	//printf("%s\n", irc_message_data->params);
+	irc->irc_send_privmsg("#efirc", irc_message_data->params);
 }
 
 void
-pong(const irc_msg_data *msg_data, void *irc_socket)
+pong(const irc_msg_data *irc_message_data, void *irc_socket)
 {
 	IRCInterface *irc = (IRCInterface *)irc_socket;
 
-	printf("%s\n", msg_data->params);
-	//irc->send_privmsg("#efirc", msg_data->params);
-	irc->send_pong(msg_data->params);
+	printf("%s\n", irc_message_data->params);
+	//irc->irc_send_privmsg("#efirc", irc_message_data->params);
+	irc->irc_send_pong(irc_message_data->params);
 }
 
 void
-print(const irc_msg_data *msg_data, void *irc_socket)
+print(const irc_msg_data *irc_message_data, void *irc_socket)
 {
-	printf("%s %s %s\n", msg_data->sender, msg_data->cmd,
-		msg_data->params);
+	printf("%s %s %s\n", irc_message_data->sender, irc_message_data->cmd,
+		irc_message_data->params);
+}
+
+void
+disconnect(int)
+{
+	ircsocket.irc_disconnect_server();
 }
 
 int
 main(int argc, const char* argv[])
 {
-	pthread_t ti;
+	signal(SIGINT, &disconnect);
 
-	ircsocket.connect_server();
-	ircsocket.auth();
+	ircsocket.irc_connect_server();
+	ircsocket.irc_auth_client();
 
 	/* MAIN!!!1einself11! */
 	pthread_create(&ti, NULL, &listen, NULL);
 
 	/* some client features examples
-	ircsocket.add_link("PRIVMSG", &check);
-	ircsocket.add_link("332", &check);
-	ircsocket.add_link("353", &check);
-	ircsocket.add_link("NICK", &check);
-	ircsocket.add_link("PING", &pong); */
+	ircsocket.irc_add_link_queue_entry("PRIVMSG", &check);
+	ircsocket.irc_add_link_queue_entry("332", &check);
+	ircsocket.irc_add_link_queue_entry("353", &check);
+	ircsocket.irc_add_link_queue_entry("NICK", &check);
+	ircsocket.irc_add_link_queue_entry("PING", &pong); */
 
 	/* connect to a server
-	ircsocket.send_join("#efirc");
-	ircsocket.send_privmsg("#efirc", "hi"); */
+	ircsocket.irc_send_join("#efirc");
+	ircsocket.irc_send_privmsg("#efirc", "hi"); */
 
-	//ircsocket.set_default_link_function(&print);
+	//ircsocket.irc_set_default_link_function(&print);
 
-	ircsocket.call_cmd();
+	ircsocket.irc_call_command_queue_entries();
 	pthread_join(ti, NULL);
 
 	return 0;

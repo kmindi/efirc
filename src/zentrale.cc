@@ -300,7 +300,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             quitmessage = befehl_parameter;
         }
 
-        irc->disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
+        irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
 
         // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
         #if defined linux || defined __unix__
@@ -322,7 +322,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
     else if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
     {
-        irc->send_join(befehl_parameter.mb_str());
+        irc->irc_send_join(befehl_parameter.mb_str());
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
 
@@ -330,17 +330,17 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->send_part(fenstername[fensternummer].mb_str());
+            irc->irc_send_part(fenstername[fensternummer].mb_str());
         }
         else
         {
-            irc->send_part(befehl_parameter.mb_str());
+            irc->irc_send_part(befehl_parameter.mb_str());
         }
     }
 
     else if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
     {
-            irc->send_nick(befehl_parameter.mb_str()); // Nickname senden
+            irc->irc_send_nick(befehl_parameter.mb_str()); // Nickname senden
             irc->WantedNick = befehl_parameter;
             // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
     }
@@ -355,14 +355,14 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
             raum = fenstername[fensternummer];
         }
 
-        wxGetApp().irc->send_invite(nickname.mb_str(), raum.mb_str());
+        wxGetApp().irc->irc_send_invite(nickname.mb_str(), raum.mb_str());
     }
 
     else if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
     {
         // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
         wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
-        irc->send_privmsg(fenstername[fensternummer].mb_str(), me_text.mb_str());
+        irc->irc_send_privmsg(fenstername[fensternummer].mb_str(), me_text.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
     }
 
@@ -370,11 +370,11 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->send_topic(fenstername[fensternummer].mb_str());
+            irc->irc_send_topic(fenstername[fensternummer].mb_str());
         }
         else
         {
-            irc->send_topic(fenstername[fensternummer].mb_str(),befehl_parameter.mb_str());
+            irc->irc_send_topic(fenstername[fensternummer].mb_str(),befehl_parameter.mb_str());
         }
     }
 
@@ -383,7 +383,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
 
-        irc->send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
+        irc->irc_send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
     }
 
@@ -391,11 +391,11 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->send_away();
+            irc->irc_send_away();
         }
         else
         {
-            irc->send_away(befehl_parameter.mb_str());
+            irc->irc_send_away(befehl_parameter.mb_str());
             zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
         }
     }
@@ -405,14 +405,14 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
 
-        irc->send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
+        irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
 
         zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
     }
 
     else if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
     {
-        irc->send_whois(befehl_parameter.mb_str());
+        irc->irc_send_whois(befehl_parameter.mb_str());
     }
 
     // sonstige Befehle
@@ -439,7 +439,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
 void Zentrale::NachrichtSenden(int fensternummer, wxString nachricht)
 {
-    irc->send_privmsg(fenstername[fensternummer].mb_str(), nachricht.mb_str());
+    irc->irc_send_privmsg(fenstername[fensternummer].mb_str(), nachricht.mb_str());
     // Nachricht im Textfenster anzeigen
     // UNICODE?
     //AKTUELLER NICKNAME?
@@ -471,7 +471,7 @@ void irc_allgemein(const irc_msg_data *msg_data, void *cp);
 void Zentrale::connect_thread()
 {
     
-    irc->set_default_link_function(&irc_allgemein);
+    irc->irc_set_default_link_function(&irc_allgemein);
     
     irc->connect();
 
@@ -485,17 +485,17 @@ void Zentrale::connect_thread()
 // Thread-Funktion fuer recv_raw-Schleife
 void Zentrale::recv_thread()
 {
-    irc->recv_raw();
+    irc->irc_receive_messages();
 }
 
 // Thread-Funkton fuer Abarbeitung der Befehlsschlange
 void Zentrale::call_thread()
 {
-    irc->call_cmd();
+    irc->irc_call_command_queue_entries();
 }
 
 int Zentrale::OnExit()
 {
     wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
-    irc->disconnect_server(quitmessage.mb_str());
+    irc->irc_disconnect_server(quitmessage.mb_str());
 }
