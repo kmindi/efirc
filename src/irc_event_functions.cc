@@ -106,6 +106,12 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_invite(msg_data);
         }
         
+        // Thema wurde gesetzt wann.
+        else if(cmd == _T("328"))
+        {
+            wxGetApp().irc_chanurl(msg_data);
+        }
+        
         // Thema des Raums anzeigen
         else if(cmd == _T("332"))
         {
@@ -634,6 +640,13 @@ void Zentrale::irc_invite(const IRC_NACHRICHT *msg_data)
     wxString raum(msg_data->params_a[1], wxConvUTF8);
 
     fenstersuchen(irc->CurrentNick)->NachrichtAnhaengen(_T("INVITE"),benutzer,raum);
+}
+
+// URL des Raumes anzeigen
+void Zentrale::irc_chanurl(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
+    fenster(empfaenger)->NachrichtAnhaengen(_T("CHANNEL_URL"), wxString(msg_data->params_a[2], wxConvUTF8));
 }
 
 // Thema des Raums anzeigen
