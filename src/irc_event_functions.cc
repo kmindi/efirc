@@ -47,32 +47,144 @@ void irc_allgemein(const irc_msg_data *msg_data, void *cp)
 void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
 {
     // Daten aus dem Ereignis einem eigenen Zeiger zuweisen.
-    
     const IRC_NACHRICHT *msg_data = (IRC_NACHRICHT *)event.GetClientData();
     
-    // Feld fuer Befehle, damit man mit switch case default durchgehen kann
-    // Fuer hoehere Geschwindigkeit und einfachere Anpassbarkeit
-    
-    wxString cmd(msg_data->cmd, wxConvUTF8); // Befehl in Variable speichern
+    // Befehl in Variable speichern
+    wxString cmd(msg_data->cmd, wxConvUTF8); 
+    long unsigned int cmd_int = 0;
     
     // Befehle Abfragen und entsprechende Funktionen aufrufen
-    
+    if(cmd.ToULong(&cmd_int,10)) // Befehlstext zu einer Zahl konvertieren
+    // Wenn der Befehl zu einer Zahl konvertiert werden konnte
+    {
+        switch(cmd_int)
+        {
+            // Willkommensnachricht 001
+            case 001:
+                wxGetApp().irc_welcome(msg_data); // Nickname setzen
+                wxGetApp().irc_einfach(msg_data); // Nachricht aber auch noch ausgeben
+                break;
+            
+            case 005:
+                wxGetApp().irc_isupport(msg_data);
+                break;
+
+            // Angeforderter Benutzername wird bereits benutzt
+            case 433:
+                wxGetApp().irc_nickinuse(msg_data);
+                break;
+
+            // Thema wurde gesetzt wann.
+            case 328:
+                wxGetApp().irc_chanurl(msg_data);
+                break;
+            
+            // Thema des Raums anzeigen
+            case 332:
+                wxGetApp().irc_topic(msg_data);
+                break;
+            
+            // Thema wurde gesetzt wann.
+            case 333:
+                wxGetApp().irc_topicwhotime(msg_data);
+                break;
+            
+            // Benutzerliste
+            case 353:
+                wxGetApp().irc_userlist(msg_data);
+                break;
+            
+            // RPL_UNAWAY
+            case 305:
+                wxGetApp().irc_unaway(msg_data);
+                break;
+            
+            // RPL_NOWAWAY
+            case 306:
+                wxGetApp().irc_nowaway(msg_data);
+                break;
+            
+            // END OF MOTD und ersten Raum betreten
+            case 376: 
+                wxGetApp().irc_endofmotd(msg_data);
+                break;
+
+            // WHOIS - USER
+            case 311:
+                wxGetApp().irc_whoisuser(msg_data);
+                break;
+            
+            // WHOIS - ABWESEND
+            case 301:
+                wxGetApp().irc_whoisaway(msg_data);
+                break;
+            
+            // WHOIS - RAEUME
+            case 319:
+                wxGetApp().irc_whoischan(msg_data);
+                break;
+            
+            // WHOIS - UNTAETIG
+            case 317:
+                wxGetApp().irc_whoisidle(msg_data);
+                break;
+            
+            // WHOIS - SERVERINFO
+            case 312:
+                wxGetApp().irc_whoisserver(msg_data);
+                break;
+            
+            // WHOIS - Special
+            case 320:
+                wxGetApp().irc_whoisspecial(msg_data);
+                break;
+            
+            // WHOIS - BENUTZT HOST
+            case 338:
+                wxGetApp().irc_whoisactually(msg_data);
+                break;
+            
+            
+            // Nachrichten die nicht angezeigt werden sollen
+            case 318: // End of /WHOIS List
+            case 366: // End of /NAMES List
+                break;
+            
+            // Nachrichten die einfach angezeigt werden sollen
+            case 002: // 002 RPL_YOURHOST 
+            case 003: // 003 RPL_CREATED 
+            case 004: // 004 RPL_MYINFO 
+            case 042: // 042 Unique ID
+            case 250: // 250 RPL_STATSCONN
+            case 251: // 251 RPL_LUSERCLIENT
+            case 252: // 252 RPL_LUSEROP
+            case 253: // 253 RPL_LUSERUNKOWN
+            case 254: // 254 RPL_LUSERCHANNELS
+            case 255: // 255 RPL_LUSERME
+            case 265: // 265 RPL_LOCALUSERS 
+            case 266: // 266 RPL_GLOBALUSERS 
+            case 372: // 372 RPL_MOTD
+            case 375: // 375 RPL_MOTDSTART 
+                wxGetApp().irc_einfach(msg_data);
+                break;
+            
+            // Abfrage nach ERR_* Antworten
+            case 300:
+                wxGetApp().irc_fehler(msg_data);
+                break;
+                
+            // wenn die Nummer nicht gefunden wurde
+            default:
+                wxGetApp().irc_unbekannt(msg_data);
+        }
+    }
+    else
+    // wenn nicht
+    {
         // PRIVMSG und NOTICE
         if(cmd == _T("PRIVMSG") || cmd == _T("NOTICE"))
         {
             wxGetApp().irc_pmsg(msg_data);
-        }
-        
-        // Willkommensnachricht 001
-        else if(cmd == _T("001"))
-        {
-            wxGetApp().irc_welcome(msg_data); // Nickname setzen
-            wxGetApp().irc_einfach(msg_data); // Nachricht aber auch noch ausgeben
-        }
-        
-        else if(cmd == _T("005"))
-        {
-            wxGetApp().irc_isupport(msg_data);
         }
         
         else if(cmd == _T("JOIN"))
@@ -95,33 +207,9 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_nick(msg_data);
         }
         
-        // Angeforderter Benutzername wird bereits benutzt
-        else if(cmd == _T("433"))
-        {
-            wxGetApp().irc_nickinuse(msg_data);
-        }
-        
         else if(cmd == _T("INVITE"))
         {
             wxGetApp().irc_invite(msg_data);
-        }
-        
-        // Thema wurde gesetzt wann.
-        else if(cmd == _T("328"))
-        {
-            wxGetApp().irc_chanurl(msg_data);
-        }
-        
-        // Thema des Raums anzeigen
-        else if(cmd == _T("332"))
-        {
-            wxGetApp().irc_topic(msg_data);
-        }
-        
-        // Thema wurde gesetzt wann.
-        else if(cmd == _T("333"))
-        {
-            wxGetApp().irc_topicwhotime(msg_data);
         }
         
         else if(cmd == _T("TOPIC"))
@@ -129,27 +217,9 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_requestedtopic(msg_data);
         }
         
-        // Benutzerliste
-        else if(cmd == _T("353"))
-        {
-            wxGetApp().irc_userlist(msg_data);
-        }
-        
         else if(cmd == _T("MODE"))
         {
             wxGetApp().irc_mode(msg_data);
-        }
-        
-        // RPL_UNAWAY
-        else if(cmd == _T("305"))
-        {
-            wxGetApp().irc_unaway(msg_data);
-        }
-        
-        // RPL_NOWAWAY
-        else if(cmd == _T("306"))
-        {
-            wxGetApp().irc_nowaway(msg_data);
         }
         
         // PING PONG
@@ -158,99 +228,12 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_pong(msg_data);
         }
         
-        // END OF MOTD und ersten Raum betreten
-        else if(cmd == _T("376")) 
-        {
-            wxGetApp().irc_endofmotd(msg_data);
-        }
-
-        // WHOIS - USER
-        else if(cmd == _T("311"))
-        {
-            wxGetApp().irc_whoisuser(msg_data);
-        }
-        
-        // WHOIS - ABWESEND
-        else if(cmd == _T("301"))
-        {
-            wxGetApp().irc_whoisaway(msg_data);
-        }
-        
-        // WHOIS - RAEUME
-        else if(cmd == _T("319"))
-        {
-            wxGetApp().irc_whoischan(msg_data);
-        }
-        
-        // WHOIS - UNTAETIG
-        else if(cmd == _T("317"))
-        {
-            wxGetApp().irc_whoisidle(msg_data);
-        }
-        
-        // WHOIS - SERVERINFO
-        else if(cmd == _T("312"))
-        {
-            wxGetApp().irc_whoisserver(msg_data);
-        }
-        
-        // WHOIS - Special
-        else if(cmd == _T("320"))
-        {
-            wxGetApp().irc_whoisspecial(msg_data);
-        }
-        
-        // WHOIS - BENUTZT HOST
-        else if(cmd == _T("338"))
-        {
-            wxGetApp().irc_whoisactually(msg_data);
-        }
-        
-        
-        // Nachrichten die nicht angezeigt werden sollen
-        else if(cmd == _T("318") || cmd == _T("366"))
-        {
-            // 318 End of /WHOIS List
-            // 366 End of /NAMES List
-        }
-        
-        // Abfrage nach Nachrichten die einfach nur ausgegeben werden sollen.
-        else if(
-        cmd == _T("002") || cmd == _T("003") || cmd == _T("004") ||
-        cmd == _T("042") || cmd == _T("250") || cmd == _T("251") || 
-        cmd == _T("252") || cmd == _T("253") || cmd == _T("254") || 
-        cmd == _T("255") || cmd == _T("265") || cmd == _T("266") || 
-        cmd == _T("372") || cmd == _T("375"))
-        {
-            // 002 RPL_YOURHOST 
-            // 003 RPL_CREATED 
-            // 004 RPL_MYINFO 
-            // 042 Unique ID
-            // 250 RPL_STATSCONN
-            // 251 RPL_LUSERCLIENT
-            // 252 RPL_LUSEROP
-            // 253 RPL_LUSERUNKOWN
-            // 254 RPL_LUSERCHANNELS
-            // 255 RPL_LUSERME
-            // 265 RPL_LOCALUSERS 
-            // 266 RPL_GLOBALUSERS 
-            // 372 RPL_MOTD
-            // 375 RPL_MOTDSTART 
-            
-            wxGetApp().irc_einfach(msg_data);
-        }
-        
-        // Abfrage nach ERR_* Antworten
-        else if(cmd == _T("300"))
-        {
-            wxGetApp().irc_fehler(msg_data);
-        }
-        
         // wenn keine Uebereinstimmung gefunden wurde, Fehler anzeigen
         else
         {
             wxGetApp().irc_unbekannt(msg_data);
         }     
+    }
         
         // Angeforderten Speicher wieder freigeben
         delete msg_data;
