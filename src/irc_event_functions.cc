@@ -63,10 +63,11 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_pmsg(msg_data);
         }
         
-        // Willkommensnachrichten 001 002 003 und 004
-        else if(cmd == _T("001") || cmd == _T("002") || cmd == _T("003") || cmd == _T("004"))
+        // Willkommensnachricht 001
+        else if(cmd == _T("001"))
         {
-            wxGetApp().irc_welcome(msg_data);
+            wxGetApp().irc_welcome(msg_data); // Nickname setzen
+            wxGetApp().irc_einfach(msg_data); // Nachricht aber auch noch ausgeben
         }
         
         else if(cmd == _T("005"))
@@ -111,6 +112,12 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_topic(msg_data);
         }
         
+        // Thema wurde gesetzt wann.
+        else if(cmd == _T("333"))
+        {
+            wxGetApp().irc_topicwhotime(msg_data);
+        }
+        
         else if(cmd == _T("TOPIC"))
         {
             wxGetApp().irc_requestedtopic(msg_data);
@@ -143,12 +150,6 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         else if(cmd == _T("PING"))
         {
             wxGetApp().irc_pong(msg_data);
-        }
-        
-        // Message of the day anzeigen
-        else if(cmd == _T("372") || cmd == _T("375"))
-        {
-            wxGetApp().irc_motd(msg_data);
         }
         
         // END OF MOTD und ersten Raum betreten
@@ -202,8 +203,16 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         }
         
         // Abfrage nach Nachrichten die einfach nur ausgegeben werden sollen.
-        else if(cmd == _T("042") || cmd == _T("250") || cmd == _T("251") || cmd == _T("252") || cmd == _T("253") || cmd == _T("254") | cmd == _T("255"))
+        else if(
+        cmd == _T("002") || cmd == _T("003") || cmd == _T("004") ||
+        cmd == _T("042") || cmd == _T("250") || cmd == _T("251") || 
+        cmd == _T("252") || cmd == _T("253") || cmd == _T("254") || 
+        cmd == _T("255") || cmd == _T("265") || cmd == _T("266") || 
+        cmd == _T("372") || cmd == _T("375"))
         {
+            // 002 RPL_YOURHOST 
+            // 003 RPL_CREATED 
+            // 004 RPL_MYINFO 
             // 042 Unique ID
             // 250 RPL_STATSCONN
             // 251 RPL_LUSERCLIENT
@@ -211,6 +220,10 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             // 253 RPL_LUSERUNKOWN
             // 254 RPL_LUSERCHANNELS
             // 255 RPL_LUSERME
+            // 265 RPL_LOCALUSERS 
+            // 266 RPL_GLOBALUSERS 
+            // 372 RPL_MOTD
+            // 375 RPL_MOTDSTART 
             
             wxGetApp().irc_einfach(msg_data);
         }
@@ -400,30 +413,20 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
 
 }
 
-// Willkommensnachrichten 001 002 003 und 004
+// Willkommensnachrichten 001 , Nickname setzen
 void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
 {
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nachricht = _T("");
-    for(int i = 1; i < msg_data->params_i; i++)
-    {
-        nachricht += _T(" ");
-        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
-    }
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
-
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
-    if(wxString(msg_data->cmd, wxConvUTF8) == _T("001"))
+    
+    // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
+    for(int i = 0; i < max_fenster; i++)
     {
-        // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
-        for(int i = 0; i < max_fenster; i++)
+        if(!(zgr_fenster[i]==NULL))
+        // nicht in nicht vorhandenen Fenstern
         {
-            if(!(zgr_fenster[i]==NULL))
-            // nicht in nicht vorhandenen Fenstern
-            {
-                    irc->CurrentNick = empfaenger;
-                    zgr_fenster[i]->TitelSetzen(fenstername[i], empfaenger);
-            }
+                irc->CurrentNick = empfaenger;
+                zgr_fenster[i]->TitelSetzen(fenstername[i], empfaenger);
         }
     }
 }
@@ -638,6 +641,28 @@ void Zentrale::irc_topic(const IRC_NACHRICHT *msg_data)
 {
     wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
     fenster(empfaenger)->ThemaAendern(wxString(msg_data->params_a[2], wxConvUTF8));
+}
+
+// Thema wurde gesetzt wann.
+void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
+    
+    // Zeitstempel erzeugen
+    long unsigned int raw_time_long;
+    msg_data->params_a[3].ToULong(&raw_time_long, 10);
+    
+    char timestamp[50];
+    time_t raw_time;
+    raw_time = raw_time_long;
+    
+    tm *local_time;
+    time(&raw_time);
+    local_time = localtime(&raw_time);
+    strftime(timestamp, 50, "%d.%m.%Y %X", local_time);
+    wxString zeit(timestamp, wxConvUTF8);
+    
+    fenster(empfaenger)->NachrichtAnhaengen(_T("TOPICWHOTIME"), wxString(msg_data->params_a[2], wxConvUTF8), zeit);
 }
 
 // Thema des Raums anzeigens

@@ -89,6 +89,7 @@ class Zentrale : public wxApp
         void irc_endofmotd(const IRC_NACHRICHT *msg_data);
         void irc_motd(const IRC_NACHRICHT *msg_data);
         void irc_topic(const IRC_NACHRICHT *msg_data);
+        void irc_topicwhotime(const IRC_NACHRICHT *msg_data);
         void irc_requestedtopic(const IRC_NACHRICHT *msg_data);
         void irc_pong(const IRC_NACHRICHT *msg_data);
         void irc_whoisuser(const IRC_NACHRICHT *msg_data);

@@ -116,6 +116,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_ACTION = *%param1 [italic]%param2[/italic]\n");
     standardkonfiguration_text += _T("local_P_ACTION = [ *%param1 [italic]%param2[/italic] ]\n");
     standardkonfiguration_text += _T("local_TOPIC = The topic is: %param1\n");
+    standardkonfiguration_text += _T("local_TOPICWHOTIME = Topic was set by %param1 at %param2\n");
     standardkonfiguration_text += _T("local_TOPIC_CHANGE = %param2 changed the topic to %param1\n");
     standardkonfiguration_text += _T("local_JOIN = %param1 joined the channel\n");
     standardkonfiguration_text += _T("local_PART = %param1 has left the channel (%param2)\n");
