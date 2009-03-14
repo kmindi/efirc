@@ -69,9 +69,9 @@ main(int argc, const char* argv[])
 	ircsocket.irc_add_link_queue_entry("NICK", &check);
 	ircsocket.irc_add_link_queue_entry("PING", &pong); */
 
-	/* connect to a server
+	/* join channel and say hello to the world
 	ircsocket.irc_send_join("#efirc");
-	ircsocket.irc_send_privmsg("#efirc", "hi"); */
+	ircsocket.irc_send_privmsg("#efirc", "hello world"); */
 
 	//ircsocket.irc_set_default_link_function(&print);
 

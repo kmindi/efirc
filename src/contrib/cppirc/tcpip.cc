@@ -222,7 +222,7 @@ IRCInterface::irc_receive_messages(void)
 				strlcpy(n, buf, l);
 
 			/* (cut and) parse message(s) */
-			c = irc_parse_server_message(n);
+			c = irc_split_server_message(n);
 
 			delete[] o;
 
@@ -252,7 +252,6 @@ void
 IRCInterface::irc_send_message_f(const char *message_format, ...)
 {
 	char tmp[W_BUFSIZE];
-// TODO len check
 	va_list ap;
 
 	/*
@@ -329,7 +328,7 @@ IRCInterface::irc_send_message(const char *message)
 	 * sock         : socket descriptor
 	 * MSG_NOSIGNAL : do not generate SIGPIPE on EOF
 	 */
-	#ifdef WIN32
+	#if defined WIN32 || defined __OpenBSD__
 	bl = send(sock, tmp, l, 0);
 	#else
 	bl = send(sock, tmp, l, MSG_NOSIGNAL);

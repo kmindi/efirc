@@ -11,7 +11,6 @@ void
 IRCInterface::irc_auth_client(const char *nickname, const char *user_name, const char *real_name,
 	const char *password)
 {
-// TODO you aren't allowed to call when already done?
 	if(authed) {
 		irc_write_message_f(3, "irc_auth_client", "Already authed.\n");
 		return;
@@ -55,11 +54,6 @@ void
 IRCInterface::irc_send_nick(const char *nickname)
 {
 	irc_send_message_f("NICK %s", nickname);
-
-// TODO sometime we DO NOT have this nick
-	/* new nick requested? */
-	if(strcmp(_IRCNICK, nickname))
-		strlcpy(_IRCNICK, nickname, sizeof(_IRCNICK));
 }
 
 /* send USER command to authenticate user */

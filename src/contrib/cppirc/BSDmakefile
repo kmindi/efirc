@@ -5,7 +5,7 @@ LDLIBS= -lircinterface -lsstring -lpthread
 CXXFLAGS+= -g -Wall
 .endif
 
-.MAIN: libircinterface.a
+.MAIN: libircinterface.a libsstring.a
 .PATH.h: $(.OBJDIR)
 .PATH.a: $(.OBJDIR)
 .INCLUDES: .h

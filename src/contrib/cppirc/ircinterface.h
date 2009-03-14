@@ -1,8 +1,3 @@
-// TODO errorhandler for ^C
-//      malloc()-use
-//      high load when "couldn't create socket"
-//      trigger call_cmd() when added cmd
-
 #ifndef _IRCSOCKET_H_
 #define	_IRCSOCKET_H_
 
@@ -169,7 +164,7 @@ class IRCInterface
 		int irc_receive_message(char *, size_t);
 
 		void irc_send_message_f(const char *, ...);
-		char *irc_parse_server_message(const char *);
+		char *irc_split_server_message(char *);
 		void irc_parse_irc_message(char *);
 };
 

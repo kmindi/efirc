@@ -46,7 +46,8 @@ IRCInterface::IRCInterface(unsigned int port, const char *server,
 	/* set defaults */
 	_IRCPORT = port;
 	strlcpy(_IRCSERV, server, sizeof(_IRCSERV));
-// TODO server defaults on connect
+	// XXX Server tells us the maximum length of these data - maybe
+	// we could then restrict requests exceding those maximums
 	strlcpy(_IRCNICK, nick, sizeof(_IRCNICK));
 	strlcpy(_IRCUSER, user, sizeof(_IRCUSER));
 	strlcpy(_IRCREAL, real, sizeof(_IRCREAL));
@@ -188,6 +189,9 @@ IRCInterface::irc_call_command_queue_entries(void)
 
 	irc_write_message_f(0, "irc_call_command_queue_entry", "Calling commands.\n");
 
+	// XXX is a endless loop really needed in a separate thread?
+	// could it be triggered? maybe only command execution in
+	// separate thread?
 	while(!disconnected || cmds > 0) {
 		/* any commands left in queue? */
 		if(cmds > 0) {
@@ -288,7 +292,6 @@ IRCInterface::irc_delete_link_queue_entry(const char *irc_command,
 	/* start at botton, let pp not be uninitialized */
 	cp = abp;
 	pp = cp;
-// TODO there may be more than one matching link (see also act_link()
 	/* link will be removed, but first search for it */
 	while(cp != NULL) {
 		if(!strcmp(cp->cmd, irc_command) && cp->function == function) {
@@ -373,57 +376,38 @@ const irc_msg_data *, void *))
 	default_link_function = function;
 }
 
-/* cut IRC reply */
+/* split server reply into IRC messages delimited by CR LF */
 char *
-IRCInterface::irc_parse_server_message(const char *server_message)
+IRCInterface::irc_split_server_message(char *server_message)
 {
-	/* substring */
-	char *sstr;
-	/* working with it */
-	char *wstr;
+	char *s, *w;
 
-	wstr = (char *)server_message;
+	irc_write_message_f(0, "irc_split_server_message", "Splitting reply into messages.\n");
 
-	irc_write_message_f(0, "irc_parse_server_message", "Splitting reply into messages.\n");
+	for(w = server_message; (s = strstr(w, "\r\n")); w = s + 2) {
+		*s = '\0';
 
-	do {
-		/* the raw message may needs to be split up */
-		sstr = strstr(wstr, "\r\n");
+		irc_write_message_f(1, "irc_split_server_message",
+			"Found relevant messagepart.\n");
 
-		/* it needs to */
-		if(sstr != NULL) {
-			/*
-			 * cut message (null-terminated at first
-			 * occurrence)
-			 */
-			*sstr = '\0';
+		irc_parse_irc_message(w);
+	}
 
-			irc_write_message_f(1, "irc_parse_server_message", "Found relevant"
-				" messagepart.\n");
-
-			irc_parse_irc_message(wstr);
-
-			/* increment pointer for another search */
-			wstr = sstr + 2;
-		} else
-			irc_write_message_f(1, "irc_parse_server_message", "No (further?) relevant"
-				" messagepart.\n");
-	} while(sstr != NULL);
-
-	/* return adress in memory where ignored message part starts */
-	return wstr;
+	/* w points to any pending reply that is not completed yet */
+	return w;
 }
 
 /* parse IRC reply */
 void
 IRCInterface::irc_parse_irc_message(char *irc_message)
 {
-	int i;
+	int i = 0;
 	size_t l;
 	char *w, *s;
 
 	/* struct containing sender, command and parameters */
 	irc_msg_data *msg_data = new irc_msg_data;
+	msg_data->params_i = 0;
 
 	w = (char *)irc_message;
 
@@ -480,7 +464,9 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 	} else {
 		irc_write_message_f(1, "irc_parse_irc_message", "Is server message.\n");
 
-// TODO server we're really connected to
+		// XXX The placeholder SERVER should be replaced by the
+		// real hostname of the server we're currently connected
+		// to
 		l = strlen("SERVER") + 1;
 		msg_data->sender = new char[l];
 		strlcpy(msg_data->sender, "SERVER", l);
@@ -504,50 +490,36 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 		*msg_data->user = '\0';
 	}
 
-	/* number of parameters */
-	msg_data->params_i = 0;
-	w = msg_data->params;
-
 	irc_write_message_f(1, "irc_parse_irc_message", "Parsing parameters."
 		" (%s)\n", msg_data->params);
 
-	/* get the number of parameters not containing text */
-	do {
-		/* from now there will be text */
-		if(*w == ':') {
-			/* for string set text-bit and stop here */
-			msg_data->params_i++;
+	for(w = msg_data->params; w; strsep(&w, " ")) {
+		msg_data->params_i++;
+
+		if(*w == ':')
 			break;
-		} else if((s = strstr(w, " ")) != NULL) {
-			msg_data->params_i++;
-			w = s + 1;
-		} else
-			msg_data->params_i++;
-	} while(s != NULL);
+	}
 
 	/* allocate memory for array with index fields */
 	msg_data->params_a = new char *[msg_data->params_i];
 
-	w = msg_data->params;
-	for(i = 0; i < msg_data->params_i; i++) {
-		/*
-		 * check whether this parameter is a string and skip ':'
-		 * before a string
-		 */
-		if(*w != ':')
-			s = strsep(&w, " ");
-		else
-			s = ++w;
+	for(w = msg_data->params; msg_data->params_i > i; w = ++s) {
+		if(*w == ':')
+			w++;
 
-		l = strlen(s) + 1;
+		s = strchr(w, '\0');
+		l = strlen(w);
 
-		msg_data->params_a[i] = new char[l];
-		strlcpy(msg_data->params_a[i], s, l);
+		msg_data->params_a[i] = new char[++l];
+		strlcpy(msg_data->params_a[i], w, l);
+
+		irc_write_message_f(1, "irc_parse_irc_message", "Found"
+			" parameter. (%s [%i/%i])\n",
+			msg_data->params_a[i], i + 1,
+			msg_data->params_i);
+
+		*s = ++i < msg_data->params_i ? ' ' : '\0';
 	}
-
-	if(w != NULL)
-		while(w != msg_data->params)
-			if(*--w == '\0') *w = ' ';
 
 	/* pass msg data and call event matching functions */
 	irc_call_link_queue_entry(msg_data);

@@ -6,7 +6,7 @@ ifdef DEBUG
 CXXFLAGS+= -g -Wall
 endif
 
-.DEFAULT_GOAL:= libircinterface.a
+.DEFAULT_GOAL:= libircinterface.a libsstring.a
 
 cppirc.exe: libircinterface.a libsstring.a cppirc.cc
 	$(CXX) $(CXXFLAGS) -o $(@) -I. -L. cppirc.cc $(LDLIBS)
