@@ -328,10 +328,10 @@ IRCInterface::irc_send_message(const char *message)
 	 * sock         : socket descriptor
 	 * MSG_NOSIGNAL : do not generate SIGPIPE on EOF
 	 */
-	#if defined WIN32 || defined __OpenBSD__
-	bl = send(sock, tmp, l, 0);
-	#else
+	#if defined __FreeBSD__ || defined linux
 	bl = send(sock, tmp, l, MSG_NOSIGNAL);
+	#else
+	bl = send(sock, tmp, l, 0);
 	#endif
 
 	/* check status and return send's return value */
