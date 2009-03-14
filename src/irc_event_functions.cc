@@ -249,19 +249,19 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
     wxString text(msg_data->params_a[1], wxConvUTF8);
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
     wxString user(msg_data->nick, wxConvUTF8);
-    wxString prefix = _T("\001");
 
     // CTCP abfragen ("'\001'BEFEHL text'\001'")
-    //Falls kein CTCP:
 
-    if (!(text.StartsWith(prefix) && text.EndsWith(prefix)))
+    if (!(text.StartsWith(_T("\001")) && text.EndsWith(_T("\001"))))
+    // Wenn nicht, dann ist es eine normale Nachricht
     {
             if(empfaenger.Upper() == irc->CurrentNick.Upper())
-            // wenn man selber der empfaenger ist
+            // Wenn man selber der empfaenger ist ...
             {
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("P_PRIVMSG"),user,text);
             }
             else
+            // ... oder wenn die Nachricht an den Raum geschickt wurde
             {
                 if(user == _T(""))
                 {
