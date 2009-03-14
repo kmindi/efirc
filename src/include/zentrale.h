@@ -98,6 +98,7 @@ class Zentrale : public wxApp
         void irc_whoischan(const IRC_NACHRICHT *msg_data);
         void irc_whoisidle(const IRC_NACHRICHT *msg_data);
         void irc_whoisserver(const IRC_NACHRICHT *msg_data);
+        void irc_whoisspecial(const IRC_NACHRICHT *msg_data);
         void irc_whoisactually(const IRC_NACHRICHT *msg_data);
         void irc_userlist(const IRC_NACHRICHT *msg_data);
         void irc_join(const IRC_NACHRICHT *msg_data);

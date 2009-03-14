@@ -194,6 +194,12 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             wxGetApp().irc_whoisserver(msg_data);
         }
         
+        // WHOIS - Special
+        else if(cmd == _T("320"))
+        {
+            wxGetApp().irc_whoisspecial(msg_data);
+        }
+        
         // WHOIS - BENUTZT HOST
         else if(cmd == _T("338"))
         {
@@ -753,6 +759,14 @@ void Zentrale::irc_whoisserver(const IRC_NACHRICHT *msg_data)
     wxString server(msg_data->params_a[2], wxConvUTF8);
     wxString servernachricht(msg_data->params_a[3], wxConvUTF8);
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
+}
+
+void Zentrale::irc_whoisspecial(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString nick(msg_data->params_a[1], wxConvUTF8);
+    wxString special(msg_data->params_a[2], wxConvUTF8);
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SPECIAL"),nick,special);
 }
 
 void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
