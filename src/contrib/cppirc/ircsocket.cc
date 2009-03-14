@@ -521,7 +521,7 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 		} else if((s = strstr(w, " ")) != NULL) {
 			msg_data->params_i++;
 			w = s + 1;
-		} else if(msg_data->params_i == 0) /* one parameter */
+		} else
 			msg_data->params_i++;
 	} while(s != NULL);
 
