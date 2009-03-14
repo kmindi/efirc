@@ -124,7 +124,6 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_QUIT = %param1 has left the network (%param2)\n");
     standardkonfiguration_text += _T("local_INVITE = %param1 invited you to %param2\n");
     standardkonfiguration_text += _T("local_NICK = %param1 changed his nickname to %param2\n");
-    standardkonfiguration_text += _T("local_MOTD = %param1\n");
     standardkonfiguration_text += _T("local_CTCP = [ <%param1@CTCP> %param2 ]\n");
     standardkonfiguration_text += _T("local_S_CTCP = [ <%param1@CTCP->%param2> %param3 ]\n");
     standardkonfiguration_text += _T("local_MODE = %param1 set mode %param2\n");
@@ -136,7 +135,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_CHANNEL = [ WHOIS: %param1 is in %param2 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_IDLE = [ WHOIS: %param1 is idle since %param2 seconds ]\n");
     standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_SPECIAL = [ WHOIS: %param1 %param2]\n");
+    standardkonfiguration_text += _T("local_WHOIS_SPECIAL = [ WHOIS: %param1 %param2 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = [ WHOIS: %param1 is actually using host %param2 ]\n");
 
 
