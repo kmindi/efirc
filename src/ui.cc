@@ -24,7 +24,7 @@ BEGIN_EVENT_TABLE(Fenster, wxFrame)
 END_EVENT_TABLE()
 
 //Konstruktor der Fenster-Klasse
-Fenster::Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style) : wxFrame((wxFrame *)NULL, id, title, pos, size, style)
+Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame((wxFrame *)NULL, wxID_ANY, title, pos, size, style)
 {
     // für was wird dann die position übergeben?
     Center();
@@ -123,7 +123,7 @@ void Fenster::ObjekteAnpassen()
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
 {
     //wxGetApp().fensterzerstoeren(fensternummer);
-    wxGetApp().EingabeVerarbeiten(fensternummer,_T("/part"));
+    wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
     // ueberpruefung ob nur noch ein fenster und ob schon im raum usw
 }
 
@@ -178,7 +178,7 @@ void Fenster::NachrichtSenden()
 
     wxString eingabe = WxEdit_eingabefeld->GetValue(); // Eingegebenen Text in Variable speichern
     WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
-    wxGetApp().EingabeVerarbeiten(fensternummer, eingabe); // an Zentrale uebergeben
+    wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
 }
 
 // OEFFENTLICHE FUNKTIONEN

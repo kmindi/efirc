@@ -14,8 +14,9 @@
 #ifndef _ZENTRALE_
 #define _ZENTRALE_
 
-const int max_fenster = 10;
+//const int max_fenster = 10;
 
+#include <map>
 #include <wx/app.h>
 #include <wx/version.h> // fuer Versionsinformationen von wxWidgets
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
@@ -46,25 +47,19 @@ class Zentrale : public wxApp
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
         Konfiguration *config; // Zeiger zur Konfiguration
 
-        void fensterzerstoeren(int);
         void fensterzerstoeren(wxString);
-        void EingabeVerarbeiten(int,wxString);
+        void EingabeVerarbeiten(wxString, wxString);
 
         Fenster* fenstersuchen(wxString);
         Fenster* fenster(wxString name);
-
-        // --------------------------------------------------------------------------
-        // NUR OEFFENTLICH WEIL DIE IRC FUNKTIONEN NOCH KEINE MITGLIEDER SIND
-        // --------------------------------------------------------------------------
-
-        // MAXIMALE ANZAHL DER RAEUME PER VARIABLE FESTSETZEN
-        Fenster *zgr_fenster[max_fenster]; // feld fuer zeiger auf maximal 10 instanzen
-        wxString fenstername[max_fenster];
+    
+    private:
+        map<wxString, Fenster*> zgr_fenster;
+        //Fenster *zgr_fenster[max_fenster]; // feld fuer zeiger auf maximal 10 instanzen
+        //wxString fenstername[max_fenster];
         wxString raum; // fuer join nach motd, temporaer
         void neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
-
-    private:
-
+        
         int OnExit();
 
         //Konfiguration
@@ -72,9 +67,8 @@ class Zentrale : public wxApp
         wxString zufallstext(int anzahl_zeichen = 4);
         void Konfiguration_anpassen();
 
-
-        void BefehlVerarbeiten(int fensternummer, wxString befehl);
-        void NachrichtSenden(int fensternummer, wxString nachricht);
+        void BefehlVerarbeiten(wxString fenstername, wxString befehl);
+        void NachrichtSenden(wxString fenstername, wxString nachricht);
 
         //Threads
         void connect_thread();

@@ -54,7 +54,7 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
     long unsigned int cmd_int = 0;
     
     // Befehle Abfragen und entsprechende Funktionen aufrufen
-    if(cmd.ToULong(&cmd_int,10)) // Befehlstext zu einer Zahl konvertieren
+    if(cmd.ToULong(&cmd_int, 10)) // Befehlstext zu einer Zahl konvertieren
     // Wenn der Befehl zu einer Zahl konvertiert werden konnte
     {
         switch(cmd_int)
@@ -414,14 +414,13 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
     
-    // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
-    for(int i = 0; i < max_fenster; i++)
+    for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
     {
-        if(!(zgr_fenster[i]==NULL))
+        if(!(zgr_fenster[i->first]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
                 irc->CurrentNick = empfaenger;
-                zgr_fenster[i]->TitelSetzen(fenstername[i], empfaenger);
+                zgr_fenster[i->first]->TitelSetzen(i->first, empfaenger);
         }
     }
 }
@@ -557,19 +556,18 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
     wxString nachricht(msg_data->params_a[0], wxConvUTF8);
     bool benutzer_entfernt = false;
 
-    // IN JEDEM FENSTER ENTFERNEN
-    for(int i = 0; i < max_fenster; i++)
+    for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
     {
         benutzer_entfernt = false; // In diesem Fenster wurde noch nicht versucht den Benutzer zu entfernen
 
-        if(!(zgr_fenster[i]==NULL))
+        if(!(zgr_fenster[i->first]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
-            benutzer_entfernt = zgr_fenster[i]->BenutzerEntfernen(benutzer);
+            benutzer_entfernt = zgr_fenster[i->first]->BenutzerEntfernen(benutzer);
             if(benutzer_entfernt = true)
             // Nachricht ausgeben falls der Benutzer in diesem Fenster entfernt werden konnte
             {
-                zgr_fenster[i]->NachrichtAnhaengen(_T("QUIT"), benutzer, nachricht);
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("QUIT"), benutzer, nachricht);
             }
         }
     }
@@ -582,26 +580,25 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
     wxString benutzer(msg_data->nick, wxConvUTF8);
     wxString neuername(msg_data->params_a[0], wxConvUTF8);
 
-    // fuer jeden Raum durchmachen da der name in jedem raum geaendert werden muss
-    for(int i = 0; i < max_fenster; i++)
+    for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
     {
-        if(!(zgr_fenster[i]==NULL))
+        if(!(zgr_fenster[i->first]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
             if(benutzer.Upper() == irc->CurrentNick.Upper() || benutzer.Upper() == irc->WantedNick.Upper())
             // Wenn man selber der Benutzer ist, dann muss der eigene Nick geaendert werden
             {
-                zgr_fenster[i]->BenutzerAendern(benutzer,neuername);
+                zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
                 irc->CurrentNick = neuername;
-                zgr_fenster[i]->TitelSetzen(fenstername[i],neuername);
-                zgr_fenster[i]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
+                zgr_fenster[i->first]->TitelSetzen(i->first,neuername);
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
             else
             // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
             {
-                zgr_fenster[i]->BenutzerAendern(benutzer, neuername);
+                zgr_fenster[i->first]->BenutzerAendern(benutzer, neuername);
                 // nachricht anzeigen
-                zgr_fenster[i]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
         }
     }
@@ -664,7 +661,6 @@ void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
     raw_time = raw_time_long;
     
     tm *local_time;
-    time(&raw_time);
     local_time = localtime(&raw_time);
     strftime(timestamp, 50, "%d.%m.%Y %X", local_time);
     wxString zeit(timestamp, wxConvUTF8);

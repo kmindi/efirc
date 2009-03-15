@@ -45,7 +45,7 @@ bool Zentrale::OnInit()
 
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
-    for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
+    //for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
 
 
     // erste Instanz der Fenster-klasse erzeugen.
@@ -173,94 +173,57 @@ void Zentrale::Konfiguration_anpassen()
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
 void Zentrale::neuesFenster(wxString namedesfensters)
 {
-    bool fenstererzeugt = false;
-
-    // nach freier Nummer suchen
-    int i = 0;
-    for(int j = 0; j < max_fenster ; j++)
+    map<wxString, Fenster*>::iterator iter = zgr_fenster.find(namedesfensters.Upper());
+    
+    // Neues Fenster nur erstellen wenn noch keines erstellt wurde
+    if(iter == zgr_fenster.end())
     {
-        if(fenstername[j].Upper() == namedesfensters.Upper())
-        return;
+        // Neues Fenster erstellen und Adresse des Speicherbereichs in zgr merken
+        Fenster *zgr = new Fenster(namedesfensters, wxPoint(8, 8), wxSize(566, 341));
+        
+        // Neuen Eintrag in der Map erstellen
+        zgr_fenster.insert(make_pair(namedesfensters.Upper(), zgr));
+        
+        zgr_fenster[namedesfensters.Upper()]->fenster_name = namedesfensters;
+        zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
+        zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
+        SetTopWindow(zgr_fenster[namedesfensters.Upper()]);
+
     }
-    while(fenstererzeugt == false && i < max_fenster)
-    {
-        if(zgr_fenster[i] == NULL)
-        {
-                // i ist auch die Fensternummer und die Window ID
-                zgr_fenster[i] = new Fenster( namedesfensters, i, wxPoint(8, 8), wxSize(566, 341) ); // neue instanz erzeugen, i = id des fensters / window
-                fenstername[i] = namedesfensters;
-                zgr_fenster[i]->fensternummer = i;
-                zgr_fenster[i]->Show(TRUE); // Fenster in den Vordergrund holen
-                SetTopWindow(zgr_fenster[i]); // Fenster zum obersten Objekt machen
-
-                // Anpassungsfunktionen:
-                zgr_fenster[i]->TitelSetzen(namedesfensters); // Titel anpassen
-
-                fenstererzeugt = true;
-        }
-        i++;
-    }
-
-    if(fenstererzeugt == false)
-    {
-        //oberstes fenster heraussuchen , dazu aktuellen Nickname als Parameter uebergeben
-        fenstersuchen(irc->CurrentNick)->Fehler(1,namedesfensters);
-    }
-
-}
-
-void Zentrale::fensterzerstoeren(int fensternummer)
-{
-    zgr_fenster[fensternummer]->Destroy();
-    zgr_fenster[fensternummer] = NULL;
-    fenstername[fensternummer] = _T("");
 }
 
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
 {
-    for(int i = 0;i < max_fenster;i++)
-    {
-        if(fenstername[i].Upper() == namedesfensters.Upper())
-        {
-            zgr_fenster[i]->Destroy();
-            zgr_fenster[i] = NULL;
-            fenstername[i] = _T("");
-        }
-    }
+    zgr_fenster[namedesfensters.Upper()]->Destroy();
+    zgr_fenster.erase(namedesfensters.Upper());
 }
 
 // Gibt IMMER einen Zeiger auf ein Fenster zurueck
 Fenster* Zentrale::fenstersuchen(wxString name)
 {
-    Fenster *zgr = NULL; // Zeiger auf Fenster
-
-    // Wenn der Name der aktuelle Nickname ist, dann wird die Nachricht im obersten Fenster angezeigt
-    if(name.Upper() == irc->CurrentNick.Upper())
+    map<wxString, Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
+    
+    if(iter != zgr_fenster.end())
+    // Wenn das Fenster gefunden wurde 
     {
-        // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen
-        // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
-        return dynamic_cast<Fenster*>(GetTopWindow());
+        return zgr_fenster[name.Upper()];
     }
     else
+    // Wenn nicht, im obersten Fenster anzeigen
     {
-        int i = 0; // laufende Nummer auf 0 setzen
-        while(i < max_fenster && zgr == NULL) // solange i kleiner max_fenster ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
+        if(name.Upper() == irc->CurrentNick.Upper())
+        // Wenn es Absicht war (an eigenen Nicknamen)
         {
-            if(fenstername[i].Upper() == name.Upper()) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
-            {
-                return zgr_fenster[i];
-            }
-            if(i == max_fenster - 1)
-            // falls keine uebereinstimmung gefunden wurde, Fehler ausgeben und oberstes Fenster als Ausgabe setzten
-            {
-                // mit SetTopWindow zuletzt als oberstes Fenster festgelegtes Fenster suchen
-                // und Zeiger casten, damit er dem Rueckgabetyp "Fenster*" entspricht
-                zgr = dynamic_cast<Fenster*>(GetTopWindow());
-                zgr->Fehler(3,name);
-                return zgr;
-            }
-            i++;
+            return dynamic_cast<Fenster*>(GetTopWindow());
         }
+        else
+        // Wenn nicht Fehler zusaetzlich anzeigen
+        {
+            Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
+            zgr->Fehler(3,name);
+            return zgr;
+        }
+        
     }
 }
 
@@ -268,19 +231,20 @@ Fenster* Zentrale::fenstersuchen(wxString name)
 // DARF nur mit VORHANDENEN Fenstern benutzt werden
 Fenster* Zentrale::fenster(wxString name)
 {
+    map<wxString,Fenster*>::iterator iter; 
+    
     while(1)
     {
-        for(int i = 0; i < max_fenster; i++)
+        iter = zgr_fenster.find(name.Upper());
+        
+        if(iter != zgr_fenster.end())
         {
-            if(fenstername[i].Upper() == name.Upper())
-            {
-                return zgr_fenster[i];
-            }
+            return zgr_fenster[name.Upper()];
         }
     }
 }
 
-void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
+void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 {
     //fenstername[fensternummer]
 
@@ -312,12 +276,13 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         #endif
 
         // Alle Fenster zerstoeren
-        for(int i = 0; i < max_fenster; i++)
+        
+        for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         {
-            if(!(wxGetApp().zgr_fenster[i]==NULL))
+            if(!(wxGetApp().zgr_fenster[i->first]==NULL))
             // nicht in nicht vorhandenen Fenstern
             {
-                zgr_fenster[i]->Destroy();
+                zgr_fenster[i->first]->Destroy();
             }
         }
     }
@@ -332,7 +297,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            irc->irc_send_part(fenstername[fensternummer].mb_str());
+            irc->irc_send_part(fenstername.mb_str());
         }
         else
         {
@@ -354,7 +319,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
         if(raum == _T(""))
         {
-            raum = fenstername[fensternummer];
+            raum = fenstername;
         }
 
         wxGetApp().irc->irc_send_invite(nickname.mb_str(), raum.mb_str());
@@ -364,19 +329,19 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
         wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
-        irc->irc_send_privmsg(fenstername[fensternummer].mb_str(), me_text.mb_str());
-        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
+        irc->irc_send_privmsg(fenstername.mb_str(), me_text.mb_str());
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
     }
 
     else if(befehl_name.Upper() == _T("TOPIC"))
     {
         if(befehl_parameter == _T(""))
         {
-            irc->irc_send_topic(fenstername[fensternummer].mb_str());
+            irc->irc_send_topic(fenstername.mb_str());
         }
         else
         {
-            irc->irc_send_topic(fenstername[fensternummer].mb_str(),befehl_parameter.mb_str());
+            irc->irc_send_topic(fenstername.mb_str(), befehl_parameter.mb_str());
         }
     }
 
@@ -386,7 +351,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
 
         irc->irc_send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
-        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
     }
 
     else if(befehl_name.Upper() == _T("AWAY"))
@@ -398,7 +363,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
         else
         {
             irc->irc_send_away(befehl_parameter.mb_str());
-            zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("AWAY"),befehl_parameter);
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("AWAY"), befehl_parameter);
         }
     }
 
@@ -409,7 +374,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
 
         irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
 
-        zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("CTCP"),irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("CTCP"), irc->CurrentNick, empfaenger, nachricht);
     }
 
     else if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
@@ -420,7 +385,7 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     // sonstige Befehle
     else if(befehl_name.Upper() == _T("CLEAR"))
     {
-        zgr_fenster[fensternummer]->AusgabefeldLeeren();
+        zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
     
     // Wenn der Befehl nicht gefunden wurde oder zu wenig parameter uebergeben wurden
@@ -428,38 +393,38 @@ void Zentrale::BefehlVerarbeiten(int fensternummer, wxString befehl)
     {
         if(befehl_parameter == _T(""))
         {
-            zgr_fenster[fensternummer]->Fehler(4,befehl_name);
+            zgr_fenster[fenstername.Upper()]->Fehler(4,befehl_name);
         }
         else
         {
-            zgr_fenster[fensternummer]->Fehler(4,befehl_name + _T(" ") + befehl_parameter);
+            zgr_fenster[fenstername.Upper()]->Fehler(4, befehl_name + _T(" ") + befehl_parameter);
         }
     }
     
         
 }
 
-void Zentrale::NachrichtSenden(int fensternummer, wxString nachricht)
+void Zentrale::NachrichtSenden(wxString fenstername, wxString nachricht)
 {
-    irc->irc_send_privmsg(fenstername[fensternummer].mb_str(), nachricht.mb_str());
+    irc->irc_send_privmsg(fenstername.mb_str(), nachricht.mb_str());
     // Nachricht im Textfenster anzeigen
     // UNICODE?
     //AKTUELLER NICKNAME?
-    zgr_fenster[fensternummer]->NachrichtAnhaengen(_T("PRIVMSG"),irc->CurrentNick,nachricht);
+    zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("PRIVMSG"),irc->CurrentNick,nachricht);
 }
 
-void Zentrale::EingabeVerarbeiten(int fensternummer, wxString eingabe)
+void Zentrale::EingabeVerarbeiten(wxString fenstername, wxString eingabe)
 {
     //Ist es ein Befehl?
     wxString befehlsprefix = _T("/");
     if(eingabe.StartsWith(befehlsprefix, &eingabe))
     {
-        BefehlVerarbeiten(fensternummer, eingabe);
+        BefehlVerarbeiten(fenstername, eingabe);
     }
     // wenn nicht an raum/benutzer senden
     else
     {
-        NachrichtSenden(fensternummer,eingabe);
+        NachrichtSenden(fenstername,eingabe);
     }
 }
 

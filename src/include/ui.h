@@ -59,8 +59,8 @@ class Fenster : public wxFrame
         void WxEdit_eingabefeldFokus(wxKeyEvent&);
 
     public:
-        int fensternummer;
-        Fenster(const wxString& title, const int& id, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER );
+        wxString fenster_name;
+        Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER );
 
 
         void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
