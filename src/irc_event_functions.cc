@@ -529,7 +529,12 @@ void Zentrale::irc_join(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
 {
     wxString empfaenger(msg_data->params_a[0], wxConvUTF8); // = ein Raum
-    wxString nachricht(msg_data->params_a[1], wxConvUTF8);
+    wxString nachricht = _T("");
+    if(msg_data->params_i > 1)
+    {
+        nachricht = msg_data->params_a[1];
+    }
+    
     wxString benutzer(msg_data->nick, wxConvUTF8);
 
     if(benutzer.Upper() == irc->CurrentNick.Upper())
