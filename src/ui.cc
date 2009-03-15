@@ -138,7 +138,7 @@ void Fenster::BeiAktivierung(wxActivateEvent& event)
 }
 
 // Sendenknopf
-void Fenster::WxButton_sendenClick(wxCommandEvent& event)
+void Fenster::WxButton_sendenClick(wxCommandEvent&)
 {
     NachrichtSenden();
 }
@@ -163,7 +163,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
 }
 
 // Bei Fokuserhalt Standardtext loeschen
-void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
+void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent&)
 {
     // VERBINDUNG ZUR KONFIGURATION
     if (WxEdit_eingabefeld->GetValue() == _T("Nachricht eingeben und Senden"))

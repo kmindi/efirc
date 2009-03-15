@@ -46,7 +46,7 @@ class Fenster : public wxFrame
         };
 
         void OnClose(wxCloseEvent& event);
-        void WxButton_sendenClick(wxCommandEvent& event);
+        void WxButton_sendenClick(wxCommandEvent&);
         void BeiAktivierung(wxActivateEvent& event);
         void NachrichtSenden();
 
@@ -56,7 +56,7 @@ class Fenster : public wxFrame
 
         DECLARE_EVENT_TABLE()
         void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
-        void WxEdit_eingabefeldFokus(wxKeyEvent& event);
+        void WxEdit_eingabefeldFokus(wxKeyEvent&);
 
     public:
         int fensternummer;
