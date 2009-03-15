@@ -35,7 +35,7 @@ END_EVENT_TABLE()
 
 
 // allgemeine Funktion fuer alle ankommenden Befehle.
-void irc_allgemein(const irc_msg_data *msg_data, void *cp)
+void irc_allgemein(const irc_msg_data *msg_data, void *)
 {
     wxCommandEvent eventCustom(wxEVT_NEUER_IRC_BEFEHL); // Neues Ereignis erzeugen
     IRC_NACHRICHT *zgr_ircn = new IRC_NACHRICHT(msg_data); // Instanz der IRC_NACHRICHT-Klasse erstellen und merken

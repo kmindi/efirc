@@ -244,7 +244,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
     else
     {
         int i = 0; // laufende Nummer auf 0 setzen
-        while(i < max_fenster && zgr == NULL) // solange i kleiner 10 ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
+        while(i < max_fenster && zgr == NULL) // solange i kleiner max_fenster ist und der zeiger noch null ist wird der inhalt der schleife ausgefuehrt
         {
             if(fenstername[i].Upper() == name.Upper()) // sobald der name uebereinstimmt wird der zeiger auf diesen frame zurueckgegeben
             {
@@ -500,4 +500,5 @@ int Zentrale::OnExit()
 {
     wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
     irc->irc_disconnect_server(quitmessage.mb_str());
+    return 0;
 }

@@ -28,7 +28,7 @@ void Konfiguration::opencfg(wxString dateipfad)
     if(!datei_ist_nicht_vorhanden)
     {
         file.Open(dateipfad);
-        for ( int i = 0; i<file.GetLineCount(); i++ )
+        for ( unsigned int i = 0; i < file.GetLineCount(); i++ )
         {
             konfiguration_text += file.GetLine(i) + _T("\n");
         }

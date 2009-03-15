@@ -27,5 +27,6 @@ Thread::~Thread() { }
 void *Thread::Entry()
 {
     (wxGetApp().*adresse)(); //Mitgliedsfunktion wird aufgerufen
+    return (void *)0;
 }
 
