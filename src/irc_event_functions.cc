@@ -60,12 +60,12 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         switch(cmd_int)
         {
             // Willkommensnachricht 001
-            case 001:
+            case 1:
                 wxGetApp().irc_welcome(msg_data); // Nickname setzen
                 wxGetApp().irc_einfach(msg_data); // Nachricht aber auch noch ausgeben
                 break;
             
-            case 005:
+            case 5:
                 wxGetApp().irc_isupport(msg_data);
                 break;
 
@@ -151,10 +151,10 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 break;
             
             // Nachrichten die einfach angezeigt werden sollen
-            case 002: // 002 RPL_YOURHOST 
-            case 003: // 003 RPL_CREATED 
-            case 004: // 004 RPL_MYINFO 
-            case 042: // 042 Unique ID
+            case 2: // 002 RPL_YOURHOST 
+            case 3: // 003 RPL_CREATED 
+            case 4: // 004 RPL_MYINFO 
+            case 42: // 042 Unique ID
             case 250: // 250 RPL_STATSCONN
             case 251: // 251 RPL_LUSERCLIENT
             case 252: // 252 RPL_LUSEROP
@@ -652,7 +652,7 @@ void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
     
     // Zeitstempel erzeugen
     long unsigned int raw_time_long;
-    msg_data->params_a[3].ToULong(&raw_time_long, 10);
+    msg_data->params_a[3].ToULong(&raw_time_long,10);
     
     char timestamp[50];
     time_t raw_time;
