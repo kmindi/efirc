@@ -171,6 +171,14 @@ void Zentrale::Konfiguration_anpassen()
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
+
+// Gibt die Anzahl der offenen Fenster zurueck
+unsigned int Zentrale::anzahl_offene_fenster()
+{
+    return zgr_fenster.size();
+}
+
+// Neues Fenster erzeugen
 void Zentrale::neuesFenster(wxString namedesfensters)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(namedesfensters.Upper());
@@ -192,6 +200,7 @@ void Zentrale::neuesFenster(wxString namedesfensters)
     }
 }
 
+// Fenster zerstoeren
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
 {
     zgr_fenster[namedesfensters.Upper()]->Destroy();

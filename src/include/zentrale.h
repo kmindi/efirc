@@ -52,6 +52,7 @@ class Zentrale : public wxApp
 
         Fenster* fenstersuchen(wxString);
         Fenster* fenster(wxString name);
+        unsigned int anzahl_offene_fenster(); 
     
     private:
         map<wxString, Fenster*> zgr_fenster;

@@ -122,9 +122,15 @@ void Fenster::ObjekteAnpassen()
 // Schliessen
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
 {
-    //wxGetApp().fensterzerstoeren(fensternummer);
-    wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
-    // ueberpruefung ob nur noch ein fenster und ob schon im raum usw
+    if(wxGetApp().anzahl_offene_fenster() == 1)
+    {
+        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+    }
+    else
+    {
+        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
+    }
+
 }
 
 void Fenster::BeiAktivierung(wxActivateEvent& event)
