@@ -569,7 +569,7 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
         // nicht in nicht vorhandenen Fenstern
         {
             benutzer_entfernt = zgr_fenster[i->first]->BenutzerEntfernen(benutzer);
-            if(benutzer_entfernt = true)
+            if(benutzer_entfernt == true)
             // Nachricht ausgeben falls der Benutzer in diesem Fenster entfernt werden konnte
             {
                 zgr_fenster[i->first]->NachrichtAnhaengen(_T("QUIT"), benutzer, nachricht);
