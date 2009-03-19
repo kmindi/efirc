@@ -69,11 +69,6 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 wxGetApp().irc_isupport(msg_data);
                 break;
 
-            // Angeforderter Benutzername wird bereits benutzt
-            case 433:
-                wxGetApp().irc_nickinuse(msg_data);
-                break;
-
             // Thema wurde gesetzt wann.
             case 328:
                 wxGetApp().irc_chanurl(msg_data);
@@ -144,6 +139,11 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 wxGetApp().irc_whoisactually(msg_data);
                 break;
             
+            // Angeforderter Benutzername wird bereits benutzt
+            case 433:
+                wxGetApp().irc_nickinuse(msg_data);
+                break;
+            
             
             // Nachrichten die nicht angezeigt werden sollen
             case 318: // End of /WHOIS List
@@ -168,14 +168,19 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 wxGetApp().irc_einfach(msg_data);
                 break;
             
-            // Abfrage nach ERR_* Antworten
-            case 300:
-                wxGetApp().irc_fehler(msg_data);
-                break;
-                
-            // wenn die Nummer nicht gefunden wurde
+
             default:
-                wxGetApp().irc_unbekannt(msg_data);
+                if(cmd_int >= 400 || cmd_int <=499)
+                // Abfrage nach ERR_* Antworten
+                {
+                    wxGetApp().irc_fehler(msg_data);
+                }
+                else
+                // wenn die Nummer nicht gefunden wurde
+                {
+                    wxGetApp().irc_unbekannt(msg_data);
+                }
+                
         }
     }
     else
@@ -420,7 +425,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
         // nicht in nicht vorhandenen Fenstern
         {
                 irc->CurrentNick = empfaenger;
-                zgr_fenster[i->first]->TitelSetzen(i->first, empfaenger);
+                zgr_fenster[i->first]->TitelSetzen(_T(""), empfaenger);
         }
     }
 }
@@ -590,7 +595,7 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
             {
                 zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
                 irc->CurrentNick = neuername;
-                zgr_fenster[i->first]->TitelSetzen(i->first,neuername);
+                zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
                 zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
             else
