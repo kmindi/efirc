@@ -789,8 +789,8 @@ void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
     for(int i = 1; i < msg_data->params_i; i++)
     // beginnend bei eins, damit der eigene Nickname nicht angezeigt wird.
     {
-        nachricht += _T(" ");
         nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+        nachricht += _T(" ");
     }
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
 }

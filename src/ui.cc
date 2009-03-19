@@ -183,8 +183,11 @@ void Fenster::NachrichtSenden()
     // IN GESCHICHTE SPEICHERN
 
     wxString eingabe = WxEdit_eingabefeld->GetValue(); // Eingegebenen Text in Variable speichern
-    WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
-    wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
+    if(eingabe != _T(""))
+    {
+        WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
+        wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
+    }
 }
 
 // OEFFENTLICHE FUNKTIONEN
@@ -234,8 +237,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
 
-    nachricht.Trim(false);
-    nachricht.Trim();
+    // Leerzeichen vorne und hinten entfernen
+    //nachricht.Trim(false);
+    //nachricht.Trim();
 
     // Besondere Textformatierungen beachten und anwenden
         // Wenn [italic] gefunden wurde:
@@ -257,8 +261,6 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                 return;
         }
 
-    // Nachricht nur ausgeben wenn sie nicht leer ist
-    if(nachricht != _T(""))
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
 }
 
