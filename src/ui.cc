@@ -21,6 +21,7 @@ BEGIN_EVENT_TABLE(Fenster, wxFrame)
     EVT_BUTTON     (ID_WxButton_senden,
                     Fenster::WxButton_sendenClick)
     EVT_ACTIVATE (Fenster::BeiAktivierung)
+    EVT_TEXT_URL (wxID_ANY, Fenster::BeiMausAufURL)
 END_EVENT_TABLE()
 
 //Konstruktor der Fenster-Klasse
@@ -36,7 +37,7 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
     WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
     WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,392), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
     WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(608,392), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH | wxTE_AUTO_URL, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
 
 
     SetIcon(wxIcon(icon));
@@ -177,6 +178,19 @@ void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent&)
         WxEdit_eingabefeld->Clear();
     }
 }
+
+// Mausklick auf hervorgehobene URL
+void Fenster::BeiMausAufURL(wxTextUrlEvent& event)
+{
+    const wxMouseEvent& mausereignis = event.GetMouseEvent();
+    if(mausereignis.LeftDown())
+    {
+        wxString adresse = WxEdit_ausgabefeld->GetRange(event.GetURLStart(), event.GetURLEnd());
+        wxLaunchDefaultBrowser(adresse);
+    }
+    event.Skip();
+}
+
 
 void Fenster::NachrichtSenden()
 {

@@ -48,6 +48,8 @@ class Fenster : public wxFrame
         void OnClose(wxCloseEvent& event);
         void WxButton_sendenClick(wxCommandEvent&);
         void BeiAktivierung(wxActivateEvent& event);
+        void BeiMausAufURL(wxTextUrlEvent& event);
+        
         void NachrichtSenden();
 
         wxString eingabe_geschichte[50];
