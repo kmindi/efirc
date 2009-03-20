@@ -276,7 +276,11 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
 
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+    
+    // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
+    WxEdit_ausgabefeld->ScrollLines(-1);
 }
+
 
 void Fenster::Fehler(int fehlernummer, wxString param1)
 {
