@@ -383,7 +383,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
         irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
 
-        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("CTCP"), irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, empfaenger, nachricht);
     }
 
     else if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
