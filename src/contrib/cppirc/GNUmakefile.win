@@ -3,7 +3,7 @@ LDLIBS= -lircinterface -lsstring -lws2_32
 RANLIB= ranlib
 
 ifdef DEBUG
-CXXFLAGS+= -g -Wall
+CXXFLAGS+= -g -W -Wall
 endif
 
 .DEFAULT_GOAL:= libircinterface.a libsstring.a

@@ -6,13 +6,12 @@
 IRCInterface ircsocket(6667, "chat.freenode.net", "efirc-dev101",
 	"efirc-dev101", "efirc-dev101", "pass",
 	"", 2);
-//	"efirc-dev101", "efirc-dev101", "pass",
 //	fopen("cppirc.log", "w"));
 
 pthread_t ti;
 
-void*
-listen(void* arg)
+void *
+listen(void *)
 {
 	ircsocket.irc_receive_messages();
 
@@ -39,10 +38,10 @@ pong(const irc_msg_data *irc_message_data, void *irc_socket)
 }
 
 void
-print(const irc_msg_data *irc_message_data, void *irc_socket)
+print(const irc_msg_data *irc_message_data, void *)
 {
-	printf("%s %s %s\n", irc_message_data->sender, irc_message_data->cmd,
-		irc_message_data->params);
+	printf("%s %s %s\n", irc_message_data->sender,
+		irc_message_data->cmd, irc_message_data->params);
 }
 
 void
@@ -52,7 +51,7 @@ disconnect(int)
 }
 
 int
-main(int argc, const char* argv[])
+main(void)
 {
 	signal(SIGINT, &disconnect);
 
