@@ -368,6 +368,9 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
 
     // ...voreingestelltes Aussehen wiederherstellen
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+    
+    // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
+    WxEdit_ausgabefeld->ScrollLines(-1);
 }
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
