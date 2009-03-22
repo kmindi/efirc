@@ -195,13 +195,11 @@ strsep(char **stringp, const char *delim)
 void
 strsub(char **dst, char **src, char sep)
 {
-	size_t l;
 	char *t, **d = dst, **s = src;
 	char delim[2];
 
 	if(*s == NULL) {
-		*d = (char *)malloc(1);
-		**d = '\0';
+		*d = strdup("");
 
 		return;
 	}
@@ -215,9 +213,7 @@ strsub(char **dst, char **src, char sep)
 	 */
 	t = strsep(s, delim);
 
-	l = strlen(t);
-	*d = (char *)malloc(++l);
-	strlcpy(*d, t, l);
+	*d = strdup(t);
 
 	/*
 	 * replace NUL (strsep(3) replaces the first occurence of any

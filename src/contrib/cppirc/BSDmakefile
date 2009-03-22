@@ -2,7 +2,7 @@ OBJS= io.o irccommands.o ircsocket.o tcpip.o
 LDLIBS= -lircinterface -lsstring -lpthread
 
 .ifdef DEBUG
-CXXFLAGS+= -g -W -Wall
+CXXFLAGS+= -g -Wextra -Wall
 .endif
 
 .MAIN: libircinterface.a libsstring.a

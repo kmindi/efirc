@@ -187,8 +187,7 @@ IRCInterface::irc_receive_messages(void)
 	char *c, *o, *n;
 
 	/* does need to have a length of 0 */
-	o = new char[1];
-	*o = '\0';
+	o = strdup("");
 
 	irc_write_message_f(0, "irc_receive_messages", "Receiving raw messages.\n");
 
@@ -227,9 +226,7 @@ IRCInterface::irc_receive_messages(void)
 			delete[] o;
 
 			/* ignored message part */
-			l = strlen(c) + 1;
-			o = new char[l];
-			strlcpy(o, c, l);
+			o = strdup(c);
 
 			delete[] n;
 		} else {

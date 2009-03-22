@@ -160,8 +160,7 @@ IRCInterface::irc_send_privmsg(const char *recipient, const char *text)
 	l = strlen(text) + 1;
 
 	/* working string for strsep() */
-	w = new char[l];
-	strlcpy(w, text, l);
+	w = strdup(text);
 
 	/*
 	 * while substring not NULL split up wstr by separator and send

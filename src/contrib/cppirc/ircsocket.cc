@@ -107,22 +107,15 @@ void
 IRCInterface::irc_add_command_queue_entry(int (IRCInterface::*function)(const char *),
 	const char *function_parameter)
 {
-	/* buffer legnth */
-	int l;
-
 	/* pointing to new cmd in queue */
 	irc_queue_cmd *ntp;
 
 	/* struct with command and arguments */
 	ntp = new irc_queue_cmd;
 
-	l = strlen(function_parameter) + 1;
-
 	/* new command on top */
 	ntp->function = function;
-	ntp->buf = new char[l];
-	/* should be string + \0 */
-	strlcpy(ntp->buf, function_parameter, l);
+	ntp->buf = strdup(function_parameter);
 	ntp->next = NULL;
 
 	/* new top/bottom */
@@ -245,19 +238,13 @@ void
 IRCInterface::irc_add_link_queue_entry(const char *irc_command,
 	void (*function)(const irc_msg_data *, void *))
 {
-	/* command length */
-	int l;
-
 	/* new link on top */
 	irc_act_link *ntp;
 
 	ntp = new struct irc_act_link;
 
-	l = strlen(irc_command) + 1;
-
 	ntp->function = function;
-	ntp->cmd = new char[l];
-	strlcpy(ntp->cmd, irc_command, l);
+	ntp->cmd = strdup(irc_command);
 	ntp->next = NULL;
 
 	/* pointer to bottom/top */
@@ -402,7 +389,6 @@ void
 IRCInterface::irc_parse_irc_message(char *irc_message)
 {
 	int i = 0;
-	size_t l;
 	char *w, *s;
 
 	/* struct containing sender, command and parameters */
@@ -439,11 +425,8 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 		w = msg_data->sender;
 		strsub(&msg_data->nick, &w, '!');
 		if(w == NULL) { /* is server command */
-			msg_data->user = new char[1];
-			msg_data->host = new char[1];
-
-			*msg_data->user = '\0';
-			*msg_data->host = '\0';
+			msg_data->user = strdup("");
+			msg_data->host = strdup("");
 
 			irc_write_message_f(1, "irc_parse_irc_message", "Server is: %s\n",
 				msg_data->sender);
@@ -467,9 +450,7 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 		// XXX The placeholder SERVER should be replaced by the
 		// real hostname of the server we're currently connected
 		// to
-		l = strlen("SERVER") + 1;
-		msg_data->sender = new char[l];
-		strlcpy(msg_data->sender, "SERVER", l);
+		msg_data->sender = strdup("SERVER");
 
 		strsub(&msg_data->cmd, &w, ' ');
 
@@ -481,13 +462,9 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 		irc_write_message_f(1, "irc_parse_irc_message", "Parameters are: %s\n",
 			msg_data->params);
 
-		msg_data->host = new char[1];
-		msg_data->nick = new char[1];
-		msg_data->user = new char[1];
-
-		*msg_data->host = '\0';
-		*msg_data->nick = '\0';
-		*msg_data->user = '\0';
+		msg_data->host = strdup("");
+		msg_data->nick = strdup("");
+		msg_data->user = strdup("");
 	}
 
 	irc_write_message_f(1, "irc_parse_irc_message", "Parsing parameters."
@@ -508,10 +485,8 @@ IRCInterface::irc_parse_irc_message(char *irc_message)
 			w++;
 
 		s = strchr(w, '\0');
-		l = strlen(w);
 
-		msg_data->params_a[i] = new char[++l];
-		strlcpy(msg_data->params_a[i], w, l);
+		msg_data->params_a[i] = strdup(w);
 
 		irc_write_message_f(1, "irc_parse_irc_message", "Found"
 			" parameter. (%s [%i/%i])\n",
