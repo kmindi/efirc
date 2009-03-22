@@ -19,6 +19,7 @@
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/string.h>
+#include <wx/arrstr.h>
 #include <wx/colour.h>
 #include <wx/sizer.h>
 
@@ -52,10 +53,11 @@ class Fenster : public wxFrame
         
         void NachrichtSenden();
 
-        wxString eingabe_geschichte[50];
-        //Autocomplete.
+        // Eingabegeschichte
+        wxArrayString geschichte_texte;
+        unsigned int geschichte_position;
 
-
+        
         DECLARE_EVENT_TABLE()
         void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
         void WxEdit_eingabefeldFokus(wxKeyEvent&);

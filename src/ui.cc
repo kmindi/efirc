@@ -80,6 +80,8 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
 
         sizer_alles->SetSizeHints( this ); // Minimale Groesse des Fensters (this) beachten ( = nicht unterschreiten)
         SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
+        
+    geschichte_position = 0;
 }
 
 // Farben aus der Konfiguration lesen und bei allen Objekten anpassen
@@ -160,13 +162,37 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
     {
         NachrichtSenden();
     }
-
-    else
+    
+    else if(event.m_keyCode == WXK_UP)
     {
-        // Ereignis weiterleiten
-        event.Skip();
+        if(geschichte_position > 0)
+        {
+                --geschichte_position;
+                WxEdit_eingabefeld->SetValue(geschichte_texte[geschichte_position]);
+                WxEdit_eingabefeld->SetInsertionPointEnd();
+        }
     }
-    return;
+    else if(event.m_keyCode == WXK_DOWN)
+    {
+        if(geschichte_texte.GetCount() != 0)
+        {
+            if(geschichte_position < static_cast<int>(geschichte_texte.GetCount())-1)
+            {
+                ++geschichte_position;
+                WxEdit_eingabefeld->SetValue(geschichte_texte[geschichte_position]);
+                WxEdit_eingabefeld->SetInsertionPointEnd();
+            }
+            else
+            {
+                geschichte_position = geschichte_texte.GetCount();
+                WxEdit_eingabefeld->SetValue(_T(""));
+                WxEdit_eingabefeld->SetInsertionPointEnd();
+            }
+        }
+    } 
+
+    // Ereignis weiterleiten
+    event.Skip();
 }
 
 // Bei Fokuserhalt Standardtext loeschen
@@ -194,13 +220,22 @@ void Fenster::BeiMausAufURL(wxTextUrlEvent& event)
 
 void Fenster::NachrichtSenden()
 {
-    // IN GESCHICHTE SPEICHERN
+    
 
     wxString eingabe = WxEdit_eingabefeld->GetValue(); // Eingegebenen Text in Variable speichern
     if(eingabe != _T(""))
     {
         WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
         wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
+    }
+    
+    // In Eingabegeschichte speichern
+    if(eingabe != _T("")) { geschichte_texte.Add(eingabe); }
+    geschichte_position = geschichte_texte.GetCount();
+    if(geschichte_position > 30)
+    {
+        geschichte_texte.RemoveAt(0);
+        --geschichte_position;
     }
 }
 
