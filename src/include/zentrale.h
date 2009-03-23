@@ -14,19 +14,25 @@
 #ifndef _ZENTRALE_
 #define _ZENTRALE_
 
-//const int max_fenster = 10;
-
 #include <map>
+
+// wxwidgets Quellen einbinden
 #include <wx/app.h>
 #include <wx/version.h> // fuer Versionsinformationen von wxWidgets
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
 #include <wx/utils.h> // fuer BS, Benutzer und Netzwerkfunktionen
+#include <wx/string.h>
+
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
+
+// eigene Quellen einbinden
 #include <thread.h>
 #include <config.h>
 #include <ui.h>
 #include <irc.h>
 #include <event.h>
+
+#include <icon.xpm>
 
 class Zentrale : public wxApp
 {
@@ -46,7 +52,7 @@ class Zentrale : public wxApp
         IRC *irc;
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
         Konfiguration *config; // Zeiger zur Konfiguration
-
+        
         void fensterzerstoeren(wxString);
         void EingabeVerarbeiten(wxString, wxString);
 
@@ -61,6 +67,8 @@ class Zentrale : public wxApp
         
         int OnExit();
 
+        wxFrame *dlg_ueber; // Zeiger auf den Ueberdialog
+        
         //Konfiguration
         wxString standardkonfiguration();
         wxString zufallstext(int anzahl_zeichen = 4);

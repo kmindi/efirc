@@ -1,3 +1,6 @@
+#ifndef _EFIRCICON_
+#define _EFIRCICON_
+
 /* XPM */
 static const char * icon[] = {
 "32 32 492 2",
@@ -525,3 +528,5 @@ static const char * icon[] = {
 "@ ~ *$&$=$o.P#-$;$l.>$>$6.,$'$)$!$!$~${${${$]$^$/$($Y =$_$:$* + ",
 ". ^ > N#P.k#l#<$o+_#_#J.[$O#O#g.g.g.g.g.g.g.g.O#o+}$k#L E * + . ",
 ". . @ * O.N#-.3.|$|$|$k#k#T T 1$1$1$1$1$1$1$1$k#2$-.3$- $ + . . "};
+
+#endif

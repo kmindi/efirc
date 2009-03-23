@@ -37,7 +37,7 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
     WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
     WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, _T("Nachricht eingeben und Senden"), wxPoint(4,392), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
     WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(608,392), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH | wxTE_AUTO_URL, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
 
 
     SetIcon(wxIcon(icon));
@@ -133,7 +133,6 @@ void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
     {
         wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
     }
-
 }
 
 void Fenster::BeiAktivierung(wxActivateEvent& event)
@@ -168,8 +167,8 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
         if(geschichte_position > 0)
         {
                 --geschichte_position;
-                WxEdit_eingabefeld->SetValue(geschichte_texte[geschichte_position]);
-                WxEdit_eingabefeld->SetInsertionPointEnd();
+                WxEdit_eingabefeld->ChangeValue(_T(""));
+                WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
         }
     }
     else if(event.m_keyCode == WXK_DOWN)
@@ -179,20 +178,24 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
             if(geschichte_position < static_cast<int>(geschichte_texte.GetCount())-1)
             {
                 ++geschichte_position;
-                WxEdit_eingabefeld->SetValue(geschichte_texte[geschichte_position]);
-                WxEdit_eingabefeld->SetInsertionPointEnd();
+                WxEdit_eingabefeld->ChangeValue(_T(""));
+                WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
             }
             else
             {
                 geschichte_position = geschichte_texte.GetCount();
-                WxEdit_eingabefeld->SetValue(_T(""));
+                WxEdit_eingabefeld->ChangeValue(_T(""));
                 WxEdit_eingabefeld->SetInsertionPointEnd();
             }
         }
     } 
+    else
+    {
+        // Ereignis weiterleiten
+        event.Skip();
+    }
 
-    // Ereignis weiterleiten
-    event.Skip();
+    
 }
 
 // Bei Fokuserhalt Standardtext loeschen
@@ -313,7 +316,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
     
     // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
-    WxEdit_ausgabefeld->ScrollLines(-1);
+    //WxEdit_ausgabefeld->ScrollLines(-1); // nur gebraucht bei style : wxTE_RICH mit wxTE_AUTO_URL oder wxTE_RICH2
 }
 
 
@@ -370,7 +373,7 @@ void Fenster::Fehler(int fehlernummer, wxString param1)
     WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     
     // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
-    WxEdit_ausgabefeld->ScrollLines(-1);
+    //WxEdit_ausgabefeld->ScrollLines(-1); // nur gebraucht bei style : wxTE_RICH mit wxTE_AUTO_URL oder wxTE_RICH2
 }
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)

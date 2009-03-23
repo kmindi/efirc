@@ -285,13 +285,12 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         #endif
 
         // Alle Fenster zerstoeren
-        
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         {
             if(!(wxGetApp().zgr_fenster[i->first]==NULL))
             // nicht in nicht vorhandenen Fenstern
             {
-                zgr_fenster[i->first]->Destroy();
+                fensterzerstoeren(i->first);
             }
         }
     }
@@ -395,6 +394,64 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     else if(befehl_name.Upper() == _T("CLEAR"))
     {
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
+    }
+    
+    // sonstige Befehle
+    else if(befehl_name.Upper() == _T("ABOUT"))
+    {
+        // Neues Fenster erzeugen
+        dlg_ueber = new wxFrame(zgr_fenster[fenstername], wxID_ANY, _T("efirc"), wxDefaultPosition, wxSize(700,200), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU, _T("AboutDialog"));
+
+        // Fenster anpassen
+            // Icon setzen
+            dlg_ueber->SetIcon(wxIcon(icon));
+            // Hintergrundfarbe festlegen
+            dlg_ueber->SetBackgroundColour( _T("#000000") );
+            // Schriftdarstellung aendern
+            dlg_ueber->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE));
+        
+        // Informationen in einem nicht veraenderbaren Textfeld anzeigen
+        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T("<efirc> "), wxPoint(5,5), wxSize(700,200), wxTE_MULTILINE, wxDefaultValidator, _T("st_infotext"));
+        // Textfeld anpassen
+            // Textfarbe aendern
+            st_infotext->SetBackgroundColour( _T("#000000") );
+            st_infotext->SetForegroundColour( _T("#510000") );
+        
+        // Fenster anzeigen
+        dlg_ueber->Show();
+        
+        wxString info = 
+         _T("efirc - easy and fast internet relay chat client - v. ") + efirc_version_string + _T(" (") + wxString(wxVERSION_STRING,wxConvUTF8) + _T(")\n") 
+        + _T("\n")
+        + _T("#DEUTSCH\n")
+        + _T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n")
+        + _T("efirc wird von Kai Mindermann und Fabian Ruch entwickelt.\n")
+        + _T("\n")
+        + _T("#ENGLISH\n")        
+        + _T("efirc is licensed under the \"Creative Commons Attribution-Share Alike 3.0 Germany\" License.\n")
+        + _T("efirc is developed by Kai Mindermann and Fabian Ruch.\n") 
+        + _T("\n")
+        + _T("http://efirc.sf.net/");
+        
+        wxString tmp_text = _T("");
+        
+        while(info != _T(""))
+        {
+            tmp_text = info.BeforeFirst(_T('\n'));
+            while(tmp_text.Len() > 100)
+            {
+                st_infotext->AppendText(_T("\n<efirc> ") + tmp_text.Left(100));
+                st_infotext->Fit();
+                dlg_ueber->Fit();
+                tmp_text = tmp_text.Mid(100);
+            }
+            st_infotext->AppendText(_T("\n<efirc> ") + tmp_text);
+            st_infotext->Fit();
+            dlg_ueber->Fit();
+            
+            info = info.AfterFirst(_T('\n'));
+            wxMilliSleep(250);
+        }
     }
     
     // Wenn der Befehl nicht gefunden wurde oder zu wenig parameter uebergeben wurden
