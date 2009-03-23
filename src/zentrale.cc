@@ -411,12 +411,12 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             dlg_ueber->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE));
         
         // Informationen in einem nicht veraenderbaren Textfeld anzeigen
-        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T("<efirc> "), wxPoint(5,5), wxSize(700,200), wxTE_MULTILINE, wxDefaultValidator, _T("st_infotext"));
+        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T("<efirc> "), wxPoint(5,5), wxSize(700,200), wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
         // Textfeld anpassen
             // Textfarbe aendern
             st_infotext->SetBackgroundColour( _T("#000000") );
             st_infotext->SetForegroundColour( _T("#510000") );
-        
+
         // Fenster anzeigen
         dlg_ueber->Show();
         
@@ -441,14 +441,9 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             while(tmp_text.Len() > 100)
             {
                 st_infotext->AppendText(_T("\n<efirc> ") + tmp_text.Left(100));
-                st_infotext->Fit();
-                dlg_ueber->Fit();
                 tmp_text = tmp_text.Mid(100);
             }
             st_infotext->AppendText(_T("\n<efirc> ") + tmp_text);
-            st_infotext->Fit();
-            dlg_ueber->Fit();
-            
             info = info.AfterFirst(_T('\n'));
             wxMilliSleep(250);
         }
