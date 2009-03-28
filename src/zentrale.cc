@@ -19,7 +19,7 @@ IMPLEMENT_APP(Zentrale) // erstellt main funktion
 
 bool Zentrale::OnInit()
 {
-    efirc_version_string = _T("0.3 testing");
+    efirc_version_string = _T("0.3-") + wxString(__SVNREVISION__);
 
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
 
