@@ -22,6 +22,7 @@
 #include <wx/platinfo.h> // fuer Informationen der Laufzeitumgebung
 #include <wx/utils.h> // fuer BS, Benutzer und Netzwerkfunktionen
 #include <wx/string.h>
+#include <wx/sizer.h>
 
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 
@@ -67,7 +68,7 @@ class Zentrale : public wxApp
         
         int OnExit();
 
-        wxFrame *dlg_ueber; // Zeiger auf den Ueberdialog
+        void zeige_ueber();
         
         //Konfiguration
         wxString standardkonfiguration();

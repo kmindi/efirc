@@ -399,54 +399,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     // sonstige Befehle
     else if(befehl_name.Upper() == _T("ABOUT"))
     {
-        // Neues Fenster erzeugen
-        dlg_ueber = new wxFrame(zgr_fenster[fenstername], wxID_ANY, _T("efirc"), wxDefaultPosition, wxSize(700,200), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU, _T("AboutDialog"));
-
-        // Fenster anpassen
-            // Icon setzen
-            dlg_ueber->SetIcon(wxIcon(icon));
-            // Hintergrundfarbe festlegen
-            dlg_ueber->SetBackgroundColour( _T("#000000") );
-            // Schriftdarstellung aendern
-            dlg_ueber->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE));
-        
-        // Informationen in einem nicht veraenderbaren Textfeld anzeigen
-        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T("<efirc> "), wxPoint(5,5), wxSize(700,200), wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
-        // Textfeld anpassen
-            // Textfarbe aendern
-            st_infotext->SetBackgroundColour( _T("#000000") );
-            st_infotext->SetForegroundColour( _T("#510000") );
-
-        // Fenster anzeigen
-        dlg_ueber->Show();
-        
-        wxString info = 
-         _T("efirc - easy and fast internet relay chat client - v. ") + efirc_version_string + _T(" (") + wxString(wxVERSION_STRING,wxConvUTF8) + _T(")\n") 
-        + _T("\n")
-        + _T("#DEUTSCH\n")
-        + _T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n")
-        + _T("efirc wird von Kai Mindermann und Fabian Ruch entwickelt.\n")
-        + _T("\n")
-        + _T("#ENGLISH\n")        
-        + _T("efirc is licensed under the \"Creative Commons Attribution-Share Alike 3.0 Germany\" License.\n")
-        + _T("efirc is developed by Kai Mindermann and Fabian Ruch.\n") 
-        + _T("\n")
-        + _T("http://efirc.sf.net/");
-        
-        wxString tmp_text = _T("");
-        
-        while(info != _T(""))
-        {
-            tmp_text = info.BeforeFirst(_T('\n'));
-            while(tmp_text.Len() > 100)
-            {
-                st_infotext->AppendText(_T("\n<efirc> ") + tmp_text.Left(100));
-                tmp_text = tmp_text.Mid(100);
-            }
-            st_infotext->AppendText(_T("\n<efirc> ") + tmp_text);
-            info = info.AfterFirst(_T('\n'));
-            wxMilliSleep(250);
-        }
+        zeige_ueber();
     }
     
     // Wenn der Befehl nicht gefunden wurde oder zu wenig parameter uebergeben wurden
@@ -489,6 +442,81 @@ void Zentrale::EingabeVerarbeiten(wxString fenstername, wxString eingabe)
     }
 }
 
+
+void Zentrale::zeige_ueber()
+{    
+    wxFrame* dlg_ueber;
+    
+    // Neues Fenster erzeugen
+    dlg_ueber = new wxFrame(NULL, wxID_ANY, _T("info@efirc"), wxDefaultPosition, wxSize(600,400), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU /*| wxRESIZE_BORDER*/, _T("AboutDialog"));
+    // Fenster anpassen
+        dlg_ueber->Center(); // In der Mitte anzeigen
+        dlg_ueber->SetIcon(wxIcon(icon)); // Icon setzen
+        dlg_ueber->SetBackgroundColour( _T("#000000") ); // Hintergrundfarbe festlegen
+    
+    // Informationen in einem nicht veraenderbaren Textfeld anzeigen
+    wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
+    // Textfeld anpassen
+        // Schriftdarstellung aendern
+        st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE)); 
+        // Textfarbe aendern
+        st_infotext->SetBackgroundColour( _T("#000000") );
+        st_infotext->SetForegroundColour( _T("#510000") );
+    // Fenster anzeigen
+    dlg_ueber->Show();
+
+    wxString info = _T("");
+    
+    info.Append(_T("         _____.__                 \n"));
+    info.Append(_T("   _____/ ____\\__|______   ____   \n"));
+    info.Append(_T(" _/ __ \\   __\\|  \\_  __ \\_/ ___\\  \n"));
+    info.Append(_T(" \\  ___/|  |  |  ||  | \\/\\  \\___  \n"));
+    info.Append(_T("  \\___  >__|  |__||__|    \\___  > \n"));
+    info.Append(_T("      \\/                      \\/  \n"));
+    info.Append(_T("\n"));
+    info.Append(_T("efirc - easy and fast internet relay chat client\n"));
+    info.Append(_T("version: ") + efirc_version_string + _T("\n"));
+    info.Append(_T("buildinfo: ") + wxString(wxVERSION_STRING,wxConvUTF8) + _T("\n"));
+    info.Append(_T("\n"));
+    info.Append(_T("Deutsch:\n"));
+    info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));
+    info.Append(_T("http://creativecommons.org/licenses/by-sa/3.0/de/deed\n"));
+    info.Append(_T("efirc wird von Kai Mindermann und Fabian Ruch entwickelt.\n"));
+    info.Append(_T("\n"));
+    info.Append(_T("English:\n"));
+    info.Append(_T("efirc is licensed under the \"Creative Commons Attribution-Share Alike 3.0 Germany\" License.\n"));
+    info.Append(_T("http://creativecommons.org/licenses/by-sa/3.0/de/deed.en\n"));
+    info.Append(_T("efirc is developed by Kai Mindermann and Fabian Ruch.\n"));
+    info.Append(_T("\n"));
+    info.Append(_T("http://efirc.sf.net/"));
+    
+    wxString tmp_text = _T("");
+    wxString prefix = _T("\n<efirc> ");
+    
+    // maximale Zeilenlaenge ist gleich Breite des Textfelds durch groesse eines Zeichens minus groesse eines Zeichens
+    unsigned int zeilenlaenge = (st_infotext->GetSize().x / st_infotext->GetCharWidth()) ;
+    
+    while(info != _T(""))
+    {
+        tmp_text = info.BeforeFirst(_T('\n')); // Alles vor dem ersten Zeilenumbruch steht jetzt in tmp_text
+        
+        // solange tmp_text und prefix zusammen laenger als die zeilenlaenge sind
+        while(tmp_text.Len() + prefix.Len() > zeilenlaenge)
+        {
+            st_infotext->AppendText(prefix + tmp_text.Left(zeilenlaenge - prefix.Len())); // prefix + den linken Teil von tmp_text bis zur Position (maximale Zeilenlaenge - prefix Laenge)
+            tmp_text = tmp_text.Mid(zeilenlaenge - prefix.Len()); // In tmp_text steht jetzt nicht mehr der Text der schon angezeigt wurde
+            wxMilliSleep(100); // Nach jeder Zeile kurz warten
+        }
+        
+        tmp_text.Pad(zeilenlaenge - tmp_text.Len() - prefix.Len(), _T('.')); // Zeile mit . auffüllen
+        
+        st_infotext->AppendText(prefix + tmp_text);
+        
+        info = info.AfterFirst(_T('\n')); // Alles nach dem ersten Zeilenumbruch steht jetzt in tmp_text
+        
+        wxMilliSleep(100); // Nach jeder Zeile kurz warten
+    }
+}
 
 
 // THREADS
