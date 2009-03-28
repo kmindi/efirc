@@ -1,0 +1,3 @@
+#ifndef __SVNREVISION__
+#define __SVNREVISION__ "$WCREV$"
+#endif /* __SVNREVISION__ */

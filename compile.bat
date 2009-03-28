@@ -1,5 +1,7 @@
 @echo off
 
+SubWCRev.exe %CD% src\include\version.in src\include\version.h
+
 (cd src\contrib\cppirc && mingw32-make.exe -f GNUmakefile.win libircinterface.a libsstring.a && ^
 cd ..\.. && mingw32-make.exe efirc.exe) 2> build.log
 

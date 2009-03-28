@@ -32,6 +32,7 @@ class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 #include <ui.h>
 #include <irc.h>
 #include <event.h>
+#include <version.h>
 
 #include <icon.xpm>
 
