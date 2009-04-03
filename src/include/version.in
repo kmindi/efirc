@@ -1,7 +1,7 @@
-#ifndef __SVNREVISION__
-#define __SVNREVISION__ "$WCREV$"
-#endif /* __SVNREVISION__ */
+#ifndef __VERSION_H__
+#define __VERSION_H__
 
-#ifndef __SVNREVISIONDATE__
+#define __SVNREVISION__ "$WCREV$"
 #define __SVNREVISIONDATE__ "$WCDATE$"
-#endif /* __SVNREVISIONDATE__ */
+#define __COMPILERVERSION__ __VERSION__
+#endif /* __VERSION_H__ */
