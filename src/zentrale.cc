@@ -19,7 +19,7 @@ IMPLEMENT_APP(Zentrale) // erstellt main funktion
 
 bool Zentrale::OnInit()
 {
-    efirc_version_string = _T("0.3-") + wxString(__SVNREVISION__);
+    efirc_version_string = _T("0.3-") + wxString(__SVNREVISION__, wxConvUTF8);
 
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
 
@@ -81,6 +81,8 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_realname = %real_name\n");
     standardkonfiguration_text += _T("irc_nickname = user_%random_string\n");
 
+    standardkonfiguration_text += _T("max_DONT_SHOW_USERLIST_CHANGES = 150\n");
+    
     // Farben
     standardkonfiguration_text += _T("colour_background = #510000\n");
     standardkonfiguration_text += _T("colour_topic_background = #EEEEEE\n");
@@ -138,9 +140,15 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_SPECIAL = [ WHOIS: %param1 %param2 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = [ WHOIS: %param1 is actually using host %param2 ]\n");
 
+    // Fehler (werden in konfigurierter Farbe dargestellt)
+    standardkonfiguration_text += _T("local_ERR_IRC = (!) %param1\n"); // case 2
+    standardkonfiguration_text += _T("local_ERR_WINDOW_NOT_FOUND = (!) Window \"%param1\" not found\n"); // case 3
+    standardkonfiguration_text += _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n"); // case 4
+    standardkonfiguration_text += _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n"); // case 5
+    standardkonfiguration_text += _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n"); // case 5
+    
 
     return standardkonfiguration_text;
-
 }
 
 wxString Zentrale::zufallstext(int anzahl_zeichen)
@@ -229,7 +237,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         // Wenn nicht Fehler zusaetzlich anzeigen
         {
             Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
-            zgr->Fehler(3,name);
+            zgr->NachrichtAnhaengen(_T("ERR_WINDOW_NOT_FOUND"), name);
             return zgr;
         }
         
@@ -260,13 +268,16 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
-
-
+    bool parameter_erwartet = false;
+    bool parameter_vorhanden = false;
+    if(befehl_parameter != _T("")) parameter_vorhanden = true;
+    
+    // Befehle die nicht unbedingt einen Parameter erwarten
     if(befehl_name.Upper() == _T("QUIT"))
     {
         wxString quitmessage = _T("");
 
-        if(befehl_parameter == _T(""))
+        if(!parameter_vorhanden)
         {
             quitmessage = config->parsecfgvalue(_T("text_quit_message"));
         }
@@ -295,15 +306,9 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
 
-    else if(befehl_name.Upper() == _T("JOIN") && befehl_parameter != _T(""))
-    {
-        irc->irc_send_join(befehl_parameter.mb_str());
-        // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
-    }
-
     else if(befehl_name.Upper() == _T("PART") || befehl_name.Upper() == _T("LEAVE"))
     {
-        if(befehl_parameter == _T(""))
+        if(!parameter_vorhanden)
         {
             irc->irc_send_part(fenstername.mb_str());
         }
@@ -312,38 +317,10 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_part(befehl_parameter.mb_str());
         }
     }
-
-    else if(befehl_name.Upper() == _T("NICK") && befehl_parameter != _T(""))
-    {
-            irc->irc_send_nick(befehl_parameter.mb_str()); // Nickname senden
-            irc->WantedNick = befehl_parameter;
-            // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
-    }
-
-    else if(befehl_name.Upper() == _T("INVITE") && befehl_parameter != _T(""))
-    {
-        wxString nickname = befehl_parameter.BeforeFirst(leerzeichen);
-        wxString raum = befehl_parameter.AfterFirst(leerzeichen);
-
-        if(raum == _T(""))
-        {
-            raum = fenstername;
-        }
-
-        wxGetApp().irc->irc_send_invite(nickname.mb_str(), raum.mb_str());
-    }
-
-    else if(befehl_name.Upper() == _T("ME") && befehl_parameter != _T(""))
-    {
-        // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
-        wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
-        irc->irc_send_privmsg(fenstername.mb_str(), me_text.mb_str());
-        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
-    }
-
+    
     else if(befehl_name.Upper() == _T("TOPIC"))
     {
-        if(befehl_parameter == _T(""))
+        if(!parameter_vorhanden)
         {
             irc->irc_send_topic(fenstername.mb_str());
         }
@@ -352,19 +329,20 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_topic(fenstername.mb_str(), befehl_parameter.mb_str());
         }
     }
-
-    else if((befehl_name.Upper() == _T("QUERY") || befehl_name.Upper() == _T("MSG")) && befehl_parameter != _T(""))
+    
+    else if(befehl_name.Upper() == _T("CLEAR"))
     {
-        wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
-        wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
-
-        irc->irc_send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
-        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
+        zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
-
+    
+    else if(befehl_name.Upper() == _T("ABOUT"))
+    {
+        zeige_ueber();
+    }
+    
     else if(befehl_name.Upper() == _T("AWAY"))
     {
-        if(befehl_parameter == _T(""))
+        if(!parameter_vorhanden)
         {
             irc->irc_send_away();
         }
@@ -375,47 +353,100 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
 
-    else if(befehl_name.Upper() == _T("CTCP") && befehl_parameter != _T(""))
+    else if(befehl_name.Upper() == _T("JOIN"))
     {
-        wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
-        wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
-
-        irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
-
-        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, empfaenger, nachricht);
-    }
-
-    else if(befehl_name.Upper() == _T("WHOIS") && befehl_parameter != _T(""))
-    {
-        irc->irc_send_whois(befehl_parameter.mb_str());
-    }
-
-    // sonstige Befehle
-    else if(befehl_name.Upper() == _T("CLEAR"))
-    {
-        zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
+        if(parameter_vorhanden) 
+        irc->irc_send_join(befehl_parameter.mb_str());
+        
+        else parameter_erwartet = true;
+        // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
     
-    // sonstige Befehle
-    else if(befehl_name.Upper() == _T("ABOUT"))
+    else if(befehl_name.Upper() == _T("NICK"))
     {
-        zeige_ueber();
+        if(parameter_vorhanden)
+        {
+            irc->irc_send_nick(befehl_parameter.mb_str()); // Nickname senden
+            irc->WantedNick = befehl_parameter;
+            // gewollten Nickname speichern, damit die nickinuse-Funktion richtig reagieren kann.
+        }
+        else parameter_erwartet = true;
+    }
+
+    else if(befehl_name.Upper() == _T("INVITE"))
+    {
+        if(parameter_vorhanden)
+        {
+            wxString nickname = befehl_parameter.BeforeFirst(leerzeichen);
+            wxString raum = befehl_parameter.AfterFirst(leerzeichen);
+
+            if(raum == _T(""))
+            {
+                raum = fenstername;
+            }
+
+            wxGetApp().irc->irc_send_invite(nickname.mb_str(), raum.mb_str());
+        }
+        else parameter_erwartet = true;
+    }
+
+    else if(befehl_name.Upper() == _T("ME"))
+    {
+        if(parameter_vorhanden)
+        {
+            // GEHT NOCH NICHT BEI NACHRICHTEN AN BENUTZER
+            wxString me_text = _T("\001ACTION ") + befehl_parameter + _T("\001");
+            irc->irc_send_privmsg(fenstername.mb_str(), me_text.mb_str());
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ACTION"), irc->CurrentNick, befehl_parameter);
+        }
+        else parameter_erwartet = true;
     }
     
-    // Wenn der Befehl nicht gefunden wurde oder zu wenig parameter uebergeben wurden
+    else if((befehl_name.Upper() == _T("QUERY") || befehl_name.Upper() == _T("MSG")))
+    {
+        if(parameter_vorhanden)
+        {
+            wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
+            wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
+
+            irc->irc_send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
+        }
+        else parameter_erwartet = true;
+    }
+
+    else if(befehl_name.Upper() == _T("CTCP"))
+    {
+        if(parameter_vorhanden)
+        {
+            wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
+            wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
+
+            irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
+
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, empfaenger, nachricht);
+        }
+        else parameter_erwartet = true;
+    }
+
+    else if(befehl_name.Upper() == _T("WHOIS"))
+    {
+        if(parameter_vorhanden) irc->irc_send_whois(befehl_parameter.mb_str());
+        else parameter_erwartet = true;
+    }
+    
+    // Falls der Befehl nicht gefunden wurde
     else
     {
-        if(befehl_parameter == _T(""))
-        {
-            zgr_fenster[fenstername.Upper()]->Fehler(4,befehl_name);
-        }
-        else
-        {
-            zgr_fenster[fenstername.Upper()]->Fehler(4, befehl_name + _T(" ") + befehl_parameter);
-        }
+        if(parameter_vorhanden) zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name + _T(" ") + befehl_parameter);
+        else zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name);
     }
     
-        
+    // Falls ein Parameter erwartet wurde (Befehl wurde dann auf jeden Fall gefunden
+    if(parameter_erwartet)
+    {
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_MISSING_PARAMETER"), befehl_name);
+    }
 }
 
 void Zentrale::NachrichtSenden(wxString fenstername, wxString nachricht)
@@ -452,7 +483,6 @@ void Zentrale::zeige_ueber()
     // Fenster anpassen
         dlg_ueber->Center(); // In der Mitte anzeigen
         dlg_ueber->SetIcon(wxIcon(icon)); // Icon setzen
-        dlg_ueber->SetBackgroundColour( _T("#000000") ); // Hintergrundfarbe festlegen
     
     // Informationen in einem nicht veraenderbaren Textfeld anzeigen
     wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
@@ -476,7 +506,7 @@ void Zentrale::zeige_ueber()
     info.Append(_T("\n"));
     info.Append(_T("efirc - easy and fast internet relay chat client\n"));
     info.Append(_T("version: ") + efirc_version_string + _T("\n"));
-    info.Append(_T("buildinfo: ") + wxString(wxVERSION_STRING,wxConvUTF8) + _T("\n"));
+    info.Append(_T("buildinfo: ") + wxString(wxVERSION_STRING, wxConvUTF8) + _T("\n"));
     info.Append(_T("\n"));
     info.Append(_T("Deutsch:\n"));
     info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));

@@ -69,7 +69,6 @@ class Fenster : public wxFrame
 
         void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
         void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));
-        void Fehler(int fehlernummer = 0, wxString param1 = _T(""));
         void ThemaAendern(wxString thema, wxString benutzer=_T(""));
         void AusgabefeldLeeren();
 
@@ -77,6 +76,8 @@ class Fenster : public wxFrame
         void BenutzerHinzufuegen(wxString benutzerliste = _T(""));
         bool BenutzerEntfernen(wxString benutzer = _T(""));
         void BenutzerAendern(wxString altername, wxString neuername);
+        
+        bool AnzeigeBegrenzungErreicht();
         //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
 
 

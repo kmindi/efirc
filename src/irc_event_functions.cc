@@ -524,6 +524,7 @@ void Zentrale::irc_join(const IRC_NACHRICHT *msg_data)
     // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
     {
         fenster(empfaenger)->BenutzerHinzufuegen(benutzer);
+        if(fenster(empfaenger)->AnzeigeBegrenzungErreicht() == false)
         fenster(empfaenger)->NachrichtAnhaengen(_T("JOIN"),benutzer);
     }
 
@@ -549,6 +550,7 @@ void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
     else
     {
         fenster(empfaenger)->BenutzerEntfernen(benutzer);
+        if(fenster(empfaenger)->AnzeigeBegrenzungErreicht() == false)
         fenster(empfaenger)->NachrichtAnhaengen(_T("PART"), benutzer, nachricht);
     }
 
@@ -572,6 +574,7 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
             if(benutzer_entfernt == true)
             // Nachricht ausgeben falls der Benutzer in diesem Fenster entfernt werden konnte
             {
+                if(zgr_fenster[i->first]->AnzeigeBegrenzungErreicht() == false)
                 zgr_fenster[i->first]->NachrichtAnhaengen(_T("QUIT"), benutzer, nachricht);
             }
         }
@@ -602,7 +605,8 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
             // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
             {
                 zgr_fenster[i->first]->BenutzerAendern(benutzer, neuername);
-                // nachricht anzeigen
+                // Nachricht anzeigen
+                if(zgr_fenster[i->first]->AnzeigeBegrenzungErreicht() == false)
                 zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
         }
@@ -622,7 +626,7 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
             fehler += _T(" ");
             fehler += wxString(msg_data->params_a[i], wxConvUTF8);
         }
-        fenstersuchen(irc->WantedNick)->Fehler(2,fehler);
+        fenstersuchen(irc->WantedNick)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
      //statt diesem irc_error aufrufen
 
     irc->WantedNick += _T("_"); // _ an den namen anhaengen
@@ -777,7 +781,7 @@ void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
         fehler += _T(" ");
         fehler += wxString(msg_data->params_a[i], wxConvUTF8);
     }
-    fenstersuchen(empfaenger)->Fehler(2,fehler);
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
 }
 
 
@@ -805,5 +809,5 @@ void Zentrale::irc_unbekannt(const IRC_NACHRICHT *msg_data)
         fehler += _T(" ");
         fehler += wxString(msg_data->params_a[i], wxConvUTF8);
     }
-    fenstersuchen(empfaenger)->Fehler(5,fehler);
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC_COMMAND_UNKNOWN"), fehler);
 }

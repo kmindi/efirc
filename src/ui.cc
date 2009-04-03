@@ -42,17 +42,14 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
 
     SetIcon(wxIcon(icon));
 
-    // OBJEKTE ANPASSEN, VERBINDUNG ZUR KONFIGURATION
-    // IN EIGENE FUNKTION AUSLAGERN
     ObjekteAnpassen();
 
     // Ereignisse verknuepfen
+        // Eine gedrueckte Taste bei Fokus im Eingabefeld
+        WxEdit_eingabefeld->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Fenster::WxEdit_eingabefeldTasteGedrueckt), NULL, this);
 
-    // Eine gedrueckte Taste bei Fokus im Eingabefeld
-    WxEdit_eingabefeld->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Fenster::WxEdit_eingabefeldTasteGedrueckt), NULL, this);
-
-    // Bei Fokus ggf. den Text im Eingabefeld loeschen
-    WxEdit_eingabefeld->Connect(wxEVT_SET_FOCUS, wxKeyEventHandler(Fenster::WxEdit_eingabefeldFokus), NULL, this);
+        // Bei Fokus ggf. den Text im Eingabefeld loeschen
+        WxEdit_eingabefeld->Connect(wxEVT_SET_FOCUS, wxKeyEventHandler(Fenster::WxEdit_eingabefeldFokus), NULL, this);
 
 
 
@@ -289,18 +286,29 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
 
-    // Leerzeichen vorne und hinten entfernen
-    //nachricht.Trim(false);
-    //nachricht.Trim();
-
     // Besondere Textformatierungen beachten und anwenden
+        
+        if(local.Left(3) == _T("ERR"))
+        // Wenn es ein Fehler ist nur Farbe anpassen
+        {
+            // Bisheriges Aussehen speichern
+            wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+            // Aussehen aendern
+            WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
+            // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
+            WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+            // ...voreingestelltes Aussehen wiederherstellen
+            WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+            // Funktion verlassen
+            return;
+        }
+        else if(nachricht.Contains(_T("[italic]")) && nachricht.Contains(_T("[/italic]")))
         // Wenn [italic] gefunden wurde:
-        if(nachricht.Contains(_T("[italic]")) && nachricht.Contains(_T("[/italic]")))
         {
             int pos = nachricht.Find(_T("[italic]"));
             //alles vor italic ausgeben
                 WxEdit_ausgabefeld->AppendText(prefix + nachricht.Left(pos));
-            //alles italic formatiert ausgeben
+            //alles kursiv formatiert ausgeben
                 wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
                 WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, *wxITALIC_FONT));
 
@@ -309,68 +317,11 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                 WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
             //alles nach italic ausgeben
                 WxEdit_ausgabefeld->AppendText(nachricht.Mid(nachricht.Find(_T("[/italic]")) + 9));
-            // Nachricht nicht nochmal ausgeben
+            // Funktion verlassen 
                 return;
         }
 
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
-    
-    // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
-    //WxEdit_ausgabefeld->ScrollLines(-1); // nur gebraucht bei style : wxTE_RICH mit wxTE_AUTO_URL oder wxTE_RICH2
-}
-
-
-void Fenster::Fehler(int fehlernummer, wxString param1)
-{
-
-    //VERBINDUNG ZUR KONFIGURATION
-
-    // Zeitstempel erzeugen
-    char timestamp[12];
-    time_t raw_time;
-    tm *local_time;
-    time(&raw_time);
-    local_time = localtime(&raw_time);
-    strftime(timestamp, 12, "[%H:%M:%S]", local_time);
-    wxString prefix(timestamp, wxConvUTF8);
-
-    // Aussehen aendern
-    // zuvor gesetzten style speichern...
-    wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-    WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
-
-        // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-        WxEdit_ausgabefeld->AppendText(_T("\n")+prefix+_T(" (!) "));
-
-        wxString fehlernummer_str =_T("");
-        fehlernummer_str << fehlernummer;
-        param1 = _T("(") + fehlernummer_str + _T(") (") + param1 + _T(")");
-        // Fehlernummern abfragen
-        switch(fehlernummer)
-        {
-            case 1:
-                WxEdit_ausgabefeld->AppendText(_T("Es konnte kein weiteres Fenster erstellt werden") + param1);
-                break;
-            case 2:
-                WxEdit_ausgabefeld->AppendText(_T("IRC Fehler aufgetreten ") + param1);
-                break;
-            case 3:
-                WxEdit_ausgabefeld->AppendText(_T("Fenster wurde nicht gefunden ") + param1);
-                break;
-            case 4:
-                WxEdit_ausgabefeld->AppendText(_T("Befehl nicht implementiert oder zu wenig Parameter angegeben: ") + param1);
-                break;
-            case 5:
-                WxEdit_ausgabefeld->AppendText(_T("IRC Befehl nicht implementiert: ") + param1);
-                break;
-            default:
-                WxEdit_ausgabefeld->AppendText(_T("Nicht definierter Fehler aufgetreten"));
-                break;
-        }
-
-
-    // ...voreingestelltes Aussehen wiederherstellen
-    WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
     
     // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
     //WxEdit_ausgabefeld->ScrollLines(-1); // nur gebraucht bei style : wxTE_RICH mit wxTE_AUTO_URL oder wxTE_RICH2
@@ -482,11 +433,20 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
         id = WxList_benutzerliste->FindItem(-1,Benutzer_prefix_liste[i] + altername);
         if(id != -1)
         {
-            WxList_benutzerliste->DeleteItem(id);
+            BenutzerEntfernen(altername);
             BenutzerHinzufuegen(Benutzer_prefix_liste[i] + neuername);
         }
     }
 }
 
-
+bool Fenster::AnzeigeBegrenzungErreicht()
+{
+    long unsigned int configwert = 0;
+    (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToULong(&configwert, 10);
+    
+    if(WxList_benutzerliste->GetItemCount() >= configwert)
+    return true;
+    else
+    return false;
+}
 
