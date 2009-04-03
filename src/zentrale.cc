@@ -490,8 +490,8 @@ void Zentrale::zeige_ueber()
         // Schriftdarstellung aendern
         st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE)); 
         // Textfarbe aendern
-        st_infotext->SetBackgroundColour( _T("#000000") );
-        st_infotext->SetForegroundColour( _T("#510000") );
+        st_infotext->SetBackgroundColour( _T("#510000") );
+        st_infotext->SetForegroundColour( _T("#000000") );
     // Fenster anzeigen
     dlg_ueber->Show();
 
@@ -505,8 +505,8 @@ void Zentrale::zeige_ueber()
     info.Append(_T("      \\/                      \\/  \n"));
     info.Append(_T("\n"));
     info.Append(_T("efirc - easy and fast internet relay chat client\n"));
-    info.Append(_T("version: ") + efirc_version_string + _T("\n"));
-    info.Append(_T("buildinfo: ") + wxString(wxVERSION_STRING, wxConvUTF8) + _T("\n"));
+    info.Append(efirc_version_string + _T("\n"));
+    info.Append(_T("GNU GCC ") + wxString(__COMPILERVERSION__, wxConvUTF8) + _T(", ") + wxString(wxVERSION_STRING, wxConvUTF8) + _T("\n"));
     info.Append(_T("\n"));
     info.Append(_T("Deutsch:\n"));
     info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));
@@ -537,8 +537,6 @@ void Zentrale::zeige_ueber()
             tmp_text = tmp_text.Mid(zeilenlaenge - prefix.Len()); // In tmp_text steht jetzt nicht mehr der Text der schon angezeigt wurde
             wxMilliSleep(100); // Nach jeder Zeile kurz warten
         }
-        
-        tmp_text.Pad(zeilenlaenge - tmp_text.Len() - prefix.Len(), _T('.')); // Zeile mit . auffüllen
         
         st_infotext->AppendText(prefix + tmp_text);
         
