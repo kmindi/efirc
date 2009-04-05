@@ -496,6 +496,11 @@ void Zentrale::zeige_ueber()
     // Fenster anzeigen
     dlg_ueber->Show();
 
+    bool unicode_build = false;
+    #ifdef wxUSE_UNICODE
+        if(wxUSE_UNICODE == 1) unicode_build = true;
+    #endif
+    
     wxString info = _T("");
     
     info.Append(_T("         _____.__                 \n"));
@@ -507,7 +512,11 @@ void Zentrale::zeige_ueber()
     info.Append(_T("\n"));
     info.Append(_T("efirc - easy and fast internet relay chat client\n"));
     info.Append(efirc_version_string + _T("\n"));
-    info.Append(_T("GNU GCC ") + wxString(__COMPILERVERSION__, wxConvUTF8) + _T(", ") + wxString(wxVERSION_STRING, wxConvUTF8) + _T("\n"));
+    info.Append(_T("GNU GCC ") + wxString(__COMPILERVERSION__, wxConvUTF8) + _T(", ") + wxString(wxVERSION_STRING, wxConvUTF8));
+    if(unicode_build)
+        info.Append(_T(", UNICODE\n"));
+    else
+        info.Append(_T("\n"));
     info.Append(_T("\n"));
     info.Append(_T("Deutsch:\n"));
     info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));
