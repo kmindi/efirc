@@ -336,7 +336,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
     
-    else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00fcBER"))
+    else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00fcBER") || befehl_name == _T("\u00dcBER"))
     {
         zeige_ueber();
     }
