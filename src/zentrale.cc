@@ -268,12 +268,13 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
+    befehl_name.MakeUpper();
     bool parameter_erwartet = false;
     bool parameter_vorhanden = false;
     if(befehl_parameter != _T("")) parameter_vorhanden = true;
     
     // Befehle die nicht unbedingt einen Parameter erwarten
-    if(befehl_name.Upper() == _T("QUIT"))
+    if(befehl_name == _T("QUIT"))
     {
         wxString quitmessage = _T("");
 
@@ -306,7 +307,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
 
-    else if(befehl_name.Upper() == _T("PART") || befehl_name.Upper() == _T("LEAVE"))
+    else if(befehl_name == _T("PART") || befehl_name == _T("LEAVE"))
     {
         if(!parameter_vorhanden)
         {
@@ -318,7 +319,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
     
-    else if(befehl_name.Upper() == _T("TOPIC"))
+    else if(befehl_name == _T("TOPIC"))
     {
         if(!parameter_vorhanden)
         {
@@ -330,17 +331,17 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
     
-    else if(befehl_name.Upper() == _T("CLEAR"))
+    else if(befehl_name == _T("CLEAR"))
     {
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
     
-    else if(befehl_name.Upper() == _T("ABOUT"))
+    else if(befehl_name == _T("ABOUT"))
     {
         zeige_ueber();
     }
     
-    else if(befehl_name.Upper() == _T("AWAY"))
+    else if(befehl_name == _T("AWAY"))
     {
         if(!parameter_vorhanden)
         {
@@ -353,7 +354,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
 
-    else if(befehl_name.Upper() == _T("JOIN"))
+    else if(befehl_name == _T("JOIN"))
     {
         if(parameter_vorhanden) 
         irc->irc_send_join(befehl_parameter.mb_str());
@@ -362,7 +363,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
     
-    else if(befehl_name.Upper() == _T("NICK"))
+    else if(befehl_name == _T("NICK"))
     {
         if(parameter_vorhanden)
         {
@@ -373,7 +374,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         else parameter_erwartet = true;
     }
 
-    else if(befehl_name.Upper() == _T("INVITE"))
+    else if(befehl_name == _T("INVITE"))
     {
         if(parameter_vorhanden)
         {
@@ -390,7 +391,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         else parameter_erwartet = true;
     }
 
-    else if(befehl_name.Upper() == _T("ME"))
+    else if(befehl_name == _T("ME"))
     {
         if(parameter_vorhanden)
         {
@@ -402,7 +403,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         else parameter_erwartet = true;
     }
     
-    else if((befehl_name.Upper() == _T("QUERY") || befehl_name.Upper() == _T("MSG")))
+    else if((befehl_name == _T("QUERY") || befehl_name == _T("MSG")))
     {
         if(parameter_vorhanden)
         {
@@ -415,7 +416,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         else parameter_erwartet = true;
     }
 
-    else if(befehl_name.Upper() == _T("CTCP"))
+    else if(befehl_name == _T("CTCP"))
     {
         if(parameter_vorhanden)
         {
@@ -429,7 +430,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         else parameter_erwartet = true;
     }
 
-    else if(befehl_name.Upper() == _T("WHOIS"))
+    else if(befehl_name == _T("WHOIS"))
     {
         if(parameter_vorhanden) irc->irc_send_whois(befehl_parameter.mb_str());
         else parameter_erwartet = true;
