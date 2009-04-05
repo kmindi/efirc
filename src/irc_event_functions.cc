@@ -50,7 +50,7 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
     const IRC_NACHRICHT *msg_data = (IRC_NACHRICHT *)event.GetClientData();
     
     // Befehl in Variable speichern
-    wxString cmd(msg_data->cmd, wxConvUTF8); 
+    wxString cmd = msg_data->cmd;
     long unsigned int cmd_int = 0;
     
     // Befehle Abfragen und entsprechende Funktionen aufrufen
@@ -251,9 +251,9 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
 {
     wxChar leerzeichen = _T(' ');
 
-    wxString text(msg_data->params_a[1], wxConvUTF8);
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString user(msg_data->nick, wxConvUTF8);
+    wxString text = msg_data->params_a[1];
+    wxString empfaenger = msg_data->params_a[0];
+    wxString user = msg_data->nick;
 
     // CTCP abfragen ("'\001'BEFEHL text'\001'")
 
@@ -283,9 +283,9 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
     else
     {
         // Text aufteilen
-        wxString ctcp(text.Mid(1,text.Len()-2), wxConvUTF8); // \001 vorne und hinten abschneiden
-        wxString ctcp_befehl(ctcp.BeforeFirst(leerzeichen), wxConvUTF8);
-        wxString ctcp_text(ctcp.AfterFirst(leerzeichen), wxConvUTF8);
+        wxString ctcp(text.Mid(1,text.Len()-2)); // \001 vorne und hinten abschneiden
+        wxString ctcp_befehl(ctcp.BeforeFirst(leerzeichen));
+        wxString ctcp_text(ctcp.AfterFirst(leerzeichen));
 
         //Befehle abfragen
         // MIT SWITCH / CASE -> schneller
@@ -416,7 +416,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
 // Willkommensnachrichten 001 , Nickname setzen
 void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
     
     for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
@@ -433,12 +433,12 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
 // RPL_ISUPPORT
 void Zentrale::irc_isupport(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
     wxString nachricht = _T("");
     for(int i = 1; i < msg_data->params_i; i++)
     {
         nachricht += _T(" ");
-        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+        nachricht += msg_data->params_a[i];
     }
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
 }
@@ -448,15 +448,15 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
     // NOCH HERAUSSUCHEN WENN +o und +v (=> @ und + vor nickname bzw chanop und voice)
 
 
-    wxString Sender(msg_data->nick, wxConvUTF8);
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString Sender = msg_data->nick;
+    wxString empfaenger = msg_data->params_a[0];
     wxString Parameter = _T("");
     wxString Raum = _T("");
     wxString Modus = _T("");
 
     if(Sender == _T(""))
     {
-        Sender = wxString(msg_data->sender, wxConvUTF8);
+        Sender = msg_data->sender;
     }
 
     for(int i = 0; i < msg_data->params_i; i++)
@@ -464,17 +464,17 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
         if(msg_data->params_a[i][0] == _T('#'))
         {
             Raum = _T(" (");
-            Raum += wxString(msg_data->params_a[i], wxConvUTF8);
+            Raum += msg_data->params_a[i];
             Raum += _T(")");
         }
         else if(msg_data->params_a[i][0] == _T('+') ||
                 msg_data->params_a[i][0] == _T('-'))
         {
-            Modus = wxString(msg_data->params_a[i], wxConvUTF8);
+            Modus = msg_data->params_a[i];
         }
         else
         {
-            Parameter += _T(" ") + wxString(msg_data->params_a[i], wxConvUTF8);
+            Parameter += _T(" ") + msg_data->params_a[i];
         }
     }
 
@@ -486,8 +486,8 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
 // Message of the day anzeigen
 void Zentrale::irc_motd(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("MOTD"),wxString(msg_data->params_a[1], wxConvUTF8));
+    wxString empfaenger = msg_data->params_a[0];
+    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("MOTD"), msg_data->params_a[1]);
 }
 
 // Am Ende der Nachricht des Tages automatisch einen Raum betreten
@@ -500,9 +500,9 @@ void Zentrale::irc_endofmotd(const IRC_NACHRICHT *msg_data)
 // Benutzerliste einlesen
 void Zentrale::irc_userlist(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[2];
     wxString benutzerliste;
-    benutzerliste = wxString(msg_data->params_a[3], wxConvUTF8);
+    benutzerliste = msg_data->params_a[3];
     fenster(empfaenger)->BenutzerHinzufuegen(benutzerliste);
 }
 
@@ -510,8 +510,8 @@ void Zentrale::irc_userlist(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_join(const IRC_NACHRICHT *msg_data)
 {
 
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString benutzer(msg_data->nick, wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString benutzer = msg_data->nick;
 
     if(benutzer.Upper() == irc->CurrentNick.Upper())
     // Wenn man selber der Benutzer ist, dann hat man den Raum betreten
@@ -533,14 +533,14 @@ void Zentrale::irc_join(const IRC_NACHRICHT *msg_data)
 // Benutzerliste aktualisieren / Benutzer hat den Raum verlassen
 void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8); // = ein Raum
+    wxString empfaenger = msg_data->params_a[0]; // = ein Raum
     wxString nachricht = _T("");
-    if(msg_data->params_i > 1)
+    if (msg_data->params_i > 1)
     {
         nachricht = msg_data->params_a[1];
     }
     
-    wxString benutzer(msg_data->nick, wxConvUTF8);
+    wxString benutzer = msg_data->nick;
 
     if(benutzer.Upper() == irc->CurrentNick.Upper())
     // wenn man selber den Raum verlaesst
@@ -558,9 +558,9 @@ void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
 
 void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(irc->CurrentNick, wxConvUTF8);
-    wxString benutzer(msg_data->nick, wxConvUTF8);
-    wxString nachricht(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger(irc->CurrentNick);
+    wxString benutzer = msg_data->nick;
+    wxString nachricht = msg_data->params_a[0];
     bool benutzer_entfernt = false;
 
     for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
@@ -584,9 +584,9 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
 // Benutzerliste aktualisieren / Benutzer hat seinen Namen geaendert
 void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
 {
-    //wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
-    wxString benutzer(msg_data->nick, wxConvUTF8);
-    wxString neuername(msg_data->params_a[0], wxConvUTF8);
+    //wxString empfaenger = msg_data->params_a[1];
+    wxString benutzer = msg_data->nick;
+    wxString neuername = msg_data->params_a[0];
 
     for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
     {
@@ -620,11 +620,11 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
     // Fehlermeldung anzeigen (alternativ irc_error aufrufen hier.
 
     //statt diesem irc_error aufrufen
-        wxString fehler(msg_data->cmd, wxConvUTF8);
+        wxString fehler = msg_data->cmd;
         for(int i = 0; i < msg_data->params_i; i++)
         {
             fehler += _T(" ");
-            fehler += wxString(msg_data->params_a[i], wxConvUTF8);
+            fehler += msg_data->params_a[i];
         }
         fenstersuchen(irc->WantedNick)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
      //statt diesem irc_error aufrufen
@@ -636,8 +636,8 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
 // Einladung in einen Raum
 void Zentrale::irc_invite(const IRC_NACHRICHT *msg_data)
 {
-    wxString benutzer(msg_data->nick, wxConvUTF8);
-    wxString raum(msg_data->params_a[1], wxConvUTF8);
+    wxString benutzer = msg_data->nick;
+    wxString raum = msg_data->params_a[1];
 
     fenstersuchen(irc->CurrentNick)->NachrichtAnhaengen(_T("INVITE"),benutzer,raum);
 }
@@ -645,21 +645,21 @@ void Zentrale::irc_invite(const IRC_NACHRICHT *msg_data)
 // URL des Raumes anzeigen
 void Zentrale::irc_chanurl(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
-    fenster(empfaenger)->NachrichtAnhaengen(_T("CHANNEL_URL"), wxString(msg_data->params_a[2], wxConvUTF8));
+    wxString empfaenger = msg_data->params_a[1];
+    fenster(empfaenger)->NachrichtAnhaengen(_T("CHANNEL_URL"), msg_data->params_a[2]);
 }
 
 // Thema des Raums anzeigen
 void Zentrale::irc_topic(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
-    fenster(empfaenger)->ThemaAendern(wxString(msg_data->params_a[2], wxConvUTF8));
+    wxString empfaenger = msg_data->params_a[1];
+    fenster(empfaenger)->ThemaAendern(msg_data->params_a[2]);
 }
 
 // Thema wurde gesetzt wann.
 void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[1], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[1];
     
     // Zeitstempel erzeugen
     long unsigned int raw_time_long;
@@ -674,15 +674,15 @@ void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
     strftime(timestamp, 50, "%d.%m.%Y %X", local_time);
     wxString zeit(timestamp, wxConvUTF8);
     
-    fenster(empfaenger)->NachrichtAnhaengen(_T("TOPICWHOTIME"), wxString(msg_data->params_a[2], wxConvUTF8), zeit);
+    fenster(empfaenger)->NachrichtAnhaengen(_T("TOPICWHOTIME"), msg_data->params_a[2], zeit);
 }
 
 // Thema des Raums anzeigens
 void Zentrale::irc_requestedtopic(const IRC_NACHRICHT *msg_data)
 {
-   wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-   wxString benutzer(msg_data->nick, wxConvUTF8);
-   fenster(empfaenger)->ThemaAendern(wxString(msg_data->params_a[1], wxConvUTF8), benutzer);
+   wxString empfaenger = msg_data->params_a[0];
+   wxString benutzer = msg_data->nick;
+   fenster(empfaenger)->ThemaAendern(msg_data->params_a[1], benutzer);
 }
 
 // Auf Ping mit Pong antworten
@@ -694,14 +694,14 @@ void Zentrale::irc_pong(const IRC_NACHRICHT *msg_data)
 // RPL_UNAWAY / 305
 void Zentrale::irc_unaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("RPL_UNAWAY"));
 }
 
 // RPL_NOWAWAY / 306
 void Zentrale::irc_nowaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("RPL_NOWAWAY"));
 }
 
@@ -709,28 +709,28 @@ void Zentrale::irc_nowaway(const IRC_NACHRICHT *msg_data)
 
 void Zentrale::irc_whoisuser(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString user(msg_data->params_a[2], wxConvUTF8);
-    wxString host(msg_data->params_a[3], wxConvUTF8);
-    wxString name(msg_data->params_a[5], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString user = msg_data->params_a[2];
+    wxString host = msg_data->params_a[3];
+    wxString name = msg_data->params_a[5];
 
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_USER"),nick,user,host,name);
 }
 
 void Zentrale::irc_whoisaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString text(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString text = msg_data->params_a[2];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_AWAY"),nick,text);
 }
 
 void Zentrale::irc_whoischan(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString chans(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString chans = msg_data->params_a[2];
 
     // Rechte noch beachten ([@|+]#channel)???
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_CHANNEL"),nick,chans);
@@ -738,35 +738,35 @@ void Zentrale::irc_whoischan(const IRC_NACHRICHT *msg_data)
 
 void Zentrale::irc_whoisidle(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString sekunden(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString sekunden = msg_data->params_a[2];
 
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_IDLE"),nick,sekunden);
 }
 
 void Zentrale::irc_whoisserver(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString server(msg_data->params_a[2], wxConvUTF8);
-    wxString servernachricht(msg_data->params_a[3], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString server = msg_data->params_a[2];
+    wxString servernachricht = msg_data->params_a[3];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
 }
 
 void Zentrale::irc_whoisspecial(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString special(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString special = msg_data->params_a[2];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SPECIAL"),nick,special);
 }
 
 void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString nick(msg_data->params_a[1], wxConvUTF8);
-    wxString server(msg_data->params_a[2], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString nick = msg_data->params_a[1];
+    wxString server = msg_data->params_a[2];
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"),nick,server);
 }
 
@@ -774,12 +774,12 @@ void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
 // Verschiedene Fehlermeldungen anzeigen 
 void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString fehler(msg_data->cmd, wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString fehler = msg_data->cmd;
     for(int i = 0; i < msg_data->params_i; i++)
     {
         fehler += _T(" ");
-        fehler += wxString(msg_data->params_a[i], wxConvUTF8);
+        fehler += msg_data->params_a[i];
     }
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
 }
@@ -788,12 +788,12 @@ void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
 // Einfache Anzeige von Nachrichten
 void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
     wxString nachricht = _T("");
     for(int i = 1; i < msg_data->params_i; i++)
     // beginnend bei eins, damit der eigene Nickname nicht angezeigt wird.
     {
-        nachricht += wxString(msg_data->params_a[i], wxConvUTF8);
+        nachricht += msg_data->params_a[i];
         nachricht += _T(" ");
     }
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
@@ -802,12 +802,12 @@ void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
 // Fehler anzeigen. Nachricht wurde nicht behandelt bzw, Befehl nicht abgefragt
 void Zentrale::irc_unbekannt(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger(msg_data->params_a[0], wxConvUTF8);
-    wxString fehler(msg_data->cmd, wxConvUTF8);
+    wxString empfaenger = msg_data->params_a[0];
+    wxString fehler = msg_data->cmd;
     for(int i = 0; i < msg_data->params_i; i++)
     {
         fehler += _T(" ");
-        fehler += wxString(msg_data->params_a[i], wxConvUTF8);
+        fehler += msg_data->params_a[i];
     }
     fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC_COMMAND_UNKNOWN"), fehler);
 }

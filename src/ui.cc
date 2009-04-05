@@ -242,13 +242,13 @@ void Fenster::NachrichtSenden()
 // OEFFENTLICHE FUNKTIONEN
 void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxString port)
 {
-    if(titel = _T(""))
+    if(titel == _T(""))
         titel = fenster_name;
-    if(nick = _T(""))
+    if(nick == _T(""))
         nick = wxGetApp().irc->CurrentNick;
-    if(hostname = _T(""))
+    if(hostname == _T(""))
         hostname = wxGetApp().irc->CurrentHostname;
-    if(port = _T(""))
+    if(port == _T(""))
         port = wxGetApp().irc->CurrentPort;
 
     // Aus Konfiguration Titelformat auslesen
