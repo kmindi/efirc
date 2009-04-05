@@ -274,7 +274,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     if(befehl_parameter != _T("")) parameter_vorhanden = true;
     
     // Befehle die nicht unbedingt einen Parameter erwarten
-    if(befehl_name == _T("QUIT"))
+    if(befehl_name == _T("QUIT") || befehl_name == _T("EXIT") || befehl_name == _T("BEENDEN"))
     {
         wxString quitmessage = _T("");
 
@@ -336,7 +336,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
     
-    else if(befehl_name == _T("ABOUT"))
+    else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00fcBER"))
     {
         zeige_ueber();
     }
