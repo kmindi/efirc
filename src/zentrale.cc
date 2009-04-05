@@ -19,7 +19,7 @@ IMPLEMENT_APP(Zentrale) // erstellt main funktion
 
 bool Zentrale::OnInit()
 {
-    efirc_version_string = _T("0.3-") + wxString(__SVNREVISION__, wxConvUTF8);
+    efirc_version_string = _T("0.3-"__SVNREVISION__);
 
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
 
@@ -507,11 +507,11 @@ void Zentrale::zeige_ueber()
     info.Append(_T("\n"));
     info.Append(_T("efirc - easy and fast internet relay chat client\n"));
     info.Append(efirc_version_string + _T("\n"));
-    info.Append(_T("GNU GCC ") + wxString(__COMPILERVERSION__, wxConvUTF8) + _T(", ") + wxString(wxVERSION_STRING, wxConvUTF8) +
+    info.Append(_T("GNU GCC "__COMPILERVERSION__", "wxVERSION_STRING
     #if wxUSE_UNICODE == 1
-    _T(", UNICODE") +
+    ", UNICODE"
     #endif
-    _T("\n"));
+    "\n"));
     info.Append(_T("\n"));
     info.Append(_T("Deutsch:\n"));
     info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));
