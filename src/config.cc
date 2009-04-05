@@ -27,7 +27,7 @@ void Konfiguration::opencfg(wxString dateipfad)
 
     if(!datei_ist_nicht_vorhanden)
     {
-        file.Open(dateipfad);
+        file.Open(dateipfad, wxConvLocal);
         for ( unsigned int i = 0; i < file.GetLineCount(); i++ )
         {
             konfiguration_text += file.GetLine(i) + _T("\n");
@@ -35,7 +35,7 @@ void Konfiguration::opencfg(wxString dateipfad)
     }
     else
     {
-        file.Open(dateipfad);
+        file.Open(dateipfad, wxConvLocal);
 
         wxString tmp_standardkonfiguration_text = standardkonfiguration_text;
         while(tmp_standardkonfiguration_text != _T(""))
