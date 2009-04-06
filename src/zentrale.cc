@@ -268,10 +268,15 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
+    
     befehl_name.MakeUpper();
+    
     bool parameter_erwartet = false;
     bool parameter_vorhanden = false;
+    
     if(befehl_parameter != _T("")) parameter_vorhanden = true;
+    
+    wxLocale *local = new wxLocale(wxLANGUAGE_GERMAN); // wird fuer ueber-Befehl gebraucht
     
     // Befehle die nicht unbedingt einen Parameter erwarten
     if(befehl_name == _T("QUIT") || befehl_name == _T("EXIT") || befehl_name == _T("BEENDEN"))
@@ -336,7 +341,8 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
     
-    else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00fcBER") || befehl_name == _T("\u00dcBER"))
+    else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00dcBER"))
+    // \u00DC = grosses U_UMLAUT
     {
         zeige_ueber();
     }
@@ -448,6 +454,8 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     {
         zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_MISSING_PARAMETER"), befehl_name);
     }
+    
+    delete local; // locale wird nur fuer ueber-Befehl gesetzt.
 }
 
 void Zentrale::NachrichtSenden(wxString fenstername, wxString nachricht)
