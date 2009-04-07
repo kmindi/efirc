@@ -1,14 +1,16 @@
-als erstes wxwidgets installieren (pfad: c:\wxwidgets)
-als zweites mingw mit mingw32-make installieren (pfad: c:\mingw)
+wir gehen von wxwidgets >= 2.9.0 aus (-> automatisch unicode)
+
+als erstes svn-trunk von wxWidgets holen (oder installieren) (pfad: c:\wxWidgets)
+wx-config win herunterladen und in einen Ordner verschieben/kopieren der ueber PATH erreichbar ist.
+als zweites mingw mit mingw32-make installieren (pfad: c:\Mingw)
 bei bedarf upx installieren unter c:\upx
 
 PATH umgebungsvariable ändern:
-PATH+=c:\mingw\bin;c:\upx
+PATH+=c:\mingw\bin;c:\upx;C:\wxWidgets
+neue Umgebungsvariablen:
+WXWIN=C:\wxWidgets
+WXCFG=gcc_lib\mswu
 
 in cmd zum kompilieren von wxwidgets:
 C:\wxwidgets\build\msw\
-mingw32-make -f makefile.gcc BUILD=release MONOLITHIC=1 USE_OPENGL=1 RUNTIME_LIBS=static USE_RTTI=0 USE_EXCEPTIONS=1
-
-dateien aus wxwidgets ordner\include\wx nach src\include\wx
-setup.h aus wx\msw nach wx kopieren
-libwxmsw28.a aus wxwidgets ordner/lib/gcc_lib nach C:\MinGW\lib\
+mingw32-make -f makefile.gcc BUILD=release MONOLITHIC=1 RUNTIME_LIBS=static
