@@ -548,14 +548,10 @@ void Zentrale::zeige_ueber()
         {
             st_infotext->AppendText(prefix + tmp_text.Left(zeilenlaenge - prefix.Len())); // prefix + den linken Teil von tmp_text bis zur Position (maximale Zeilenlaenge - prefix Laenge)
             tmp_text = tmp_text.Mid(zeilenlaenge - prefix.Len()); // In tmp_text steht jetzt nicht mehr der Text der schon angezeigt wurde
-            wxMilliSleep(100); // Nach jeder Zeile kurz warten
         }
-        
         st_infotext->AppendText(prefix + tmp_text);
         
         info = info.AfterFirst(_T('\n')); // Alles nach dem ersten Zeilenumbruch steht jetzt in tmp_text
-        
-        wxMilliSleep(100); // Nach jeder Zeile kurz warten
     }
 }
 
