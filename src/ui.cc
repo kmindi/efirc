@@ -154,45 +154,43 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
     // Der Wert der gedrueckten Taste
     int gedrueckte_taste = event.GetKeyCode();
 
-    if (gedrueckte_taste == WXK_RETURN)
+    switch(gedrueckte_taste)
     {
-        NachrichtSenden();
-    }
-    
-    else if(event.m_keyCode == WXK_UP)
-    {
-        if(geschichte_position > 0)
-        {
-                --geschichte_position;
-                WxEdit_eingabefeld->ChangeValue(_T(""));
-                WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
-        }
-    }
-    else if(event.m_keyCode == WXK_DOWN)
-    {
-        if(geschichte_texte.GetCount() != 0)
-        {
-            if(geschichte_position < static_cast<int>(geschichte_texte.GetCount())-1)
+        case WXK_RETURN:
+            NachrichtSenden();
+            break;
+        
+        case WXK_UP:
+            if(geschichte_position > 0)
             {
-                ++geschichte_position;
-                WxEdit_eingabefeld->ChangeValue(_T(""));
-                WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
+                    --geschichte_position;
+                    WxEdit_eingabefeld->ChangeValue(_T(""));
+                    WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
             }
-            else
+            break;
+        
+        case WXK_DOWN:
+            if(geschichte_texte.GetCount() != 0)
             {
-                geschichte_position = geschichte_texte.GetCount();
-                WxEdit_eingabefeld->ChangeValue(_T(""));
-                WxEdit_eingabefeld->SetInsertionPointEnd();
+                if(geschichte_position < static_cast<int>(geschichte_texte.GetCount())-1)
+                {
+                    ++geschichte_position;
+                    WxEdit_eingabefeld->ChangeValue(_T(""));
+                    WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
+                }
+                else
+                {
+                    geschichte_position = geschichte_texte.GetCount();
+                    WxEdit_eingabefeld->ChangeValue(_T(""));
+                    WxEdit_eingabefeld->SetInsertionPointEnd();
+                }
             }
-        }
-    } 
-    else
-    {
-        // Ereignis weiterleiten
-        event.Skip();
+            break;
+            
+            default:
+                event.Skip();
+        
     }
-
-    
 }
 
 // Bei Fokuserhalt Standardtext loeschen
