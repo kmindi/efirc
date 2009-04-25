@@ -620,19 +620,12 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
 // Nickname wird bereits genutzt
 void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
 {
+    
+    irc_fehler(msg_data); // Fehlermeldung anzeigen
+    
     // VERBINDUNG ZUR KONFIGURATION
-    // Fehlermeldung anzeigen (alternativ irc_error aufrufen hier.
-
-    //statt diesem irc_error aufrufen
-        wxString fehler = msg_data->cmd;
-        for(int i = 0; i < msg_data->params_i; i++)
-        {
-            fehler += _T(" ");
-            fehler += msg_data->params_a[i];
-        }
-        fenstersuchen(irc->WantedNick)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
-     //statt diesem irc_error aufrufen
-
+    // Abfragen ob der Name automatisch geaendert werden soll
+    
     irc->WantedNick += _T("_"); // _ an den namen anhaengen
     irc->irc_send_nick(irc->WantedNick.mb_str());
 }
