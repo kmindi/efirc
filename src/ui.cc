@@ -122,7 +122,7 @@ void Fenster::ObjekteAnpassen()
 // Schliessen
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
 {
-    if(fenster_name == wxGetApp().irc->CurrentHostname || fenster_name == wxGetApp().irc->CurrentNick)
+    if(fenster_name.Upper() == wxGetApp().irc->CurrentHostname.Upper() || fenster_name.Upper() == wxGetApp().irc->CurrentNick.Upper())
     {
         if(wxGetApp().anzahl_offene_fenster() == 1)
         {
