@@ -122,13 +122,28 @@ void Fenster::ObjekteAnpassen()
 // Schliessen
 void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
 {
-    if(wxGetApp().anzahl_offene_fenster() == 1)
+    if(fenster_name == wxGetApp().irc->CurrentHostname || fenster_name == wxGetApp().irc->CurrentNick)
     {
-        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+        if(wxGetApp().anzahl_offene_fenster() == 1)
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+        }
+        else
+        {
+            wxGetApp().fensterzerstoeren(fenster_name);
+        }
     }
     else
     {
-        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
+        if(wxGetApp().anzahl_offene_fenster() == 1)
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+        }
+        else
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
+            wxGetApp().fensterzerstoeren(fenster_name);
+        }
     }
 }
 

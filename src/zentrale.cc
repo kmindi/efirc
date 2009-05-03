@@ -43,12 +43,14 @@ bool Zentrale::OnInit()
     _T("PASS"));
 
     // FENSTER
-    // dafuer sorgen, dass kein zeiger festgelegt ist
-    //for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
-
 
     // erste Instanz der Fenster-klasse erzeugen.
-    neuesFenster(config->parsecfgvalue(_T("irc_channel")));
+    neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
+    
+    if(config->parsecfgvalue(_T("irc_channel")) != _T(""))
+    {
+        neuesFenster(config->parsecfgvalue(_T("irc_channel")));
+    }
 
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
@@ -178,7 +180,7 @@ unsigned int Zentrale::anzahl_offene_fenster()
 }
 
 // Neues Fenster erzeugen
-void Zentrale::neuesFenster(wxString namedesfensters)
+Fenster* Zentrale::neuesFenster(wxString namedesfensters)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(namedesfensters.Upper());
     
@@ -195,15 +197,23 @@ void Zentrale::neuesFenster(wxString namedesfensters)
         zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
         zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
         SetTopWindow(zgr_fenster[namedesfensters.Upper()]);
-
+        
+        return zgr;
+    }
+    else
+    {
+        return zgr_fenster[namedesfensters.Upper()];
     }
 }
 
 // Fenster zerstoeren
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
 {
-    zgr_fenster[namedesfensters.Upper()]->Destroy();
-    zgr_fenster.erase(namedesfensters.Upper());
+    if(zgr_fenster.end() != zgr_fenster.find(namedesfensters.Upper()))
+    {
+        zgr_fenster[namedesfensters.Upper()]->Destroy();
+        zgr_fenster.erase(namedesfensters.Upper());
+    }
 }
 
 // Gibt IMMER einen Zeiger auf ein Fenster zurueck
@@ -222,16 +232,16 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         if(name.Upper() == irc->CurrentNick.Upper())
         // Wenn es Absicht war (an eigenen Nicknamen)
         {
-            return dynamic_cast<Fenster*>(GetTopWindow());
+            //return dynamic_cast<Fenster*>(GetTopWindow());
+            return fenster(name);
         }
         else
         // Wenn nicht Fehler zusaetzlich anzeigen
         {
-            Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
-            zgr->NachrichtAnhaengen(_T("ERR_WINDOW_NOT_FOUND"), name);
-            return zgr;
+            //Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
+            //zgr->NachrichtAnhaengen(_T("ERR_WINDOW_NOT_FOUND"), name);
+            return zgr_fenster[irc->CurrentHostname.Upper()];
         }
-        
     }
 }
 
@@ -248,6 +258,10 @@ Fenster* Zentrale::fenster(wxString name)
         if(iter != zgr_fenster.end())
         {
             return zgr_fenster[name.Upper()];
+        }
+        else
+        {
+            return neuesFenster(name);
         }
     }
 }
@@ -292,6 +306,10 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         Sleep(30);
         #endif
 
+        // Threads beenden
+        thrd_recv->Delete();
+        thrd_call->Delete();
+        
         // Alle Fenster zerstoeren
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         {
@@ -559,10 +577,10 @@ void Zentrale::connect_thread()
     
     irc->connect();
 
-    Thread *thread = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
-    Thread *thread2 = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten
-    if (thread->Create() == wxTHREAD_NO_ERROR) { thread->Run(); }
-    if (thread2->Create() == wxTHREAD_NO_ERROR) { thread2->Run(); }
+    thrd_recv = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
+    thrd_call = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten
+    if (thrd_recv->Create() == wxTHREAD_NO_ERROR) { thrd_recv->Run(); }
+    if (thrd_call->Create() == wxTHREAD_NO_ERROR) { thrd_call->Run(); }
 
 }
 

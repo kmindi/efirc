@@ -64,7 +64,7 @@ class Zentrale : public wxApp
     
     private:
         map<wxString, Fenster*> zgr_fenster;
-        void neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
+        Fenster* neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
         
         int OnExit();
 
@@ -82,6 +82,9 @@ class Zentrale : public wxApp
         void connect_thread();
         void recv_thread();
         void call_thread();
+        
+        Thread* thrd_recv;
+        Thread* thrd_call;
 
         // IRC FUNKTIONEN
         void irc_pmsg(const IRC_NACHRICHT *);

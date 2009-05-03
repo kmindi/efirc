@@ -420,18 +420,39 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
 // Willkommensnachrichten 001 , Nickname setzen
 void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
-    
-    for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
+    wxString alter_nick = irc->CurrentNick;
+    wxString empfaenger = msg_data->params_a[0];
+    if(!irc->CurrentNick == empfaenger)
+    // wenn der gesendete Nick nicht der gleiche wie der gespeicherte ist, dann überall anpassen, denn dann wurde er vom server geaendert
     {
-        if(!(zgr_fenster[i->first]==NULL))
-        // nicht in nicht vorhandenen Fenstern
+        irc->CurrentNick = empfaenger; // neuen nickname setzen
+        
+        for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
+        // In jedem Fenster neuen Namen setzen und Fenster anpassen
         {
-                irc->CurrentNick = empfaenger;
-                zgr_fenster[i->first]->TitelSetzen(_T(""), empfaenger);
+            if(!(zgr_fenster[i->first]==NULL))
+            // nicht in nicht vorhandenen Fenstern
+            {
+                if(i == zgr_fenster.find(alter_nick.Upper()))
+                // falls gerade das Fenster geändert wird, das als Namen den eigenen Nickname hat
+                // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
+                {
+                    zgr_fenster[i->first]->fenster_name = empfaenger;
+                    zgr_fenster[i->first]->TitelSetzen(empfaenger, empfaenger);
+                    // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+                    Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
+                    zgr_fenster.erase(i); // Eintrag loeschen
+                    zgr_fenster.insert(make_pair(empfaenger.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen 
+                }
+                else
+                {
+                    zgr_fenster[i->first]->TitelSetzen(_T(""), empfaenger);
+                }
+            }
         }
     }
+    
 }
 
 // RPL_ISUPPORT
@@ -444,7 +465,7 @@ void Zentrale::irc_isupport(const IRC_NACHRICHT *msg_data)
         nachricht += _T(" ");
         nachricht += msg_data->params_a[i];
     }
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
 }
 
 void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
@@ -490,8 +511,7 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
 // Message of the day anzeigen
 void Zentrale::irc_motd(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("MOTD"), msg_data->params_a[1]);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("MOTD"), msg_data->params_a[1]);
 }
 
 // Am Ende der Nachricht des Tages automatisch einen Raum betreten
@@ -588,7 +608,7 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
 // Benutzerliste aktualisieren / Benutzer hat seinen Namen geaendert
 void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
 {
-    //wxString empfaenger = msg_data->params_a[1];
+    wxString alter_nick = irc->CurrentNick;
     wxString benutzer = msg_data->nick;
     wxString neuername = msg_data->params_a[0];
 
@@ -597,16 +617,31 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
         if(!(zgr_fenster[i->first]==NULL))
         // nicht in nicht vorhandenen Fenstern
         {
-            if(benutzer.Upper() == irc->CurrentNick.Upper() || benutzer.Upper() == irc->WantedNick.Upper())
+            if(benutzer.Upper() == alter_nick.Upper() || benutzer.Upper() == irc->WantedNick.Upper())
             // Wenn man selber der Benutzer ist, dann muss der eigene Nick geaendert werden
             {
-                zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
+                if(i == zgr_fenster.find(alter_nick.Upper()))
+                // falls gerade das Fenster geändert wird, das als Namen den eigenen Nickname hat
+                // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
+                {
+                    zgr_fenster[i->first]->fenster_name = neuername;
+                    zgr_fenster[i->first]->TitelSetzen(neuername, neuername);
+                    // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+                    Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
+                    zgr_fenster.erase(i); // Eintrag loeschen
+                    zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen 
+                }
+                else
+                {                
+                    zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
+                    zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
+                    zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
+                }
+                
                 irc->CurrentNick = neuername;
-                zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
-                zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
             }
             else
-            // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
+            // Andernfalls ist es logischerweise ein Benutzer der seinen Namen geaendert hat
             {
                 zgr_fenster[i->first]->BenutzerAendern(benutzer, neuername);
                 // Nachricht anzeigen
@@ -691,101 +726,89 @@ void Zentrale::irc_pong(const IRC_NACHRICHT *msg_data)
 // RPL_UNAWAY / 305
 void Zentrale::irc_unaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("RPL_UNAWAY"));
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("RPL_UNAWAY"));
 }
 
 // RPL_NOWAWAY / 306
 void Zentrale::irc_nowaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("RPL_NOWAWAY"));
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("RPL_NOWAWAY"));
 }
 
 //whois Antworten anzeigen
 
 void Zentrale::irc_whoisuser(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString user = msg_data->params_a[2];
     wxString host = msg_data->params_a[3];
     wxString name = msg_data->params_a[5];
 
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_USER"),nick,user,host,name);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_USER"), nick, user, host, name);
 }
 
 void Zentrale::irc_whoisaway(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString text = msg_data->params_a[2];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_AWAY"),nick,text);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_AWAY"), nick, text);
 }
 
 void Zentrale::irc_whoischan(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString chans = msg_data->params_a[2];
 
     // Rechte noch beachten ([@|+]#channel)???
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_CHANNEL"),nick,chans);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_CHANNEL"), nick, chans);
 }
 
 void Zentrale::irc_whoisidle(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString sekunden = msg_data->params_a[2];
-
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_IDLE"),nick,sekunden);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_IDLE"), nick, sekunden);
 }
 
 void Zentrale::irc_whoisserver(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString server = msg_data->params_a[2];
     wxString servernachricht = msg_data->params_a[3];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"),nick,server,servernachricht);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_SERVERMSG"), nick, server, servernachricht);
 }
 
 void Zentrale::irc_whoisspecial(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString special = msg_data->params_a[2];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_SPECIAL"),nick,special);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_SPECIAL"), nick, special);
 }
 
 void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nick = msg_data->params_a[1];
     wxString server = msg_data->params_a[2];
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"),nick,server);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"), nick, server);
 }
 
 // ERR_*-Nachrichten
 // Verschiedene Fehlermeldungen anzeigen 
 void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString fehler = msg_data->cmd;
     for(int i = 0; i < msg_data->params_i; i++)
     {
         fehler += _T(" ");
         fehler += msg_data->params_a[i];
     }
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("ERR_IRC"), fehler);
 }
 
 
 // Einfache Anzeige von Nachrichten
 void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString nachricht = _T("");
     for(int i = 1; i < msg_data->params_i; i++)
     // beginnend bei eins, damit der eigene Nickname nicht angezeigt wird.
@@ -793,18 +816,17 @@ void Zentrale::irc_einfach(const IRC_NACHRICHT *msg_data)
         nachricht += msg_data->params_a[i];
         nachricht += _T(" ");
     }
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("PRIVMSG_NOSENDER"),_T(""), nachricht);
 }
 
 // Fehler anzeigen. Nachricht wurde nicht behandelt bzw, Befehl nicht abgefragt
 void Zentrale::irc_unbekannt(const IRC_NACHRICHT *msg_data)
 {
-    wxString empfaenger = msg_data->params_a[0];
     wxString fehler = msg_data->cmd;
     for(int i = 0; i < msg_data->params_i; i++)
     {
         fehler += _T(" ");
         fehler += msg_data->params_a[i];
     }
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("ERR_IRC_COMMAND_UNKNOWN"), fehler);
+    fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("ERR_IRC_COMMAND_UNKNOWN"), fehler);
 }
