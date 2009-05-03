@@ -47,10 +47,6 @@ bool Zentrale::OnInit()
     // erste Instanz der Fenster-klasse erzeugen.
     neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
     
-    if(config->parsecfgvalue(_T("irc_channel")) != _T(""))
-    {
-        neuesFenster(config->parsecfgvalue(_T("irc_channel")));
-    }
 
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
@@ -240,7 +236,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         {
             //Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
             //zgr->NachrichtAnhaengen(_T("ERR_WINDOW_NOT_FOUND"), name);
-            return zgr_fenster[irc->CurrentHostname.Upper()];
+            return fenster(irc->CurrentHostname);
         }
     }
 }
@@ -249,20 +245,15 @@ Fenster* Zentrale::fenstersuchen(wxString name)
 // DARF nur mit VORHANDENEN Fenstern benutzt werden
 Fenster* Zentrale::fenster(wxString name)
 {
-    map<wxString,Fenster*>::iterator iter; 
+    map<wxString,Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
     
-    while(1)
+    if(iter != zgr_fenster.end())
     {
-        iter = zgr_fenster.find(name.Upper());
-        
-        if(iter != zgr_fenster.end())
-        {
-            return zgr_fenster[name.Upper()];
-        }
-        else
-        {
-            return neuesFenster(name);
-        }
+        return zgr_fenster[name.Upper()];
+    }
+    else
+    {
+        return neuesFenster(name);
     }
 }
 
