@@ -42,12 +42,9 @@ bool Zentrale::OnInit()
     config->parsecfgvalue(_T("irc_realname")),
     _T("PASS"));
 
-    // FENSTER
-
     // erste Instanz der Fenster-klasse erzeugen.
     neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
     
-
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
     connect_thread();
@@ -175,7 +172,7 @@ unsigned int Zentrale::anzahl_offene_fenster()
     return zgr_fenster.size();
 }
 
-// Neues Fenster erzeugen
+// Neues Fenster erzeugen und Zeiger auf dieses zurueckgeben
 Fenster* Zentrale::neuesFenster(wxString namedesfensters)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(namedesfensters.Upper());
@@ -206,6 +203,7 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
 void Zentrale::fensterzerstoeren(wxString namedesfensters)
 {
     if(zgr_fenster.end() != zgr_fenster.find(namedesfensters.Upper()))
+    // Nur versuchen zu zerstoeren wenn das Fenster auch existiert
     {
         zgr_fenster[namedesfensters.Upper()]->Destroy();
         zgr_fenster.erase(namedesfensters.Upper());
@@ -223,35 +221,32 @@ Fenster* Zentrale::fenstersuchen(wxString name)
         return zgr_fenster[name.Upper()];
     }
     else
-    // Wenn nicht, im obersten Fenster anzeigen
     {
         if(name.Upper() == irc->CurrentNick.Upper())
-        // Wenn es Absicht war (an eigenen Nicknamen)
+        // Wenn nicht, ist es entweder eine Nachricht an einen selber
         {
-            //return dynamic_cast<Fenster*>(GetTopWindow());
             return fenster(name);
         }
         else
-        // Wenn nicht Fehler zusaetzlich anzeigen
+        // Oder eine andere Nachricht die im Serverfenster angezeigt werden soll
         {
-            //Fenster *zgr = dynamic_cast<Fenster*>(GetTopWindow());
-            //zgr->NachrichtAnhaengen(_T("ERR_WINDOW_NOT_FOUND"), name);
             return fenster(irc->CurrentHostname);
         }
     }
 }
 
 // Gibt  IMMER einen Zeiger auf ein Fenster zurueck
-// DARF nur mit VORHANDENEN Fenstern benutzt werden
 Fenster* Zentrale::fenster(wxString name)
 {
     map<wxString,Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
     
     if(iter != zgr_fenster.end())
+    // Wenn das Fenster gefunden wurde
     {
         return zgr_fenster[name.Upper()];
     }
     else
+    // Wenn nicht ein neues erstellen
     {
         return neuesFenster(name);
     }
