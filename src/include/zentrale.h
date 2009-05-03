@@ -64,7 +64,6 @@ class Zentrale : public wxApp
     
     private:
         map<wxString, Fenster*> zgr_fenster;
-        wxString raum; // fuer join nach motd, temporaer
         void neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
         
         int OnExit();

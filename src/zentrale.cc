@@ -42,26 +42,17 @@ bool Zentrale::OnInit()
     config->parsecfgvalue(_T("irc_realname")),
     _T("PASS"));
 
-
     // FENSTER
     // dafuer sorgen, dass kein zeiger festgelegt ist
     //for(int i=0;i<max_fenster;i++) { zgr_fenster[i]=NULL; }
 
 
     // erste Instanz der Fenster-klasse erzeugen.
-    // VERBINDUNG ZUR KONFIGURATION
-    //raum = _T("#efirc");
-    raum = config->parsecfgvalue(_T("irc_channel"));
-    neuesFenster(raum);
-
+    neuesFenster(config->parsecfgvalue(_T("irc_channel")));
 
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
     connect_thread();
-
-
-
-    // TEST FUNKTIONEN
 
     return TRUE;
 }
