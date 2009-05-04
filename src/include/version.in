@@ -4,4 +4,6 @@
 #define __SVNREVISION__ "$WCREV$"
 #define __SVNREVISIONDATE__ "$WCDATE$"
 #define __COMPILERVERSION__ __VERSION__
+#define __COMPILEDATE__ __DATE__
+#define __COMPILETIME__ __TIME__
 #endif /* __VERSION_H__ */

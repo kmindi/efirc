@@ -513,7 +513,7 @@ void Zentrale::zeige_ueber()
     #if wxUSE_UNICODE == 1
     ", UNICODE"
     #endif
-    "\n"));
+    ", "__COMPILEDATE__" "__COMPILETIME__"\n"));
     info.Append(_T("\n"));
     info.Append(_T("Deutsch:\n"));
     info.Append(_T("efirc steht unter der \"Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Deutschland\" Lizenz.\n"));
