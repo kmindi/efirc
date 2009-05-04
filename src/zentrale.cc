@@ -189,7 +189,6 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
         zgr_fenster[namedesfensters.Upper()]->fenster_name = namedesfensters;
         zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
         zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
-        SetTopWindow(zgr_fenster[namedesfensters.Upper()]);
         
         return zgr;
     }
