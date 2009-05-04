@@ -423,7 +423,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
     // bei 001 ist der aktuelle Nickname gleich dem Empfaenger der Nachricht (man selber)
     wxString alter_nick = irc->CurrentNick;
     wxString empfaenger = msg_data->params_a[0];
-    if(!irc->CurrentNick == empfaenger)
+    if(irc->CurrentNick != empfaenger)
     // wenn der gesendete Nick nicht der gleiche wie der gespeicherte ist, dann überall anpassen, denn dann wurde er vom server geaendert
     {
         irc->CurrentNick = empfaenger; // neuen nickname setzen
