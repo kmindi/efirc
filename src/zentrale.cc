@@ -283,20 +283,6 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
 
         irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
-
-        // kurz warten, damit die Verbindung ordnungsgemaess getrennt werden kann (Nachricht soll noch gesendet werden)
-        #if defined linux || defined __unix__
-        usleep(30000);
-        #else
-        Sleep(30);
-        #endif
-
-        // Threads beenden
-        thrd_recv->Delete();
-        thrd_call->Delete();
-        
-        while(thrd_recv != NULL || thrd_call != NULL)
-        { /* solange warten bis die beiden Threads beendet wurden */ }
         
         // Alle Fenster zerstoeren
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
@@ -587,7 +573,9 @@ void Zentrale::call_thread()
 // OnExit wird ausgefuehrt wenn das ganze Programm beendet wird
 int Zentrale::OnExit()
 {
-    wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
-    irc->irc_disconnect_server(quitmessage.mb_str());
+    //wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
+    //irc->irc_disconnect_server(quitmessage.mb_str());
+    thrd_call->Delete();
+    thrd_recv->Delete();
     return 0;
 }
