@@ -295,6 +295,9 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         thrd_recv->Delete();
         thrd_call->Delete();
         
+        while(thrd_recv != NULL || thrd_call != NULL)
+        { /* solange warten bis die beiden Threads beendet wurden */ }
+        
         // Alle Fenster zerstoeren
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         {
@@ -581,6 +584,7 @@ void Zentrale::call_thread()
     irc->irc_call_command_queue_entries();
 }
 
+// OnExit wird ausgefuehrt wenn das ganze Programm beendet wird
 int Zentrale::OnExit()
 {
     wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
