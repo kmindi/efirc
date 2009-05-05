@@ -1,9 +1,11 @@
-CPPIRCDIR= contrib/cppirc
-OBJS= irc.o ui.o thread.o config.o irc_event_functions.o
-CXXFLAGS+= `wx-config --cxxflags` -L$(CPPIRCDIR) -Iinclude -I$(CPPIRCDIR)
-LDLIBS= `wx-config --libs` -lircinterface -lsstring
+CPPIRCDIR:= contrib/cppirc
+OBJS:= irc.o ui.o thread.o config.o irc_event_functions.o
+WXCXXFLAGS!= wx-config --cxxflags
+CXXFLAGS+= $(WXCXXFLAGS) -L$(CPPIRCDIR) -Iinclude -I$(CPPIRCDIR)
+WXLIBS!= wx-config --libs
+LDLIBS:= $(WXLIBS) -lircinterface -lsstring
 
-efirc: zentrale.cc $(OBJS) $(CPPIRCDIR)/libircinterface.a
+efirc: zentrale.cc $(OBJS) $(CPPIRCDIR)/libircinterface.a $(CPPIRCDIR)/libsstring.a
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(.TARGET) zentrale.cc $(LDLIBS)
 
 irc.o irc_event_functions.o: $(CPPIRCDIR)/ircinterface.h
