@@ -573,9 +573,5 @@ void Zentrale::call_thread()
 // OnExit wird ausgefuehrt wenn das ganze Programm beendet wird
 int Zentrale::OnExit()
 {
-    //wxString quitmessage = config->parsecfgvalue(_T("text_quit_message"));
-    //irc->irc_disconnect_server(quitmessage.mb_str());
-    thrd_call->Delete();
-    thrd_recv->Delete();
     return 0;
 }
