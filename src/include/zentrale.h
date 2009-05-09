@@ -50,7 +50,7 @@ class Zentrale : public wxApp
         friend class Thread;
         friend class Ereignisverwalter;
         // muss ein Freund sein, damit die erstellten Threads
-        // auf die privaten Thread funktionen zugreifen koennen
+        // auf die privaten Thread Funktionen zugreifen koennen
 
         IRC *irc;
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter

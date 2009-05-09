@@ -29,10 +29,8 @@ bool Zentrale::OnInit()
     // Laufzeitkonfiguration anpassen
     Konfiguration_anpassen();
 
-
     // irc zeigt auf die IRC-Instanz
     //irc = new IRC(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-    //irc = new IRC(_T("6667"),_T("localhost"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
 
     irc = new IRC(
     config->parsecfgvalue(_T("irc_port")),
@@ -137,7 +135,6 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_DLG_NEWNICK_NICKINUSE_TEXT = The Nickname you try to use is already in use. You have to choose a new one:\n"); // case 5
     standardkonfiguration_text += _T("local_DLG_NEWNICK_CAPTION = Change your Nickname\n"); // case 5
     
-
     return standardkonfiguration_text;
 }
 
@@ -159,13 +156,9 @@ wxString Zentrale::zufallstext(int anzahl_zeichen)
 void Zentrale::Konfiguration_anpassen()
 {
     // Platzhalter ersetzen
-
-    // [efirc_version]
-    config->edit_cfg_replace(_T("%efirc_version"), efirc_version_string);
-    // [efirc_random_string]
-    config->edit_cfg_replace(_T("%random_string"), zufallstext(4));
-    // [efirc_real_name]
-    config->edit_cfg_replace(_T("%real_name"), wxGetUserId());
+        config->edit_cfg_replace(_T("%efirc_version"), efirc_version_string);
+        config->edit_cfg_replace(_T("%random_string"), zufallstext(4));
+        config->edit_cfg_replace(_T("%real_name"), wxGetUserId());
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
@@ -196,6 +189,7 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
         
         return zgr;
     }
+    
     else
     {
         return zgr_fenster[namedesfensters.Upper()];
@@ -226,12 +220,12 @@ Fenster* Zentrale::fenstersuchen(wxString name)
     else
     {
         if(name.Upper() == irc->CurrentNick.Upper())
-        // Wenn nicht, ist es entweder eine Nachricht an einen selber
+        // Wenn nicht, ist es entweder eine Nachricht an einen selber...
         {
             return fenster(name);
         }
         else
-        // Oder eine andere Nachricht die im Serverfenster angezeigt werden soll
+        // ...oder eine andere Nachricht die im Serverfenster angezeigt werden soll
         {
             return fenster(irc->CurrentHostname);
         }
@@ -425,15 +419,19 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
     else if(befehl_name == _T("WHOIS"))
     {
-        if(parameter_vorhanden) irc->irc_send_whois(befehl_parameter.mb_str());
-        else parameter_erwartet = true;
+        if(parameter_vorhanden) 
+            irc->irc_send_whois(befehl_parameter.mb_str());
+        else 
+            parameter_erwartet = true;
     }
     
     // Falls der Befehl nicht gefunden wurde
     else
     {
-        if(parameter_vorhanden) zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name + _T(" ") + befehl_parameter);
-        else zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name);
+        if(parameter_vorhanden) 
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name + _T(" ") + befehl_parameter);
+        else 
+        zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name);
     }
     
     // Falls ein Parameter erwartet wurde (Befehl wurde dann auf jeden Fall gefunden
@@ -450,44 +448,45 @@ void Zentrale::NachrichtSenden(wxString fenstername, wxString nachricht)
     irc->irc_send_privmsg(fenstername.mb_str(), nachricht.mb_str());
     // Nachricht im Textfenster anzeigen
     // UNICODE?
-    //AKTUELLER NICKNAME?
     zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("PRIVMSG"),irc->CurrentNick,nachricht);
 }
 
 void Zentrale::EingabeVerarbeiten(wxString fenstername, wxString eingabe)
 {
-    //Ist es ein Befehl?
+    //Ist es ein Befehl?...
     wxString befehlsprefix = _T("/");
     if(eingabe.StartsWith(befehlsprefix, &eingabe))
     {
         BefehlVerarbeiten(fenstername, eingabe);
     }
-    // wenn nicht an raum/benutzer senden
+    // oder eine normale Nachricht, dann an Raum/Benutzer senden
     else
     {
         NachrichtSenden(fenstername,eingabe);
     }
 }
 
-
 void Zentrale::zeige_ueber()
 {    
     wxFrame* dlg_ueber;
     
     // Neues Fenster erzeugen
-    dlg_ueber = new wxFrame(NULL, wxID_ANY, _T("info@efirc"), wxDefaultPosition, wxSize(600,400), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU /*| wxRESIZE_BORDER*/, _T("AboutDialog"));
+        dlg_ueber = new wxFrame(NULL, wxID_ANY, _T("info@efirc"), wxDefaultPosition, wxSize(600,400), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU /*| wxRESIZE_BORDER*/, _T("AboutDialog"));
+    
     // Fenster anpassen
         dlg_ueber->Center(); // In der Mitte anzeigen
         dlg_ueber->SetIcon(wxIcon(icon)); // Icon setzen
     
     // Informationen in einem nicht veraenderbaren Textfeld anzeigen
-    wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
+        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
+    
     // Textfeld anpassen
         // Schriftdarstellung aendern
         st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE)); 
         // Textfarbe aendern
         st_infotext->SetBackgroundColour( _T("#510000") );
         st_infotext->SetForegroundColour( _T("#000000") );
+    
     // Fenster anzeigen
     dlg_ueber->Show();
 
@@ -546,6 +545,7 @@ void Zentrale::zeige_ueber()
 // THREADS
 // THREADS
 // THREADS
+// Bekanntmachen der Funktion (Prototyp)
 void irc_allgemein(const irc_msg_data *msg_data, void *cp);
 
 void Zentrale::connect_thread()
@@ -559,7 +559,6 @@ void Zentrale::connect_thread()
     thrd_call = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten
     if (thrd_recv->Create() == wxTHREAD_NO_ERROR) { thrd_recv->Run(); }
     if (thrd_call->Create() == wxTHREAD_NO_ERROR) { thrd_call->Run(); }
-
 }
 
 // Thread-Funktion fuer recv_raw-Schleife

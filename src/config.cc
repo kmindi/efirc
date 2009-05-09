@@ -10,8 +10,6 @@
 
 #include <config.h>
 
-using namespace std;
-
 Konfiguration::Konfiguration(wxString dateipfad, wxString standardkonfiguration)
 {
     standardkonfiguration_text = standardkonfiguration;
@@ -45,7 +43,6 @@ void Konfiguration::opencfg(wxString dateipfad)
         }
         file.Write(); // Aenderungen anwenden
     }
-
 }
 
 wxString Konfiguration::parsecfgvalue(wxString searchstring)
@@ -71,7 +68,7 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
             return tmp_wert;
         }
     }
-
+    
     return _T("");
 }
 
@@ -79,7 +76,6 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
 bool Konfiguration::edit_cfg(wxString option, wxString neuerwert, bool aenderungenspeichern)
 {
     bool erfolg = false;
-
 
     return erfolg;
 }

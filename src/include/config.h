@@ -8,7 +8,6 @@
 ** This important information must not be removed!
 **/
 
-
 #ifndef _KONFIGURATION_
 #define _KONFIGURATION_
 
