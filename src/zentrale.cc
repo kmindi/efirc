@@ -68,6 +68,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_nickname = user_%random_string\n");
 
     standardkonfiguration_text += _T("max_DONT_SHOW_USERLIST_CHANGES = 150\n");
+    standardkonfiguration_text += _T("bool_automatic_nickchange_if_in_use = 1\n");
     
     // Farben
     standardkonfiguration_text += _T("colour_background = #510000\n");
@@ -132,6 +133,10 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n"); // case 4
     standardkonfiguration_text += _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n"); // case 5
     standardkonfiguration_text += _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n"); // case 5
+    
+    // Anzeige bestimmter Dialog oder anderer nicht irc spezifischer Nachrichten
+    standardkonfiguration_text += _T("local_DLG_NEWNICK_NICKINUSE_TEXT = The Nickname you try to use is already in use. You have to choose a new one:\n"); // case 5
+    standardkonfiguration_text += _T("local_DLG_NEWNICK_CAPTION = Change your Nickname\n"); // case 5
     
 
     return standardkonfiguration_text;

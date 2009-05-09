@@ -23,6 +23,7 @@
 #include <wx/utils.h> // fuer BS, Benutzer und Netzwerkfunktionen
 #include <wx/string.h>
 #include <wx/sizer.h>
+#include <wx/textdlg.h> // fuer textdialog zur eingabe eines einzeiligen textes
 
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 

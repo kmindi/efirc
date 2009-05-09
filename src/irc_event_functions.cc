@@ -658,14 +658,25 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
 // Nickname wird bereits genutzt
 void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
 {
-    
     irc_fehler(msg_data); // Fehlermeldung anzeigen
+    long unsigned int automatischaendern;
+    config->parsecfgvalue(_T("bool_automatic_nickchange_if_in_use")).ToULong(&automatischaendern, 10);
     
-    // VERBINDUNG ZUR KONFIGURATION
-    // Abfragen ob der Name automatisch geaendert werden soll
-    
-    irc->WantedNick += _T("_"); // _ an den namen anhaengen
-    irc->irc_send_nick(irc->WantedNick.mb_str());
+    if(automatischaendern)
+    // Abfragen ob der Nickname automatisch geaendert weren darf wenn er schon vorhanden ist
+    {    
+        irc->WantedNick += _T("_"); // _ an den namen anhaengen
+        irc->irc_send_nick(irc->WantedNick.mb_str());
+    }
+    else
+    {
+        wxTextEntryDialog* nickdialog = new wxTextEntryDialog(NULL, config->parsecfgvalue(_T("local_DLG_NEWNICK_NICKINUSE_TEXT")), config->parsecfgvalue(_T("local_DLG_NEWNICK_CAPTION")), wxEmptyString, wxOK);
+        if(nickdialog->ShowModal() == wxID_OK)
+        {
+            irc->WantedNick = nickdialog->GetValue();
+            irc->irc_send_nick(irc->WantedNick.mb_str());
+        }
+    }
 }
 
 // Einladung in einen Raum
