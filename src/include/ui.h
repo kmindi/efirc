@@ -66,7 +66,6 @@ class Fenster : public wxFrame
         wxString fenster_name;
         Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER );
 
-
         void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
         void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));
         void ThemaAendern(wxString thema, wxString benutzer=_T(""));
@@ -78,10 +77,6 @@ class Fenster : public wxFrame
         void BenutzerAendern(wxString altername, wxString neuername);
         
         bool AnzeigeBegrenzungErreicht();
-        //void Benutzerliste_benutzer_modus(wxString& benutzer, wxString);
-
-
-
 };
 
 #endif

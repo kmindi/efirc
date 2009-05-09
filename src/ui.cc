@@ -39,7 +39,6 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
     WxButton_senden = new wxButton(this, ID_WxButton_senden, _T("Senden"), wxPoint(608,392), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
     WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
 
-
     SetIcon(wxIcon(icon));
 
     ObjekteAnpassen();
@@ -50,8 +49,6 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
 
         // Bei Fokus ggf. den Text im Eingabefeld loeschen
         WxEdit_eingabefeld->Connect(wxEVT_SET_FOCUS, wxKeyEventHandler(Fenster::WxEdit_eingabefeldFokus), NULL, this);
-
-
 
     // Groessenaenderung beachten
         // Sizer erzeugen:
@@ -73,7 +70,6 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
         // Horizontal beide zusammen
             sizer_alles->Add(sizer_links, 1, wxEXPAND | wxALL, 3); // Linker Teil wird breiter bei horizontaler Groessenaenderung
             sizer_alles->Add(sizer_rechts, 0, wxEXPAND | wxTOP | wxRIGHT | wxBOTTOM, 3); // Rechter Teil behaelt seine Groesse
-
 
         sizer_alles->SetSizeHints( this ); // Minimale Groesse des Fensters (this) beachten ( = nicht unterschreiten)
         SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
@@ -178,9 +174,9 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
         case WXK_UP:
             if(geschichte_position > 0)
             {
-                    --geschichte_position;
-                    WxEdit_eingabefeld->ChangeValue(_T(""));
-                    WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
+                --geschichte_position;
+                WxEdit_eingabefeld->ChangeValue(_T(""));
+                WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
             }
             break;
         
@@ -202,9 +198,8 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
             }
             break;
             
-            default:
-                event.Skip();
-        
+        default:
+            event.Skip();
     }
 }
 
@@ -233,8 +228,6 @@ void Fenster::BeiMausAufURL(wxTextUrlEvent& event)
 
 void Fenster::NachrichtSenden()
 {
-    
-
     wxString eingabe = WxEdit_eingabefeld->GetValue(); // Eingegebenen Text in Variable speichern
     if(eingabe != _T(""))
     {
@@ -243,8 +236,13 @@ void Fenster::NachrichtSenden()
     }
     
     // In Eingabegeschichte speichern
-    if(eingabe != _T("")) { geschichte_texte.Add(eingabe); }
+    if(eingabe != _T("")) 
+    {
+        geschichte_texte.Add(eingabe);
+    }
+    
     geschichte_position = geschichte_texte.GetCount();
+    
     if(geschichte_position > 30)
     {
         geschichte_texte.RemoveAt(0);
@@ -338,9 +336,6 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
 
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
-    
-    // Automatisches scrollen laesst sich sowieso nicht einfach deaktivieren.
-    //WxEdit_ausgabefeld->ScrollLines(-1); // nur gebraucht bei style : wxTE_RICH mit wxTE_AUTO_URL oder wxTE_RICH2
 }
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
@@ -354,7 +349,6 @@ void Fenster::ThemaAendern(wxString thema, wxString benutzer)
     {
         NachrichtAnhaengen(_T("TOPIC_CHANGE"),thema,benutzer);
     }
-
 }
 
 void Fenster::AusgabefeldLeeren()
@@ -461,8 +455,8 @@ bool Fenster::AnzeigeBegrenzungErreicht()
     (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToULong(&configwert, 10);
     
     if(WxList_benutzerliste->GetItemCount() >= configwert)
-    return true;
+        return true;
     else
-    return false;
+        return false;
 }
 
