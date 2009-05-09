@@ -659,10 +659,8 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
 {
     irc_fehler(msg_data); // Fehlermeldung anzeigen
-    long unsigned int automatischaendern;
-    config->parsecfgvalue(_T("bool_automatic_nickchange_if_in_use")).ToULong(&automatischaendern, 10);
-    
-    if(automatischaendern)
+
+    if(config->parsecfgvalue(_T("bool_automatic_nickchange_if_in_use")) == _T("1"))
     // Abfragen ob der Nickname automatisch geaendert weren darf wenn er schon vorhanden ist
     {    
         irc->WantedNick += _T("_"); // _ an den namen anhaengen
