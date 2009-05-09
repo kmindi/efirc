@@ -670,7 +670,7 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
     }
     else
     {
-        wxTextEntryDialog* nickdialog = new wxTextEntryDialog(NULL, config->parsecfgvalue(_T("local_DLG_NEWNICK_NICKINUSE_TEXT")), config->parsecfgvalue(_T("local_DLG_NEWNICK_CAPTION")), wxEmptyString, wxOK);
+        wxTextEntryDialog* nickdialog = new wxTextEntryDialog(fenster(irc->CurrentNick), config->parsecfgvalue(_T("local_DLG_NEWNICK_NICKINUSE_TEXT")), config->parsecfgvalue(_T("local_DLG_NEWNICK_CAPTION")), wxEmptyString, wxOK);
         if(nickdialog->ShowModal() == wxID_OK)
         {
             irc->WantedNick = nickdialog->GetValue();
