@@ -129,7 +129,6 @@ wxString Zentrale::standardkonfiguration()
 
     // Fehler (werden in konfigurierter Farbe dargestellt)
     standardkonfiguration_text += _T("local_ERR_IRC = (!) %param1\n"); // case 2
-    standardkonfiguration_text += _T("local_ERR_WINDOW_NOT_FOUND = (!) Window \"%param1\" not found\n"); // case 3
     standardkonfiguration_text += _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n"); // case 4
     standardkonfiguration_text += _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n"); // case 5
     standardkonfiguration_text += _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n"); // case 5
