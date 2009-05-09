@@ -187,7 +187,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
         case WXK_DOWN:
             if(geschichte_texte.GetCount() != 0)
             {
-                if(geschichte_position < static_cast<int>(geschichte_texte.GetCount())-1)
+                if(geschichte_position < geschichte_texte.GetCount() - 1)
                 {
                     ++geschichte_position;
                     WxEdit_eingabefeld->ChangeValue(_T(""));
