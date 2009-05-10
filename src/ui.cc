@@ -451,8 +451,8 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
 
 bool Fenster::AnzeigeBegrenzungErreicht()
 {
-    long unsigned int configwert = 0;
-    (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToULong(&configwert, 10);
+    long configwert = 0;
+    (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToLong(&configwert, 10);
 
     if(WxList_benutzerliste->GetItemCount() >= configwert)
         return true;
