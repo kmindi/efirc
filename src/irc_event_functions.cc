@@ -27,10 +27,10 @@ DEFINE_EVENT_TYPE(wxEVT_NEUER_IRC_BEFEHL)
         (wxObject *) NULL \
     ),
 
-    
+
 BEGIN_EVENT_TABLE(Ereignisverwalter, wxEvtHandler)
     EVT_NEUER_IRC_BEFEHL(wxID_ANY, Ereignisverwalter::BeiNeueIRCNachricht)
-END_EVENT_TABLE()    
+END_EVENT_TABLE()
 
 
 
@@ -51,11 +51,11 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
 {
     // Daten aus dem Ereignis einem eigenen Zeiger zuweisen.
     const IRC_NACHRICHT *msg_data = (IRC_NACHRICHT *)event.GetClientData();
-    
+
     // Befehl in Variable speichern
     wxString cmd = msg_data->cmd;
     long unsigned int cmd_int = 0;
-    
+
     // Befehle Abfragen und entsprechende Funktionen aufrufen
     if(cmd.ToULong(&cmd_int, 10)) // Befehlstext zu einer Zahl konvertieren
     // Wenn der Befehl zu einer Zahl konvertiert werden konnte
@@ -67,7 +67,7 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 wxGetApp().irc_welcome(msg_data); // Nickname setzen
                 wxGetApp().irc_einfach(msg_data); // Nachricht aber auch noch ausgeben
                 break;
-            
+
             case 5:
                 wxGetApp().irc_isupport(msg_data);
                 break;
@@ -76,34 +76,34 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             case 328:
                 wxGetApp().irc_chanurl(msg_data);
                 break;
-            
+
             // Thema des Raums anzeigen
             case 332:
                 wxGetApp().irc_topic(msg_data);
                 break;
-            
+
             // Thema wurde gesetzt wann.
             case 333:
                 wxGetApp().irc_topicwhotime(msg_data);
                 break;
-            
+
             // Benutzerliste
             case 353:
                 wxGetApp().irc_userlist(msg_data);
                 break;
-            
+
             // RPL_UNAWAY
             case 305:
                 wxGetApp().irc_unaway(msg_data);
                 break;
-            
+
             // RPL_NOWAWAY
             case 306:
                 wxGetApp().irc_nowaway(msg_data);
                 break;
-            
+
             // END OF MOTD und ersten Raum betreten
-            case 376: 
+            case 376:
                 wxGetApp().irc_endofmotd(msg_data);
                 break;
 
@@ -111,52 +111,52 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             case 311:
                 wxGetApp().irc_whoisuser(msg_data);
                 break;
-            
+
             // WHOIS - ABWESEND
             case 301:
                 wxGetApp().irc_whoisaway(msg_data);
                 break;
-            
+
             // WHOIS - RAEUME
             case 319:
                 wxGetApp().irc_whoischan(msg_data);
                 break;
-            
+
             // WHOIS - UNTAETIG
             case 317:
                 wxGetApp().irc_whoisidle(msg_data);
                 break;
-            
+
             // WHOIS - SERVERINFO
             case 312:
                 wxGetApp().irc_whoisserver(msg_data);
                 break;
-            
+
             // WHOIS - Special
             case 320:
                 wxGetApp().irc_whoisspecial(msg_data);
                 break;
-            
+
             // WHOIS - BENUTZT HOST
             case 338:
                 wxGetApp().irc_whoisactually(msg_data);
                 break;
-            
+
             // Angeforderter Benutzername wird bereits benutzt
             case 433:
                 wxGetApp().irc_nickinuse(msg_data);
                 break;
-            
-            
+
+
             // Nachrichten die nicht angezeigt werden sollen
             case 318: // End of /WHOIS List
             case 366: // End of /NAMES List
                 break;
-            
+
             // Nachrichten die einfach angezeigt werden sollen
-            case 2: // 002 RPL_YOURHOST 
-            case 3: // 003 RPL_CREATED 
-            case 4: // 004 RPL_MYINFO 
+            case 2: // 002 RPL_YOURHOST
+            case 3: // 003 RPL_CREATED
+            case 4: // 004 RPL_MYINFO
             case 42: // 042 Unique ID
             case 250: // 250 RPL_STATSCONN
             case 251: // 251 RPL_LUSERCLIENT
@@ -164,13 +164,13 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             case 253: // 253 RPL_LUSERUNKOWN
             case 254: // 254 RPL_LUSERCHANNELS
             case 255: // 255 RPL_LUSERME
-            case 265: // 265 RPL_LOCALUSERS 
-            case 266: // 266 RPL_GLOBALUSERS 
+            case 265: // 265 RPL_LOCALUSERS
+            case 266: // 266 RPL_GLOBALUSERS
             case 372: // 372 RPL_MOTD
-            case 375: // 375 RPL_MOTDSTART 
+            case 375: // 375 RPL_MOTDSTART
                 wxGetApp().irc_einfach(msg_data);
                 break;
-            
+
 
             default:
                 if(cmd_int >= 400 || cmd_int <=499)
@@ -183,7 +183,7 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
                 {
                     wxGetApp().irc_unbekannt(msg_data);
                 }
-                
+
         }
     }
     else
@@ -194,55 +194,55 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         {
             wxGetApp().irc_pmsg(msg_data);
         }
-        
+
         else if(cmd == _T("JOIN"))
         {
             wxGetApp().irc_join(msg_data);
         }
-        
+
         else if(cmd == _T("PART"))
         {
             wxGetApp().irc_leave(msg_data);
         }
-        
+
         else if(cmd == _T("QUIT"))
         {
             wxGetApp().irc_quit(msg_data);
         }
-        
+
         else if(cmd == _T("NICK"))
         {
             wxGetApp().irc_nick(msg_data);
         }
-        
+
         else if(cmd == _T("INVITE"))
         {
             wxGetApp().irc_invite(msg_data);
         }
-        
+
         else if(cmd == _T("TOPIC"))
         {
             wxGetApp().irc_requestedtopic(msg_data);
         }
-        
+
         else if(cmd == _T("MODE"))
         {
             wxGetApp().irc_mode(msg_data);
         }
-        
+
         // PING PONG
         else if(cmd == _T("PING"))
         {
             wxGetApp().irc_pong(msg_data);
         }
-        
+
         // wenn keine Uebereinstimmung gefunden wurde, Fehler anzeigen
         else
         {
             wxGetApp().irc_unbekannt(msg_data);
-        }     
+        }
     }
-        
+
         // Angeforderten Speicher wieder freigeben
         delete msg_data;
 }
@@ -430,7 +430,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
     // wenn der gesendete Nick nicht der gleiche wie der gespeicherte ist, dann überall anpassen, denn dann wurde er vom server geaendert
     {
         irc->CurrentNick = empfaenger; // neuen nickname setzen
-        
+
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         // In jedem Fenster neuen Namen setzen und Fenster anpassen
         {
@@ -446,7 +446,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
                     // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
                     Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
                     zgr_fenster.erase(i); // Eintrag loeschen
-                    zgr_fenster.insert(make_pair(empfaenger.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen 
+                    zgr_fenster.insert(make_pair(empfaenger.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
                 }
                 else
                 {
@@ -455,7 +455,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
             }
         }
     }
-    
+
 }
 
 // RPL_ISUPPORT
@@ -566,7 +566,7 @@ void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
     {
         nachricht = msg_data->params_a[1];
     }
-    
+
     wxString benutzer = msg_data->nick;
 
     if(benutzer.Upper() == irc->CurrentNick.Upper())
@@ -632,15 +632,15 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
                     // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
                     Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
                     zgr_fenster.erase(i); // Eintrag loeschen
-                    zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen 
+                    zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
                 }
                 else
-                {                
+                {
                     zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
                     zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
                     zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
                 }
-                
+
                 irc->CurrentNick = neuername;
             }
             else
@@ -662,7 +662,7 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
 
     if(config->parsecfgvalue(_T("bool_automatic_nickchange_if_in_use")) == _T("1"))
     // Abfragen ob der Nickname automatisch geaendert weren darf wenn er schon vorhanden ist
-    {    
+    {
         irc->WantedNick += _T("_"); // _ an den namen anhaengen
         irc->irc_send_nick(irc->WantedNick.mb_str());
     }
@@ -704,20 +704,20 @@ void Zentrale::irc_topic(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
 {
     wxString empfaenger = msg_data->params_a[1];
-    
+
     // Zeitstempel erzeugen
     long unsigned int raw_time_long;
     msg_data->params_a[3].ToULong(&raw_time_long,10);
-    
+
     char timestamp[50];
     time_t raw_time;
     raw_time = raw_time_long;
-    
+
     tm *local_time;
     local_time = localtime(&raw_time);
     strftime(timestamp, 50, "%d.%m.%Y %X", local_time);
     wxString zeit(timestamp, wxConvUTF8);
-    
+
     fenster(empfaenger)->NachrichtAnhaengen(_T("TOPICWHOTIME"), msg_data->params_a[2], zeit);
 }
 
@@ -805,7 +805,7 @@ void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
 }
 
 // ERR_*-Nachrichten
-// Verschiedene Fehlermeldungen anzeigen 
+// Verschiedene Fehlermeldungen anzeigen
 void Zentrale::irc_fehler(const IRC_NACHRICHT *msg_data)
 {
     wxString fehler = msg_data->cmd;

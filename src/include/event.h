@@ -24,7 +24,7 @@ class Ereignisverwalter : public wxEvtHandler
 };
 
 class IRC_NACHRICHT
-{   
+{
     public:
         IRC_NACHRICHT(const irc_msg_data *msg_data)
         {
@@ -35,20 +35,20 @@ class IRC_NACHRICHT
             nick = wxString(msg_data->nick, wxConvUTF8);
             user = wxString(msg_data->user, wxConvUTF8);
             params_i = msg_data->params_i;
-            
+
             params_a = new wxString[params_i];
-            
+
             for(int i = 0; i < params_i; i++)
             {
                 params_a[i] = wxString(msg_data->params_a[i], wxConvUTF8);
             }
         }
-        
-        ~IRC_NACHRICHT() 
+
+        ~IRC_NACHRICHT()
         {
             delete[] params_a;
         }
-        
+
         wxString sender, cmd, params, host, nick, user;
         wxString *params_a;
         int params_i;

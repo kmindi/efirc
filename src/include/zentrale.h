@@ -55,22 +55,22 @@ class Zentrale : public wxApp
         IRC *irc;
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
         Konfiguration *config; // Zeiger zur Konfiguration
-        
+
         void fensterzerstoeren(wxString);
         void EingabeVerarbeiten(wxString, wxString);
 
         Fenster* fenstersuchen(wxString);
         Fenster* fenster(wxString name);
-        unsigned int anzahl_offene_fenster(); 
-    
+        unsigned int anzahl_offene_fenster();
+
     private:
         map<wxString, Fenster*> zgr_fenster;
         Fenster* neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
-        
+
         int OnExit();
 
         void zeige_ueber();
-        
+
         //Konfiguration
         wxString standardkonfiguration();
         wxString zufallstext(int anzahl_zeichen = 4);
@@ -83,7 +83,7 @@ class Zentrale : public wxApp
         void connect_thread();
         void recv_thread();
         void call_thread();
-        
+
         Thread* thrd_recv;
         Thread* thrd_call;
 

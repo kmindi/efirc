@@ -73,7 +73,7 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
 
         sizer_alles->SetSizeHints( this ); // Minimale Groesse des Fensters (this) beachten ( = nicht unterschreiten)
         SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
-        
+
     geschichte_position = 0;
 }
 
@@ -170,7 +170,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
         case WXK_RETURN:
             NachrichtSenden();
             break;
-        
+
         case WXK_UP:
             if(geschichte_position > 0)
             {
@@ -179,7 +179,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
                 WxEdit_eingabefeld->AppendText(geschichte_texte[geschichte_position]);
             }
             break;
-        
+
         case WXK_DOWN:
             if(geschichte_texte.GetCount() != 0)
             {
@@ -197,7 +197,7 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
                 }
             }
             break;
-            
+
         default:
             event.Skip();
     }
@@ -234,15 +234,15 @@ void Fenster::NachrichtSenden()
         WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
         wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
     }
-    
+
     // In Eingabegeschichte speichern
-    if(eingabe != _T("")) 
+    if(eingabe != _T(""))
     {
         geschichte_texte.Add(eingabe);
     }
-    
+
     geschichte_position = geschichte_texte.GetCount();
-    
+
     if(geschichte_position > 30)
     {
         geschichte_texte.RemoveAt(0);
@@ -298,7 +298,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param4"),param4);
 
     // Besondere Textformatierungen beachten und anwenden
-        
+
         if(local.Left(3) == _T("ERR"))
         // Wenn es ein Fehler ist nur Farbe anpassen
         {
@@ -321,7 +321,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                 WxEdit_ausgabefeld->AppendText(prefix + nachricht.Left(pos));
             //alles kursiv formatiert ausgeben
                 wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-                
+
                 wxFont font = WxEdit_ausgabefeld->GetFont(); // bisherige Schriftformatierung speichern
                 font.SetStyle(wxITALIC); // kursiv setzen
                 WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, font));
@@ -331,7 +331,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                 WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
             //alles nach italic ausgeben
                 WxEdit_ausgabefeld->AppendText(nachricht.Mid(nachricht.Find(_T("[/italic]")) + 9));
-            // Funktion verlassen 
+            // Funktion verlassen
                 return;
         }
 
@@ -453,7 +453,7 @@ bool Fenster::AnzeigeBegrenzungErreicht()
 {
     long unsigned int configwert = 0;
     (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToULong(&configwert, 10);
-    
+
     if(WxList_benutzerliste->GetItemCount() >= configwert)
         return true;
     else

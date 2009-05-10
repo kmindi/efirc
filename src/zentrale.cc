@@ -42,7 +42,7 @@ bool Zentrale::OnInit()
 
     // erste Instanz der Fenster-klasse erzeugen.
     neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
-    
+
     // Verlinkung der IRC-Funktionen starten und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
     connect_thread();
@@ -67,7 +67,7 @@ wxString Zentrale::standardkonfiguration()
 
     standardkonfiguration_text += _T("max_DONT_SHOW_USERLIST_CHANGES = 150\n");
     standardkonfiguration_text += _T("bool_automatic_nickchange_if_in_use = 1\n");
-    
+
     // Farben
     standardkonfiguration_text += _T("colour_background = #510000\n");
     standardkonfiguration_text += _T("colour_topic_background = #EEEEEE\n");
@@ -130,11 +130,11 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n"); // case 4
     standardkonfiguration_text += _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n"); // case 5
     standardkonfiguration_text += _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n"); // case 5
-    
+
     // Anzeige bestimmter Dialog oder anderer nicht irc spezifischer Nachrichten
     standardkonfiguration_text += _T("local_DLG_NEWNICK_NICKINUSE_TEXT = The Nickname you try to use is already in use. You have to choose a new one:\n"); // case 5
     standardkonfiguration_text += _T("local_DLG_NEWNICK_CAPTION = Change your Nickname\n"); // case 5
-    
+
     return standardkonfiguration_text;
 }
 
@@ -173,23 +173,23 @@ unsigned int Zentrale::anzahl_offene_fenster()
 Fenster* Zentrale::neuesFenster(wxString namedesfensters)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(namedesfensters.Upper());
-    
+
     // Neues Fenster nur erstellen wenn noch keines erstellt wurde
     if(iter == zgr_fenster.end())
     {
         // Neues Fenster erstellen und Adresse des Speicherbereichs in zgr merken
         Fenster *zgr = new Fenster(namedesfensters, wxPoint(8, 8), wxSize(566, 341));
-        
+
         // Neuen Eintrag in der Map erstellen
         zgr_fenster.insert(make_pair(namedesfensters.Upper(), zgr));
-        
+
         zgr_fenster[namedesfensters.Upper()]->fenster_name = namedesfensters;
         zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
         zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
-        
+
         return zgr;
     }
-    
+
     else
     {
         return zgr_fenster[namedesfensters.Upper()];
@@ -211,9 +211,9 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
 Fenster* Zentrale::fenstersuchen(wxString name)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
-    
+
     if(iter != zgr_fenster.end())
-    // Wenn das Fenster gefunden wurde 
+    // Wenn das Fenster gefunden wurde
     {
         return zgr_fenster[name.Upper()];
     }
@@ -236,7 +236,7 @@ Fenster* Zentrale::fenstersuchen(wxString name)
 Fenster* Zentrale::fenster(wxString name)
 {
     map<wxString,Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
-    
+
     if(iter != zgr_fenster.end())
     // Wenn das Fenster gefunden wurde
     {
@@ -256,16 +256,16 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
     wxChar leerzeichen = _T(' ');
     wxString befehl_name = befehl.BeforeFirst(leerzeichen);
     wxString befehl_parameter = befehl.AfterFirst(leerzeichen);
-    
+
     befehl_name.MakeUpper();
-    
+
     bool parameter_erwartet = false;
     bool parameter_vorhanden = false;
-    
+
     if(befehl_parameter != _T("")) parameter_vorhanden = true;
-    
+
     wxLocale *local = new wxLocale(wxLANGUAGE_GERMAN); // wird fuer ueber-Befehl gebraucht
-    
+
     // Befehle die nicht unbedingt einen Parameter erwarten
     if(befehl_name == _T("QUIT") || befehl_name == _T("EXIT") || befehl_name == _T("BEENDEN"))
     {
@@ -281,7 +281,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
 
         irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
-        
+
         // Alle Fenster zerstoeren
         for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
         {
@@ -304,7 +304,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_part(befehl_parameter.mb_str());
         }
     }
-    
+
     else if(befehl_name == _T("TOPIC"))
     {
         if(!parameter_vorhanden)
@@ -316,18 +316,18 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_topic(fenstername.mb_str(), befehl_parameter.mb_str());
         }
     }
-    
+
     else if(befehl_name == _T("CLEAR"))
     {
         zgr_fenster[fenstername.Upper()]->AusgabefeldLeeren();
     }
-    
+
     else if(befehl_name == _T("ABOUT") || befehl_name == _T("\u00dcBER"))
     // \u00DC = grosses U_UMLAUT
     {
         zeige_ueber();
     }
-    
+
     else if(befehl_name == _T("AWAY"))
     {
         if(!parameter_vorhanden)
@@ -343,13 +343,13 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
     else if(befehl_name == _T("JOIN"))
     {
-        if(parameter_vorhanden) 
+        if(parameter_vorhanden)
         irc->irc_send_join(befehl_parameter.mb_str());
-        
+
         else parameter_erwartet = true;
         // Auf eigenen JOIN Warten und dann neues Fenster aufmachen
     }
-    
+
     else if(befehl_name == _T("NICK"))
     {
         if(parameter_vorhanden)
@@ -389,7 +389,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
         else parameter_erwartet = true;
     }
-    
+
     else if((befehl_name == _T("QUERY") || befehl_name == _T("MSG")))
     {
         if(parameter_vorhanden)
@@ -419,27 +419,27 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
     else if(befehl_name == _T("WHOIS"))
     {
-        if(parameter_vorhanden) 
+        if(parameter_vorhanden)
             irc->irc_send_whois(befehl_parameter.mb_str());
-        else 
+        else
             parameter_erwartet = true;
     }
-    
+
     // Falls der Befehl nicht gefunden wurde
     else
     {
-        if(parameter_vorhanden) 
+        if(parameter_vorhanden)
         zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name + _T(" ") + befehl_parameter);
-        else 
+        else
         zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_UNKNOWN"), befehl_name);
     }
-    
+
     // Falls ein Parameter erwartet wurde (Befehl wurde dann auf jeden Fall gefunden
     if(parameter_erwartet)
     {
         zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("ERR_COMMAND_MISSING_PARAMETER"), befehl_name);
     }
-    
+
     delete local; // locale wird nur fuer ueber-Befehl gesetzt.
 }
 
@@ -467,31 +467,31 @@ void Zentrale::EingabeVerarbeiten(wxString fenstername, wxString eingabe)
 }
 
 void Zentrale::zeige_ueber()
-{    
+{
     wxFrame* dlg_ueber;
-    
+
     // Neues Fenster erzeugen
         dlg_ueber = new wxFrame(NULL, wxID_ANY, _T("info@efirc"), wxDefaultPosition, wxSize(600,400), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU /*| wxRESIZE_BORDER*/, _T("AboutDialog"));
-    
+
     // Fenster anpassen
         dlg_ueber->Center(); // In der Mitte anzeigen
         dlg_ueber->SetIcon(wxIcon(icon)); // Icon setzen
-    
+
     // Informationen in einem nicht veraenderbaren Textfeld anzeigen
         wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
-    
+
     // Textfeld anpassen
         // Schriftdarstellung aendern
-        st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE)); 
+        st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE));
         // Textfarbe aendern
         st_infotext->SetBackgroundColour( _T("#510000") );
         st_infotext->SetForegroundColour( _T("#000000") );
-    
+
     // Fenster anzeigen
     dlg_ueber->Show();
 
     wxString info = _T("");
-    
+
     info.Append(_T("         _____.__                 \n"));
     info.Append(_T("   _____/ ____\\__|______   ____   \n"));
     info.Append(_T(" _/ __ \\   __\\|  \\_  __ \\_/ ___\\  \n"));
@@ -518,17 +518,17 @@ void Zentrale::zeige_ueber()
     info.Append(_T("efirc is developed by Kai Mindermann and Fabian Ruch.\n"));
     info.Append(_T("\n"));
     info.Append(_T("http://efirc.sf.net/"));
-    
+
     wxString tmp_text = _T("");
     wxString prefix = _T("\n<efirc> ");
-    
+
     // maximale Zeilenlaenge ist gleich Breite des Textfelds durch groesse eines Zeichens minus groesse eines Zeichens
     unsigned int zeilenlaenge = (st_infotext->GetSize().x / st_infotext->GetCharWidth()) ;
-    
+
     while(info != _T(""))
     {
         tmp_text = info.BeforeFirst(_T('\n')); // Alles vor dem ersten Zeilenumbruch steht jetzt in tmp_text
-        
+
         // solange tmp_text und prefix zusammen laenger als die zeilenlaenge sind
         while(tmp_text.Len() + prefix.Len() > zeilenlaenge)
         {
@@ -536,7 +536,7 @@ void Zentrale::zeige_ueber()
             tmp_text = tmp_text.Mid(zeilenlaenge - prefix.Len()); // In tmp_text steht jetzt nicht mehr der Text der schon angezeigt wurde
         }
         st_infotext->AppendText(prefix + tmp_text);
-        
+
         info = info.AfterFirst(_T('\n')); // Alles nach dem ersten Zeilenumbruch steht jetzt in tmp_text
     }
 }
@@ -550,9 +550,9 @@ void irc_allgemein(const irc_msg_data *msg_data, void *cp);
 
 void Zentrale::connect_thread()
 {
-    
+
     irc->irc_set_default_link_function(&irc_allgemein);
-    
+
     irc->connect();
 
     thrd_recv = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten

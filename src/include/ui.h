@@ -50,14 +50,14 @@ class Fenster : public wxFrame
         void WxButton_sendenClick(wxCommandEvent&);
         void BeiAktivierung(wxActivateEvent& event);
         void BeiMausAufURL(wxTextUrlEvent& event);
-        
+
         void NachrichtSenden();
 
         // Eingabegeschichte
         wxArrayString geschichte_texte;
         unsigned int geschichte_position;
 
-        
+
         DECLARE_EVENT_TABLE()
         void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
         void WxEdit_eingabefeldFokus(wxKeyEvent&);
@@ -75,7 +75,7 @@ class Fenster : public wxFrame
         void BenutzerHinzufuegen(wxString benutzerliste = _T(""));
         bool BenutzerEntfernen(wxString benutzer = _T(""));
         void BenutzerAendern(wxString altername, wxString neuername);
-        
+
         bool AnzeigeBegrenzungErreicht();
 };
 

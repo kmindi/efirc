@@ -68,7 +68,7 @@ wxString Konfiguration::parsecfgvalue(wxString searchstring)
             return tmp_wert;
         }
     }
-    
+
     return _T("");
 }
 
