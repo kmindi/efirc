@@ -235,6 +235,11 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
         {
             wxGetApp().irc_pong(msg_data);
         }
+        
+        else if(cmd == _T("KICK"))
+        {
+            wxGetApp().irc_kick(msg_data);
+        }
 
         // wenn keine Uebereinstimmung gefunden wurde, Fehler anzeigen
         else
@@ -802,6 +807,34 @@ void Zentrale::irc_whoisactually(const IRC_NACHRICHT *msg_data)
     wxString nick = msg_data->params_a[1];
     wxString server = msg_data->params_a[2];
     fenster(irc->CurrentHostname)->NachrichtAnhaengen(_T("WHOIS_ACTUALLY"), nick, server);
+}
+
+void Zentrale::irc_kick(const IRC_NACHRICHT *msg_data)
+{
+    wxString empfaenger = msg_data->params_a[0];
+    wxString benutzer = msg_data->params_a[1];
+    wxString kommentar = msg_data->params_a[2];
+
+    fenster(empfaenger)->BenutzerEntfernen(benutzer);
+    
+    if(benutzer.Upper() == irc->CurrentNick.Upper())
+    // Entweder wurde man bedauerlicherweise selber aus dem Raum geschmissen ...
+    {
+        if(kommentar == msg_data->nick)
+            fenster(empfaenger)->NachrichtAnhaengen(_T("KICK_SELF"), msg_data->nick);
+        else
+            fenster(empfaenger)->NachrichtAnhaengen(_T("KICK_SELF"), msg_data->nick, kommentar);
+    }
+    else
+    // ... oder gluecklicherweise ein anderer Benutzer
+    {
+        if(kommentar == msg_data->nick)
+            fenster(empfaenger)->NachrichtAnhaengen(_T("KICK"), msg_data->nick, benutzer);
+        else
+            fenster(empfaenger)->NachrichtAnhaengen(_T("KICK"), msg_data->nick, benutzer, kommentar);
+    }
+    
+
 }
 
 // ERR_*-Nachrichten

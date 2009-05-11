@@ -115,6 +115,8 @@ class Zentrale : public wxApp
         void irc_unaway(const IRC_NACHRICHT *msg_data);
         void irc_nowaway(const IRC_NACHRICHT *msg_data);
         void irc_invite(const IRC_NACHRICHT *msg_data);
+        void irc_kick(const IRC_NACHRICHT *msg_data);
+        
         void irc_einfach(const IRC_NACHRICHT *msg_data);
         void irc_fehler(const IRC_NACHRICHT *msg_data);
         void irc_unbekannt(const IRC_NACHRICHT *msg_data);

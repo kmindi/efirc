@@ -124,6 +124,8 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_SPECIAL = [ WHOIS: %param1 %param2 ]\n");
     standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = [ WHOIS: %param1 is actually using host %param2 ]\n");
+    standardkonfiguration_text += _T("local_KICK = %param1 has kicked %param2 (%param3)\n");
+    standardkonfiguration_text += _T("local_KICK_SELF = You were kicked by %param1 (%param2)\n");
 
     // Fehler (werden in konfigurierter Farbe dargestellt)
     standardkonfiguration_text += _T("local_ERR_IRC = (!) %param1\n"); // case 2
@@ -423,6 +425,22 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_whois(befehl_parameter.mb_str());
         else
             parameter_erwartet = true;
+    }
+    
+    else if((befehl_name == _T("KICK")))
+    {
+        if(parameter_vorhanden)
+        {
+            wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
+            wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
+            
+            if(nachricht == _T(""))
+                irc->irc_send_kick(fenstername.mb_str(), empfaenger.mb_str());
+            else
+                irc->irc_send_kick(fenstername.mb_str(), empfaenger.mb_str(), nachricht.mb_str());
+        }
+        
+        else parameter_erwartet = true;
     }
 
     // Falls der Befehl nicht gefunden wurde
