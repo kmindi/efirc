@@ -417,11 +417,11 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
 
 bool Fenster::BenutzerEntfernen(wxString benutzer)
 {
-    wxString Benutzer_prefix_liste[3]={_T(""),_T("@"),_T("+")};
+    wxString Benutzer_prefix_liste[]={_T(""), _T("@"), _T("+"), _T("@+"), _T("+@")};
     long id = 0;
     bool entfernt = false;
 
-    for(int i = 0;i<3;i++)
+    for(int i = 0;i<5;i++)
     {
         id = WxList_benutzerliste->FindItem(-1,Benutzer_prefix_liste[i] + benutzer);
         if(id != -1)
@@ -435,10 +435,10 @@ bool Fenster::BenutzerEntfernen(wxString benutzer)
 void Fenster::BenutzerAendern(wxString altername, wxString neuername)
 {
     // PREFIXE VOM SERVER HIER EINFUEGEN
-    wxString Benutzer_prefix_liste[3]={_T(""),_T("@"),_T("+")};
+    wxString Benutzer_prefix_liste[]={_T(""), _T("@"), _T("+"), _T("@+"), _T("+@")};
     long id = 0;
 
-    for(int i = 0;i<3;i++)
+    for(int i = 0;i<5;i++)
     {
         id = WxList_benutzerliste->FindItem(-1,Benutzer_prefix_liste[i] + altername);
         if(id != -1)
@@ -466,11 +466,14 @@ wxString Fenster::HoleBenutzerModi(wxString benutzer)
 void Fenster::BenutzerModiHinzufuegen(wxString benutzer, wxString modi)
 {
     wxString altemodi = HoleBenutzerModi(benutzer);
-    
-    long id = WxList_benutzerliste->FindItem(-1, altemodi + benutzer);
-    if(id != -1)
+    if(!altemodi.Contains(modi))
     {
-        WxList_benutzerliste->SetItemText(id, altemodi + modi + benutzer);
+        long id = WxList_benutzerliste->FindItem(-1, altemodi + benutzer);
+        if(id != -1)
+        {
+            BenutzerEntfernen(benutzer);
+            BenutzerHinzufuegen(altemodi + modi + benutzer);
+        }
     }
 }
 
@@ -481,7 +484,8 @@ void Fenster::BenutzerModiEntfernen(wxString benutzer, wxString modi)
     if(id != -1)
     {
         altemodi.Replace(modi, _T(""));
-        WxList_benutzerliste->SetItemText(id, altemodi + benutzer);
+        BenutzerEntfernen(benutzer);
+        BenutzerHinzufuegen(altemodi + benutzer);
     }
 }
 
