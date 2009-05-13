@@ -496,7 +496,7 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
         Sender = msg_data->sender;
     }
     
-    if(empfaenger.StartsWith(_T('#')) || empfaenger.StartsWith(_T('&')))
+    if(empfaenger.StartsWith(_T("#")) || empfaenger.StartsWith(_T("&")))
     {
         Raum = true;
     }
