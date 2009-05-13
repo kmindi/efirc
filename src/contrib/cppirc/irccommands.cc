@@ -221,3 +221,33 @@ IRCInterface::irc_send_invite(const char *nickname, const char *channel_name)
 	irc_send_message_f("INVITE %s %s", nickname, channel_name);
 }
 
+/* KICK */
+void
+IRCInterface::irc_send_kick(const char *channel_name, const char *nickname)
+{
+	irc_send_message_f("KICK %s %s", channel_name, nickname);
+}
+
+void
+IRCInterface::irc_send_kick(const char *channel_name, const char *nickname,
+    const char *kick_text)
+{
+	irc_send_message_f("KICK %s %s :%s", channel_name, nickname,
+	    kick_text);
+}
+
+/* MODE */
+void
+IRCInterface::irc_send_mode(const char *target_name, const char *mode_string)
+{
+	irc_send_message_f("MODE %s %s", target_name, mode_string);
+}
+
+void
+IRCInterface::irc_send_mode(const char *target_name, const char *mode_string,
+    const char *parameters)
+{
+	irc_send_message_f("MODE %s %s %s", target_name, mode_string,
+	    parameters);
+}
+

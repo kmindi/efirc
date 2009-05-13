@@ -142,6 +142,10 @@ class IRCInterface
 		void irc_send_away(void);
 		void irc_send_away(const char *);
 		void irc_send_invite(const char *, const char *);
+		void irc_send_kick(const char *, const char *);
+		void irc_send_kick(const char *, const char *, const char *);
+		void irc_send_mode(const char *, const char *);
+		void irc_send_mode(const char *, const char *, const char *);
 
 	private:
 		int sock;
