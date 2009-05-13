@@ -480,40 +480,74 @@ void Zentrale::irc_mode(const IRC_NACHRICHT *msg_data)
 {
     // NOCH HERAUSSUCHEN WENN +o und +v (=> @ und + vor nickname bzw chanop und voice)
 
-
+    
+    // :keinname!keinname@192.168.0.100 MODE #efirc -k testpassword
+    
+    
+    
     wxString Sender = msg_data->nick;
     wxString empfaenger = msg_data->params_a[0];
     wxString Parameter = _T("");
-    wxString Raum = _T("");
-    wxString Modus = _T("");
-
+    wxString Modi = _T("");
+    bool Raum = false;
+    
     if(Sender == _T(""))
     {
         Sender = msg_data->sender;
     }
-
-    for(int i = 0; i < msg_data->params_i; i++)
+    
+    if(empfaenger.StartsWith(_T('#')) || empfaenger.StartsWith(_T('&')))
     {
-        if(msg_data->params_a[i][0] == _T('#'))
-        {
-            Raum = _T(" (");
-            Raum += msg_data->params_a[i];
-            Raum += _T(")");
-        }
-        else if(msg_data->params_a[i][0] == _T('+') ||
-                msg_data->params_a[i][0] == _T('-'))
-        {
-            Modus = msg_data->params_a[i];
-        }
-        else
+        Raum = true;
+    }
+
+    if(msg_data->params_i >= 2)
+    {
+        Modi = msg_data->params_a[1];
+
+        for(int i = 2; i < msg_data->params_i; i++)
         {
             Parameter += _T(" ") + msg_data->params_a[i];
         }
+        
+        // Modi nur zerlegen wenn ein dritter Parameter uebergeben wurde
+        if(msg_data->params_i >= 3)
+        {
+            bool positive_mode = false;
+            wxString modi_setzen = _T("");
+            wxString modi_entfernen = _T("");
+            
+            // -t+o 
+            for(int i = 0; i < Modi.Len(); i++)
+            // den ganzen modus text durchsuchen
+            {
+                if(Modi.GetChar(i) == _T('+'))
+                    positive_mode = true;
+                else if(Modi.GetChar(i) == _T('-'))
+                    positive_mode = false;
+                else if(positive_mode)
+                    modi_setzen += Modi.GetChar(i);
+                else
+                    modi_entfernen += Modi.GetChar(i);
+            }
+            
+            if(modi_setzen.Matches(_T("*o*")) )
+                fenster(empfaenger)->BenutzerModiHinzufuegen(msg_data->params_a[2], _T("@"));
+                
+            else if(modi_entfernen.Matches(_T("*o*")))
+                fenster(empfaenger)->BenutzerModiEntfernen(msg_data->params_a[2], _T("@"));
+                
+            if(modi_setzen.Matches(_T("*v*")) )
+                fenster(empfaenger)->BenutzerModiHinzufuegen(msg_data->params_a[2], _T("+"));
+                
+            else if(modi_entfernen.Matches(_T("*v*")))
+                fenster(empfaenger)->BenutzerModiEntfernen(msg_data->params_a[2], _T("+"));
+        }
+            
     }
+    Modi += Parameter;
 
-    Modus += Parameter + Raum;
-
-    fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("MODE"), Sender, Modus);
+    fenster(empfaenger)->NachrichtAnhaengen(_T("MODE"), Sender, Modi);
 }
 
 // Message of the day anzeigen

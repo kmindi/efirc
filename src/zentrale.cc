@@ -442,6 +442,24 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         
         else parameter_erwartet = true;
     }
+    
+    else if((befehl_name == _T("MODE")))
+    {
+        if(parameter_vorhanden)
+        {
+            wxString empfaenger = befehl_parameter.BeforeFirst(leerzeichen);
+            wxString modi = befehl_parameter.AfterFirst(leerzeichen);
+            
+            if(modi == _T(""))
+            // Wenn keine Modi angegeben werden, sollen die Modi abgefragt werden
+                irc->irc_send_mode(empfaenger.mb_str());
+            else
+            // Angegebene Modi setzen
+                irc->irc_send_mode(empfaenger.mb_str(), modi.mb_str());
+        }
+        
+        else parameter_erwartet = true;
+    }
 
     // Falls der Befehl nicht gefunden wurde
     else

@@ -449,6 +449,42 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
     }
 }
 
+wxString Fenster::HoleBenutzerModi(wxString benutzer)
+{
+    wxString Benutzer_prefix_liste[]={_T(""), _T("@"), _T("+"), _T("@+"), _T("+@")};
+    for(int i = 0;i<5;i++)
+    {
+        if(WxList_benutzerliste->FindItem(-1, Benutzer_prefix_liste[i] + benutzer) != -1)
+        {
+            return Benutzer_prefix_liste[i];
+        }
+    }
+    return _T("");
+}
+
+
+void Fenster::BenutzerModiHinzufuegen(wxString benutzer, wxString modi)
+{
+    wxString altemodi = HoleBenutzerModi(benutzer);
+    
+    long id = WxList_benutzerliste->FindItem(-1, altemodi + benutzer);
+    if(id != -1)
+    {
+        WxList_benutzerliste->SetItemText(id, altemodi + modi + benutzer);
+    }
+}
+
+void Fenster::BenutzerModiEntfernen(wxString benutzer, wxString modi)
+{
+    wxString altemodi = HoleBenutzerModi(benutzer);
+    long id = WxList_benutzerliste->FindItem(-1, altemodi + benutzer);
+    if(id != -1)
+    {
+        altemodi.Replace(modi, _T(""));
+        WxList_benutzerliste->SetItemText(id, altemodi + benutzer);
+    }
+}
+
 bool Fenster::AnzeigeBegrenzungErreicht()
 {
     long configwert = 0;
