@@ -238,6 +238,12 @@ IRCInterface::irc_send_kick(const char *channel_name, const char *nickname,
 
 /* MODE */
 void
+IRCInterface::irc_send_mode(const char *target_name)
+{
+	irc_send_message_f("MODE %s", target_name);
+}
+
+void
 IRCInterface::irc_send_mode(const char *target_name, const char *mode_string)
 {
 	irc_send_message_f("MODE %s %s", target_name, mode_string);
