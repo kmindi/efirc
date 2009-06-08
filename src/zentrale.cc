@@ -43,9 +43,12 @@ bool Zentrale::OnInit()
     // erste Instanz der Fenster-klasse erzeugen.
     neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
 
-    // Verlinkung der IRC-Funktionen starten und IRC Threads starten
+    // IRC-Funktion mit IRCInterface verknuepfen und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
-    connect_thread();
+    void irc_allgemein(const irc_msg_data *msg_data, void *cp);
+    irc->irc_set_default_link_function(&irc_allgemein);
+    
+    threads_starten();
 
     return TRUE;
 }
@@ -578,24 +581,21 @@ void Zentrale::zeige_ueber()
     }
 }
 
-
-// THREADS
-// THREADS
-// THREADS
-// Bekanntmachen der Funktion (Prototyp)
-void irc_allgemein(const irc_msg_data *msg_data, void *cp);
-
-void Zentrale::connect_thread()
+void Zentrale::threads_starten()
 {
-
-    irc->irc_set_default_link_function(&irc_allgemein);
-
-    irc->connect();
-
-    thrd_recv = new Thread(&Zentrale::recv_thread); // Thread für recv_thread starten
-    thrd_call = new Thread(&Zentrale::call_thread); // Thread fuer call_thread starten
+    thrd_connect = new Thread(&Zentrale::connect_thread);
+    thrd_recv = new Thread(&Zentrale::recv_thread);
+    thrd_call = new Thread(&Zentrale::call_thread);
+    
+    if (thrd_connect->Create() == wxTHREAD_NO_ERROR) { thrd_connect->Run(); }
     if (thrd_recv->Create() == wxTHREAD_NO_ERROR) { thrd_recv->Run(); }
     if (thrd_call->Create() == wxTHREAD_NO_ERROR) { thrd_call->Run(); }
+}
+
+// Thread-Funktion fuer Verbindungsaufbau
+void Zentrale::connect_thread()
+{
+    irc->connect();
 }
 
 // Thread-Funktion fuer recv_raw-Schleife

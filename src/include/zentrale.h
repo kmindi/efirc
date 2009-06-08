@@ -80,10 +80,12 @@ class Zentrale : public wxApp
         void NachrichtSenden(wxString fenstername, wxString nachricht);
 
         //Threads
-        void connect_thread();
-        void recv_thread();
-        void call_thread();
+        void threads_starten();
+            void connect_thread();
+            void recv_thread();
+            void call_thread();
 
+        Thread* thrd_connect;
         Thread* thrd_recv;
         Thread* thrd_call;
 
