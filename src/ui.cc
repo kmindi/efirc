@@ -336,6 +336,10 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         }
 
     WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+    
+    // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen.
+    if(this != wxGetActiveWindow())
+    this->RequestUserAttention();
 }
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
