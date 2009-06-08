@@ -334,11 +334,15 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
             // Funktion verlassen
                 return;
         }
-
-    WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+     
+    // Nachricht nicht anzeigen wenn es eine Benutzerlistenaenderung ist und die Begrenzung erreicht ist
+    if(local.Left(3) != _T("BL_") || (local.Left(3) == _T("BL_") && !AnzeigeBegrenzungErreicht()))
+    {
+        WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+    }
     
-    // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen.
-    if(this != wxGetActiveWindow() & this != wxGetApp().GetTopWindow())
+    // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen, ausser es ist eine Benutzerlistenaenderung
+    if(this != wxGetActiveWindow() && this != wxGetApp().GetTopWindow() && local.Left(3) != _T("BL_"))
     this->RequestUserAttention();
 }
 
@@ -436,7 +440,7 @@ bool Fenster::BenutzerEntfernen(wxString benutzer)
     return entfernt;
 }
 
-void Fenster::BenutzerAendern(wxString altername, wxString neuername)
+bool Fenster::BenutzerAendern(wxString altername, wxString neuername)
 {
     // PREFIXE VOM SERVER HIER EINFUEGEN
     wxString Benutzer_prefix_liste[]={_T(""), _T("@"), _T("+"), _T("@+"), _T("+@")};
@@ -449,8 +453,10 @@ void Fenster::BenutzerAendern(wxString altername, wxString neuername)
         {
             BenutzerEntfernen(altername);
             BenutzerHinzufuegen(Benutzer_prefix_liste[i] + neuername);
+            return true;
         }
     }
+    return false;
 }
 
 wxString Fenster::HoleBenutzerModi(wxString benutzer)
@@ -498,6 +504,8 @@ bool Fenster::AnzeigeBegrenzungErreicht()
     long configwert = 0;
     (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToLong(&configwert, 10);
 
+    if(configwert == 0) return false;
+    
     if(WxList_benutzerliste->GetItemCount() >= configwert)
         return true;
     else

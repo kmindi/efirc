@@ -74,7 +74,7 @@ class Fenster : public wxFrame
         //Benutzerlistenfunktionen
         void BenutzerHinzufuegen(wxString benutzerliste = _T(""));
         bool BenutzerEntfernen(wxString benutzer = _T(""));
-        void BenutzerAendern(wxString altername, wxString neuername);
+        bool BenutzerAendern(wxString altername, wxString neuername);
         wxString HoleBenutzerModi(wxString benutzer);
         void BenutzerModiHinzufuegen(wxString benutzer, wxString modi);
         void BenutzerModiEntfernen(wxString benutzer, wxString modi);

@@ -96,6 +96,7 @@ wxString Zentrale::standardkonfiguration()
     // Standardtexte
     // S =s elber, fuer Nachrichten die man selber geschrieben hat
     // P = privat, fuer Nachrichten die nicht an einen Raum, sondern an einen selber geschrieben wurden.
+    // BL = Benutzerliste
     standardkonfiguration_text += _T("local_P_PRIVMSG = -%param1- %param2\n");
     standardkonfiguration_text += _T("local_S_P_PRIVMSG = >%param1< %param2\n");
     standardkonfiguration_text += _T("local_PRIVMSG = <%param1> %param2\n");
@@ -106,11 +107,11 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_TOPIC = The topic is: %param1\n");
     standardkonfiguration_text += _T("local_TOPICWHOTIME = Topic was set by %param1 at %param2\n");
     standardkonfiguration_text += _T("local_TOPIC_CHANGE = %param2 changed the topic to %param1\n");
-    standardkonfiguration_text += _T("local_JOIN = %param1 joined the channel\n");
-    standardkonfiguration_text += _T("local_PART = %param1 has left the channel (%param2)\n");
-    standardkonfiguration_text += _T("local_QUIT = %param1 has left the network (%param2)\n");
+    standardkonfiguration_text += _T("local_BL_JOIN = %param1 joined the channel\n");
+    standardkonfiguration_text += _T("local_BL_PART = %param1 has left the channel (%param2)\n");
+    standardkonfiguration_text += _T("local_BL_QUIT = %param1 has left the network (%param2)\n");
     standardkonfiguration_text += _T("local_INVITE = %param1 invited you to %param2\n");
-    standardkonfiguration_text += _T("local_NICK = %param1 changed his nickname to %param2\n");
+    standardkonfiguration_text += _T("local_BL_NICK = %param1 changed his nickname to %param2\n");
     standardkonfiguration_text += _T("local_CTCP = -%param1@CTCP- %param2\n");
     standardkonfiguration_text += _T("local_S_CTCP = >%param1@CTCP< %param2\n");
     standardkonfiguration_text += _T("local_MODE = %param1 set mode %param2\n");

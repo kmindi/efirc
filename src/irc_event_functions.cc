@@ -590,8 +590,7 @@ void Zentrale::irc_join(const IRC_NACHRICHT *msg_data)
     // Andernfalls ist es logischerweise ein neuer Benutzer der den Raum betreten hat
     {
         fenster(empfaenger)->BenutzerHinzufuegen(benutzer);
-        if(fenster(empfaenger)->AnzeigeBegrenzungErreicht() == false)
-        fenster(empfaenger)->NachrichtAnhaengen(_T("JOIN"),benutzer);
+        fenster(empfaenger)->NachrichtAnhaengen(_T("BL_JOIN"),benutzer);
     }
 
 }
@@ -616,8 +615,7 @@ void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
     else
     {
         fenster(empfaenger)->BenutzerEntfernen(benutzer);
-        if(fenster(empfaenger)->AnzeigeBegrenzungErreicht() == false)
-        fenster(empfaenger)->NachrichtAnhaengen(_T("PART"), benutzer, nachricht);
+        fenster(empfaenger)->NachrichtAnhaengen(_T("BL_PART"), benutzer, nachricht);
     }
 
 }
@@ -640,8 +638,7 @@ void Zentrale::irc_quit(const IRC_NACHRICHT *msg_data)
             if(benutzer_entfernt == true)
             // Nachricht ausgeben falls der Benutzer in diesem Fenster entfernt werden konnte
             {
-                if(zgr_fenster[i->first]->AnzeigeBegrenzungErreicht() == false)
-                zgr_fenster[i->first]->NachrichtAnhaengen(_T("QUIT"), benutzer, nachricht);
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_QUIT"), benutzer, nachricht);
             }
         }
     }
@@ -677,7 +674,7 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
                 {
                     zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
                     zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
-                    zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
+                    zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_NICK"), benutzer, neuername);
                 }
 
                 irc->CurrentNick = neuername;
@@ -685,10 +682,9 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
             else
             // Andernfalls ist es logischerweise ein Benutzer der seinen Namen geaendert hat
             {
-                zgr_fenster[i->first]->BenutzerAendern(benutzer, neuername);
-                // Nachricht anzeigen
-                if(zgr_fenster[i->first]->AnzeigeBegrenzungErreicht() == false)
-                zgr_fenster[i->first]->NachrichtAnhaengen(_T("NICK"), benutzer, neuername);
+                // Namen aendern und bei Erfolg Nachricht anzeigen
+                if(zgr_fenster[i->first]->BenutzerAendern(benutzer, neuername))
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_NICK"), benutzer, neuername);
             }
         }
     }
