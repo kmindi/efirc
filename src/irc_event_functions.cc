@@ -319,7 +319,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString version = _T("efirc:") + efirc_version_string + _T(" (") + wxString(wxVERSION_STRING,wxConvUTF8) + _T("):") + wxGetOsDescription();
                 irc->irc_send_ctcp_version(user.mb_str(), version.mb_str());
-                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, user, ctcp_befehl + _T(" ") + version);
+                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), user, ctcp_befehl + _T(" ") + version);
             }
             else
             {
@@ -348,7 +348,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString quelle = _T("http://efirc.sourceforge.net/");
                 irc->irc_send_ctcp_source(user.mb_str(), quelle.mb_str());
-                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, user, ctcp_befehl + _T(" ") + quelle);
+                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), user, ctcp_befehl + _T(" ") + quelle);
             }
             else
             {
@@ -377,7 +377,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString antwort = _T("VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME");
                 irc->irc_send_ctcp_clientinfo(user.mb_str(), antwort.mb_str());
-                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, user, ctcp_befehl + _T(" ") + antwort);
+                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), user, ctcp_befehl + _T(" ") + antwort);
             }
             else
             {
@@ -414,7 +414,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
                 wxString antwort = timewxString;
 
                 irc->irc_send_ctcp_time(user.mb_str(), antwort.mb_str());
-                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, user, ctcp_befehl + _T(" ") + antwort);
+                fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), user, ctcp_befehl + _T(" ") + antwort);
             }
             else
             {

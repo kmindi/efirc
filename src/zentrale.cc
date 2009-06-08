@@ -96,12 +96,12 @@ wxString Zentrale::standardkonfiguration()
     // Standardtexte
     // S =s elber, fuer Nachrichten die man selber geschrieben hat
     // P = privat, fuer Nachrichten die nicht an einen Raum, sondern an einen selber geschrieben wurden.
-    standardkonfiguration_text += _T("local_P_PRIVMSG = [ <%param1> %param2 ]\n");
-    standardkonfiguration_text += _T("local_S_P_PRIVMSG = [ <%param1->%param2> %param3 ]\n");
+    standardkonfiguration_text += _T("local_P_PRIVMSG = -%param1- %param2\n");
+    standardkonfiguration_text += _T("local_S_P_PRIVMSG = >%param1< %param2\n");
     standardkonfiguration_text += _T("local_PRIVMSG = <%param1> %param2\n");
     standardkonfiguration_text += _T("local_PRIVMSG_NOSENDER = %param2\n");
     standardkonfiguration_text += _T("local_ACTION = *%param1 [italic]%param2[/italic]\n");
-    standardkonfiguration_text += _T("local_P_ACTION = [ *%param1 [italic]%param2[/italic] ]\n");
+    standardkonfiguration_text += _T("local_P_ACTION = *%param1 [italic]%param2[/italic]\n");
     standardkonfiguration_text += _T("local_CHANNEL_URL = The channel url is: %param1\n");
     standardkonfiguration_text += _T("local_TOPIC = The topic is: %param1\n");
     standardkonfiguration_text += _T("local_TOPICWHOTIME = Topic was set by %param1 at %param2\n");
@@ -111,19 +111,19 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_QUIT = %param1 has left the network (%param2)\n");
     standardkonfiguration_text += _T("local_INVITE = %param1 invited you to %param2\n");
     standardkonfiguration_text += _T("local_NICK = %param1 changed his nickname to %param2\n");
-    standardkonfiguration_text += _T("local_CTCP = [ <%param1@CTCP> %param2 ]\n");
-    standardkonfiguration_text += _T("local_S_CTCP = [ <%param1@CTCP->%param2> %param3 ]\n");
+    standardkonfiguration_text += _T("local_CTCP = -%param1@CTCP- %param2\n");
+    standardkonfiguration_text += _T("local_S_CTCP = >%param1@CTCP< %param2\n");
     standardkonfiguration_text += _T("local_MODE = %param1 set mode %param2\n");
     standardkonfiguration_text += _T("local_AWAY = You have been marked as being away (%param1)\n");
     standardkonfiguration_text += _T("local_RPL_UNAWAY = You are not longer marked as being away\n");
     standardkonfiguration_text += _T("local_RPL_NOWAWAY = You have been marked as being away\n");
-    standardkonfiguration_text += _T("local_WHOIS_USER = [ WHOIS: %param1 (%param2@%param3 - %param4) ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_AWAY = [ WHOIS: %param1 is away %param2 ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_CHANNEL = [ WHOIS: %param1 is in %param2 ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_IDLE = [ WHOIS: %param1 is idle since %param2 seconds ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = [ WHOIS: %param1 %param2 %param3 ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_SPECIAL = [ WHOIS: %param1 %param2 ]\n");
-    standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = [ WHOIS: %param1 is actually using host %param2 ]\n");
+    standardkonfiguration_text += _T("local_WHOIS_USER = WHOIS: %param1 (%param2@%param3 - %param4)\n");
+    standardkonfiguration_text += _T("local_WHOIS_AWAY = WHOIS: %param1 is away %param2\n");
+    standardkonfiguration_text += _T("local_WHOIS_CHANNEL = WHOIS: %param1 is in %param2\n");
+    standardkonfiguration_text += _T("local_WHOIS_IDLE = WHOIS: %param1 is idle since %param2 seconds\n");
+    standardkonfiguration_text += _T("local_WHOIS_SERVERMSG = WHOIS: %param1 %param2 %param3\n");
+    standardkonfiguration_text += _T("local_WHOIS_SPECIAL = WHOIS: %param1 %param2\n");
+    standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = WHOIS: %param1 is actually using host %param2\n");
     standardkonfiguration_text += _T("local_KICK = %param1 has kicked %param2 (%param3)\n");
     standardkonfiguration_text += _T("local_KICK_SELF = You were kicked by %param1 (%param2)\n");
 
@@ -400,7 +400,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             wxString nachricht = befehl_parameter.AfterFirst(leerzeichen);
 
             irc->irc_send_privmsg(empfaenger.mb_str(),nachricht.mb_str());
-            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_P_PRIVMSG"),irc->CurrentNick, empfaenger, nachricht);
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_P_PRIVMSG"), empfaenger, nachricht);
         }
         else parameter_erwartet = true;
     }
@@ -414,7 +414,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
             irc->irc_send_privmsg(empfaenger.mb_str(), (_T("\001") + nachricht + _T("\001")).mb_str());
 
-            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_CTCP"), irc->CurrentNick, empfaenger, nachricht);
+            zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("S_CTCP"), empfaenger, nachricht);
         }
         else parameter_erwartet = true;
     }
