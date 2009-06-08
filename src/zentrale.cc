@@ -65,7 +65,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("irc_realname = %real_name\n");
     standardkonfiguration_text += _T("irc_nickname = user_%random_string\n");
 
-    standardkonfiguration_text += _T("max_DONT_SHOW_USERLIST_CHANGES = 150\n");
+    standardkonfiguration_text += _T("max_DONT_SHOW_USERLIST_CHANGES = 25\n");
     standardkonfiguration_text += _T("bool_automatic_nickchange_if_in_use = 1\n");
 
     // Farben
