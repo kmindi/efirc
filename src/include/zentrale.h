@@ -68,6 +68,8 @@ class Zentrale : public wxApp
     private:
         map<wxString, Fenster*> zgr_fenster;
         Fenster* neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
+        
+        wxTextEntryDialog* nickdialog; // Nickname aendern - Dialog
 
         int OnExit();
 

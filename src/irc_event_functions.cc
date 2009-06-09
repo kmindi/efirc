@@ -703,10 +703,16 @@ void Zentrale::irc_nickinuse(const IRC_NACHRICHT *msg_data)
     }
     else
     {
-        wxTextEntryDialog* nickdialog = new wxTextEntryDialog(fenster(irc->CurrentNick), config->parsecfgvalue(_T("local_DLG_NEWNICK_NICKINUSE_TEXT")), config->parsecfgvalue(_T("local_DLG_NEWNICK_CAPTION")), wxEmptyString, wxOK);
-        if(nickdialog->ShowModal() == wxID_OK)
+        if(nickdialog != NULL) nickdialog->Destroy(); // Falls der Dialog schon angezeigt wird diesen zerstoeren
+        nickdialog = new wxTextEntryDialog(fenster(irc->CurrentNick), config->parsecfgvalue(_T("local_DLG_NEWNICK_NICKINUSE_TEXT")), config->parsecfgvalue(_T("local_DLG_NEWNICK_CAPTION")), wxEmptyString, wxOK);
+        if(nickdialog->ShowModal() == wxID_OK && nickdialog->GetValue() != _T(""))
         {
             irc->WantedNick = nickdialog->GetValue();
+            irc->irc_send_nick(irc->WantedNick.mb_str());
+        }
+        else
+        // wenn nichts eingegeben wurde oder der Dialog beendet wurde trotzdem einen Nick senden
+        {
             irc->irc_send_nick(irc->WantedNick.mb_str());
         }
     }
