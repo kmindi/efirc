@@ -204,13 +204,15 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
 }
 
 // Bei Fokuserhalt Standardtext loeschen
-void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent&)
+void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
 {
     // VERBINDUNG ZUR KONFIGURATION
     if (WxEdit_eingabefeld->GetValue() == _T("Nachricht eingeben und Senden"))
     {
         WxEdit_eingabefeld->Clear();
     }
+    
+    event.Skip();
 }
 
 // Mausklick auf hervorgehobene URL
