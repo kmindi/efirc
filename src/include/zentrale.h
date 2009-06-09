@@ -37,6 +37,8 @@ class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 
 #include <icon.xpm>
 
+void irc_allgemein(const irc_msg_data *msg_data, void *cp);
+
 class Zentrale : public wxApp
 {
     public:

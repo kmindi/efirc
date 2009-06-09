@@ -45,7 +45,6 @@ bool Zentrale::OnInit()
 
     // IRC-Funktion mit IRCInterface verknuepfen und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
-    void irc_allgemein(const irc_msg_data *msg_data, void *cp);
     irc->irc_set_default_link_function(&irc_allgemein);
     
     threads_starten();
