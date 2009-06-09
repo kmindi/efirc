@@ -324,9 +324,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
             //alles kursiv formatiert ausgeben
                 wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
 
-                wxFont font = WxEdit_ausgabefeld->GetFont(); // bisherige Schriftformatierung speichern
-                font.SetStyle(wxITALIC); // kursiv setzen
-                WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, font));
+                wxTextAttr textattr = WxEdit_ausgabefeld->GetDefaultStyle(); // bisherige Schriftformatierung speichern
+                textattr.SetFontStyle(wxFONTSTYLE_ITALIC); // kursiv setzen
+                WxEdit_ausgabefeld->SetDefaultStyle(textattr);
 
                 WxEdit_ausgabefeld->AppendText(nachricht.Mid(pos + 8, nachricht.Find(_T("[/italic]")) - pos - 8));
 
