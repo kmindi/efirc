@@ -129,6 +129,9 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_KICK = %param1 has kicked %param2 (%param3)\n");
     standardkonfiguration_text += _T("local_KICK_SELF = You were kicked by %param1 (%param2)\n");
     standardkonfiguration_text += _T("local_quit_message = efirc sagt tschuess\n");
+    
+    standardkonfiguration_text += _T("local_label_button = Send\n");
+    standardkonfiguration_text += _T("local_label_input = Put your message here and press Enter\n");
 
     // Fehler (werden in konfigurierter Farbe dargestellt)
     standardkonfiguration_text += _T("local_ERR_IRC = (!) %param1\n"); // case 2
