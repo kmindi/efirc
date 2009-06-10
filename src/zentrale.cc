@@ -86,7 +86,6 @@ wxString Zentrale::standardkonfiguration()
 
     // Texte
     standardkonfiguration_text += _T("text_title = %param4 [%param1@%param2:%param3] - \n");
-    standardkonfiguration_text += _T("text_quit_message = tschuess\n");
 
     // Schriftarten
     standardkonfiguration_text += _T("font_topic = \n");
@@ -129,6 +128,7 @@ wxString Zentrale::standardkonfiguration()
     standardkonfiguration_text += _T("local_WHOIS_ACTUALLY = WHOIS: %param1 is actually using host %param2\n");
     standardkonfiguration_text += _T("local_KICK = %param1 has kicked %param2 (%param3)\n");
     standardkonfiguration_text += _T("local_KICK_SELF = You were kicked by %param1 (%param2)\n");
+    standardkonfiguration_text += _T("local_quit_message = efirc sagt tschuess\n");
 
     // Fehler (werden in konfigurierter Farbe dargestellt)
     standardkonfiguration_text += _T("local_ERR_IRC = (!) %param1\n"); // case 2
@@ -278,7 +278,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
 
         if(!parameter_vorhanden)
         {
-            quitmessage = config->parsecfgvalue(_T("text_quit_message"));
+            quitmessage = config->parsecfgvalue(_T("local_quit_message"));
         }
         else
         {
