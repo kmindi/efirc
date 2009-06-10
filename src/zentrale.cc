@@ -38,7 +38,7 @@ bool Zentrale::OnInit()
     config->parsecfgvalue(_T("irc_nickname")),
     config->parsecfgvalue(_T("irc_username")),
     config->parsecfgvalue(_T("irc_realname")),
-    _T("PASS"));
+    zufallstext(8));
 
     // erste Instanz der Fenster-klasse erzeugen.
     neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
