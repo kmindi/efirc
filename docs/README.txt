@@ -4,7 +4,7 @@ Bauanleitung
 2) Erstellen einer Arbeitskopie von wxWidgets[2] (und efirc[3])
 3) Herunterladen und Entpacken von Mingw[4] (schließlich Hinzufügen von bin zu PATH)
 4) Bauen von wxWidgets durch Ausführen von 
-   "mingw32-make -f makefile.gcc BUILD=release MONOLITHIC=1 RUNTIME_LIBS=static"
+   "mingw32-make -f makefile.gcc"
    in build\msw (bei Bedarf mit anderen Optionen, siehe config.gcc)
 5) Herunterladen von wx-config für Windows[5] (muss per PATH verfügbar sein)
 6) Setzen der Umgebungsvariablen WXWIN auf den Pfad der Arbeitskopie von wxWidgets (zB.: C:\wxWidgets)
