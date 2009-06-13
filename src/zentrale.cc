@@ -40,16 +40,49 @@ bool Zentrale::OnInit()
     config->parsecfgvalue(_T("irc_realname")),
     zufallstext(8));
 
+    // Reiteranzeige
+        reiterframe = new wxFrame(NULL, wxID_ANY, _T("REITERFRAME"), wxDefaultPosition, wxSize(724, 416), wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER, _T("reiterframe"));
+        wxGetApp().m_mgr.SetManagedWindow(reiterframe); // Das gerade erstellte Fenster dem AUI Verwalter zuweisen
+        
+        TitelSetzen(); // Titel anpassen
+        
+        reiterframe->SetIcon(wxIcon(icon)); // Icon setzten
+        // Neues Reiteransichtobjekt erzeugen
+        notebook = new wxAuiNotebook (reiterframe, wxID_ANY, wxPoint(0, 0), wxSize(720, 412), wxAUI_NB_TAB_MOVE | wxAUI_NB_CLOSE_ON_ALL_TABS | wxAUI_NB_TOP);
+        
+        reiterframe->SetSizeHints(wxSize(740, 472)); // Breite + 20, Hoehe +60 ???
+        reiterframe->Fit();
+        reiterframe->Show(true);
+        
     // erste Instanz der Fenster-klasse erzeugen.
-    neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
+    Fenster* fenster = neuesFenster(irc->CurrentHostname); // mit dem Namen des aktuellen Servers
 
     // IRC-Funktion mit IRCInterface verknuepfen und IRC Threads starten
     // Eine Instanz der Fensterklasse muss erzeugt sein
     irc->irc_set_default_link_function(&irc_allgemein);
     
     threads_starten();
-
+        
     return TRUE;
+}
+
+// Titel des Hauptfensters setzen
+void Zentrale::TitelSetzen(wxString titel, wxString nick)
+{
+    if(nick == _T(""))
+        nick = irc->CurrentNick;
+    
+    // Titel anpassen
+    wxString titel_text = wxGetApp().config->parsecfgvalue(_T("text_title"));
+    
+    
+    
+    titel_text.Replace(_T("%param1"), nick);
+    titel_text.Replace(_T("%param2"), irc->CurrentHostname);
+    titel_text.Replace(_T("%param3"), irc->CurrentPort);
+    titel_text.Replace(_T("%param4"), titel);
+    
+    reiterframe->SetTitle(titel_text + _T("efirc ") + wxGetApp().efirc_version_string);
 }
 
 //Konfigurationsfunktionen
@@ -186,8 +219,10 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
     if(iter == zgr_fenster.end())
     {
         // Neues Fenster erstellen und Adresse des Speicherbereichs in zgr merken
-        Fenster *zgr = new Fenster(namedesfensters, wxPoint(8, 8), wxSize(566, 341));
+        Fenster *zgr = new Fenster(namedesfensters, wxPoint(0, 0), wxSize(720, 412));
 
+        
+        
         // Neuen Eintrag in der Map erstellen
         zgr_fenster.insert(make_pair(namedesfensters.Upper(), zgr));
 
@@ -195,6 +230,8 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
         zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
         zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
 
+        notebook->AddPage((wxWindow *)zgr, namedesfensters);
+        
         return zgr;
     }
 
@@ -210,7 +247,7 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
     if(zgr_fenster.end() != zgr_fenster.find(namedesfensters.Upper()))
     // Nur versuchen zu zerstoeren wenn das Fenster auch existiert
     {
-        zgr_fenster[namedesfensters.Upper()]->Destroy();
+        notebook->DeletePage(notebook->GetPageIndex((wxWindow*) zgr_fenster[namedesfensters.Upper()]));
         zgr_fenster.erase(namedesfensters.Upper());
     }
 }
@@ -299,6 +336,9 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
                 fensterzerstoeren(i->first);
             }
         }
+        
+        reiterframe->Destroy();
+        
     }
 
     else if(befehl_name == _T("PART") || befehl_name == _T("LEAVE"))

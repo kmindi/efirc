@@ -22,10 +22,9 @@
 #include <wx/arrstr.h>
 #include <wx/colour.h>
 #include <wx/sizer.h>
+#include <wx/panel.h>
 
-#include <icon.xpm>
-
-class Fenster : public wxFrame
+class Fenster : public wxPanel
 {
     private:
         // Zeiger für die zu erstellenden Objekte erzeugen
@@ -46,9 +45,7 @@ class Fenster : public wxFrame
             ID_WxEdit_ausgabefeld = 1001,
         };
 
-        void OnClose(wxCloseEvent& event);
         void WxButton_sendenClick(wxCommandEvent&);
-        void BeiAktivierung(wxActivateEvent& event);
         void BeiMausAufURL(wxTextUrlEvent& event);
 
         void NachrichtSenden();
@@ -64,9 +61,10 @@ class Fenster : public wxFrame
 
     public:
         wxString fenster_name;
-        Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, long style= wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER );
+        Fenster(const wxString& title, const wxPoint& pos, const wxSize& size);
+        ~Fenster();
 
-        void TitelSetzen(wxString titel, wxString nick = _T(""), wxString hostname = _T(""), wxString port = _T(""));
+        void TitelSetzen(wxString titel);
         void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));
         void ThemaAendern(wxString thema, wxString benutzer=_T(""));
         void AusgabefeldLeeren();

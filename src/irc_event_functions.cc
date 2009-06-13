@@ -447,15 +447,16 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
                 // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
                 {
                     zgr_fenster[i->first]->fenster_name = empfaenger;
-                    zgr_fenster[i->first]->TitelSetzen(empfaenger, empfaenger);
+                    zgr_fenster[i->first]->TitelSetzen(empfaenger);
                     // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+                    TitelSetzen(_T(""), empfaenger);
                     Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
                     zgr_fenster.erase(i); // Eintrag loeschen
                     zgr_fenster.insert(make_pair(empfaenger.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
                 }
                 else
                 {
-                    zgr_fenster[i->first]->TitelSetzen(_T(""), empfaenger);
+                    TitelSetzen(_T(""), empfaenger);
                 }
             }
         }
@@ -664,7 +665,8 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
                 // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
                 {
                     zgr_fenster[i->first]->fenster_name = neuername;
-                    zgr_fenster[i->first]->TitelSetzen(neuername, neuername);
+                    zgr_fenster[i->first]->TitelSetzen(neuername);
+                    TitelSetzen(_T(""), neuername);
                     // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
                     Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
                     zgr_fenster.erase(i); // Eintrag loeschen
@@ -673,7 +675,7 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
                 else
                 {
                     zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
-                    zgr_fenster[i->first]->TitelSetzen(_T(""), neuername);
+                    TitelSetzen(_T(""), neuername);
                     zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_NICK"), benutzer, neuername);
                 }
 

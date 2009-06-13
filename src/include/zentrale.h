@@ -25,6 +25,10 @@
 #include <wx/sizer.h>
 #include <wx/textdlg.h> // fuer textdialog zur eingabe eines einzeiligen textes
 
+//fuer Reiter (Tab) basierende Anzeige der Fenster
+#include <wx/aui/aui.h>
+#include <wx/aui/auibook.h> 
+
 class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 
 // eigene Quellen einbinden
@@ -58,14 +62,21 @@ class Zentrale : public wxApp
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter
         Konfiguration *config; // Zeiger zur Konfiguration
 
+        void TitelSetzen(wxString titel = _T(""), wxString nick = _T(""));
         void fensterzerstoeren(wxString);
         void EingabeVerarbeiten(wxString, wxString);
 
         Fenster* fenstersuchen(wxString);
         Fenster* fenster(wxString name);
         unsigned int anzahl_offene_fenster();
+        
+        wxAuiNotebook* notebook;
+        
 
     private:
+        wxFrame* reiterframe;
+        wxAuiManager m_mgr;
+    
         map<wxString, Fenster*> zgr_fenster;
         Fenster* neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum
         

@@ -16,30 +16,23 @@
 DECLARE_APP(Zentrale) // braucht man fuer wxGetApp() um damit auf die funktionen der Zentrale zuzugreifen
 
 // Ereignisse definieren
-BEGIN_EVENT_TABLE(Fenster, wxFrame)
-    EVT_CLOSE      (Fenster::OnClose)
+BEGIN_EVENT_TABLE(Fenster, wxPanel)
     EVT_BUTTON     (ID_WxButton_senden,
                     Fenster::WxButton_sendenClick)
-    EVT_ACTIVATE (Fenster::BeiAktivierung)
     EVT_TEXT_URL (wxID_ANY, Fenster::BeiMausAufURL)
 END_EVENT_TABLE()
 
 //Konstruktor der Fenster-Klasse
-Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame((wxFrame *)NULL, wxID_ANY, title, pos, size, style)
+Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size) : wxPanel(wxGetApp().notebook, wxID_ANY, pos, size, 0)
 {
-    // für was wird dann die position übergeben?
-    Center();
-
     // Objekte erzeugen
-    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(608,4), wxSize(111,384), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
+    WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(606,3), wxSize(111,383), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
     WxList_benutzerliste->InsertColumn(0, _T("Benutzerliste"), wxLIST_FORMAT_LEFT, -1);
 
-    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(4,4), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
-    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, wxGetApp().config->parsecfgvalue(_T("local_label_input")), wxPoint(4,392), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
-    WxButton_senden = new wxButton(this, ID_WxButton_senden, wxGetApp().config->parsecfgvalue(_T("local_label_button")), wxPoint(608,392), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
-    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(4,28), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
-
-    SetIcon(wxIcon(icon));
+    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(3,3), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
+    WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, wxGetApp().config->parsecfgvalue(_T("local_label_input")), wxPoint(3,389), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
+    WxButton_senden = new wxButton(this, ID_WxButton_senden, wxGetApp().config->parsecfgvalue(_T("local_label_button")), wxPoint(606,389), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
+    WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(3,26), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
 
     ObjekteAnpassen();
 
@@ -75,6 +68,34 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size, 
         SetSizer(sizer_alles); // sizer_alles als Sizer fuer dieses Fenster verwenden
 
     geschichte_position = 0;
+}
+
+// Destruktor
+Fenster::~Fenster()
+{
+    if(fenster_name.Upper() == wxGetApp().irc->CurrentHostname.Upper() || fenster_name.Upper() == wxGetApp().irc->CurrentNick.Upper())
+    {
+        if(wxGetApp().anzahl_offene_fenster() == 1)
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+        }
+        else
+        {
+            wxGetApp().fensterzerstoeren(fenster_name);
+        }
+    }
+    else
+    {
+        if(wxGetApp().anzahl_offene_fenster() == 1)
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
+        }
+        else
+        {
+            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
+            wxGetApp().fensterzerstoeren(fenster_name);
+        }
+    }
 }
 
 // Farben aus der Konfiguration lesen und bei allen Objekten anpassen
@@ -114,44 +135,6 @@ void Fenster::ObjekteAnpassen()
 }
 
 // Ereignissabhaengige Funktionen
-
-// Schliessen
-void Fenster::OnClose(wxCloseEvent& WXUNUSED(event))
-{
-    if(fenster_name.Upper() == wxGetApp().irc->CurrentHostname.Upper() || fenster_name.Upper() == wxGetApp().irc->CurrentNick.Upper())
-    {
-        if(wxGetApp().anzahl_offene_fenster() == 1)
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
-        }
-        else
-        {
-            wxGetApp().fensterzerstoeren(fenster_name);
-        }
-    }
-    else
-    {
-        if(wxGetApp().anzahl_offene_fenster() == 1)
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
-        }
-        else
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
-            wxGetApp().fensterzerstoeren(fenster_name);
-        }
-    }
-}
-
-void Fenster::BeiAktivierung(wxActivateEvent& event)
-{
-    // wenn das Fenster "aktiviert" wird
-    // wird es als oberstes Fenster gesetzt
-    // damit man mit GetTopWindow() abfragen kann welches das oberste ist
-    if(event.GetActive())
-    wxGetApp().SetTopWindow(dynamic_cast<wxWindow*>(event.GetEventObject()));
-    event.Skip();
-}
 
 // Sendenknopf
 void Fenster::WxButton_sendenClick(wxCommandEvent&)
@@ -253,27 +236,10 @@ void Fenster::NachrichtSenden()
 }
 
 // OEFFENTLICHE FUNKTIONEN
-void Fenster::TitelSetzen(wxString titel, wxString nick, wxString hostname, wxString port)
+void Fenster::TitelSetzen(wxString titel)
 {
-    if(titel == _T(""))
-        titel = fenster_name;
-    if(nick == _T(""))
-        nick = wxGetApp().irc->CurrentNick;
-    if(hostname == _T(""))
-        hostname = wxGetApp().irc->CurrentHostname;
-    if(port == _T(""))
-        port = wxGetApp().irc->CurrentPort;
-
-    // Aus Konfiguration Titelformat auslesen
-    wxString titel_text = wxGetApp().config->parsecfgvalue(_T("text_title"));
-
-    // Parameter ersetzen
-    titel_text.Replace(_T("%param1"),nick);
-    titel_text.Replace(_T("%param2"),hostname);
-    titel_text.Replace(_T("%param3"),port);
-    titel_text.Replace(_T("%param4"),titel);
-
-    SetTitle(titel_text + _T("efirc ") + wxGetApp().efirc_version_string);
+    if(titel == _T("")) titel = fenster_name;
+    wxGetApp().notebook->SetPageText(wxGetApp().notebook->GetPageIndex(this), titel);
 }
 
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)
@@ -344,8 +310,8 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     }
     
     // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen, ausser es ist eine Benutzerlistenaenderung
-    if(this != wxGetActiveWindow() && this != wxGetApp().GetTopWindow() && local.Left(3) != _T("BL_"))
-    this->RequestUserAttention();
+    //if(this != wxGetActiveWindow() && this != wxGetApp().GetTopWindow() && local.Left(3) != _T("BL_"))
+    //this->RequestUserAttention();
 }
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
