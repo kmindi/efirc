@@ -658,6 +658,5 @@ void Zentrale::call_thread()
 // OnExit wird ausgefuehrt wenn das ganze Programm beendet wird
 int Zentrale::OnExit()
 {
-    BefehlVerarbeiten(_T(""), _T("/QUIT"));
     return 0;
 }
