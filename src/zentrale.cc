@@ -50,7 +50,10 @@ bool Zentrale::OnInit()
         // Neues Reiteransichtobjekt erzeugen
         notebook = new wxAuiNotebook (reiterframe, wxID_ANY, wxPoint(0, 0), wxSize(720, 412), wxAUI_NB_TAB_MOVE | wxAUI_NB_CLOSE_ON_ALL_TABS | wxAUI_NB_TOP);
         
-        reiterframe->SetSizeHints(wxSize(740, 472)); // Breite + 20, Hoehe +60 ???
+        reiterframe->SetSizeHints(wxSize(760, 492)); // Breite + 20, Hoehe +60 ???
+        // int breite, hoehe;
+        // notebook->GetSize(&breite, &hoehe);
+        // reiterframe->SetSizeHints(wxSize(breite, hoehe)); 
         reiterframe->Fit();
         reiterframe->Show(true);
         
@@ -655,5 +658,6 @@ void Zentrale::call_thread()
 // OnExit wird ausgefuehrt wenn das ganze Programm beendet wird
 int Zentrale::OnExit()
 {
+    BefehlVerarbeiten(_T(""), _T("/QUIT"));
     return 0;
 }
