@@ -331,12 +331,12 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
 
         // Alle Fenster zerstoeren
-        for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
+        while(!zgr_fenster.empty())
         {
-            if(!(wxGetApp().zgr_fenster[i->first]==NULL))
+            if(!(wxGetApp().zgr_fenster[zgr_fenster.begin()->first]==NULL))
             // nicht in nicht vorhandenen Fenstern
             {
-                fensterzerstoeren(i->first);
+                fensterzerstoeren(zgr_fenster.begin()->first);
             }
         }
         
