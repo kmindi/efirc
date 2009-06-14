@@ -2,7 +2,7 @@ CPPIRCDIR:= contrib\cppirc
 OBJS:= irc.o ui.o thread.o config.o irc_event_functions.o
 WXCXXFLAGS:= $(shell wx-config --cxxflags)
 CXXFLAGS+= $(WXCXXFLAGS) -L$(CPPIRCDIR) -Iinclude -I$(CPPIRCDIR)
-LDLIBS:= $(shell wx-config --libs) -lircinterface -lsstring -mwindows -luuid -lcomctl32 -lole32 -loleaut32 -lwsock32
+LDLIBS:= $(shell wx-config --libs) -lircinterface -lsstring -lws2_32
 
 efirc.exe: zentrale.cc $(OBJS) $(CPPIRCDIR)\libircinterface.a $(CPPIRCDIR)\libsstring.a
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(@) $(<) $(LDLIBS)
