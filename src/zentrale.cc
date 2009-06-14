@@ -233,7 +233,7 @@ Fenster* Zentrale::neuesFenster(wxString namedesfensters)
         zgr_fenster[namedesfensters.Upper()]->TitelSetzen(namedesfensters); // Titel anpassen
         zgr_fenster[namedesfensters.Upper()]->Show(TRUE); // Fenster in den Vordergrund holen
 
-        notebook->AddPage((wxWindow *)zgr, namedesfensters);
+        notebook->AddPage((wxWindow *)zgr, namedesfensters, true);
         
         return zgr;
     }
