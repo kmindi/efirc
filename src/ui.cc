@@ -73,28 +73,18 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size) 
 // Destruktor
 Fenster::~Fenster()
 {
-    if(fenster_name.Upper() == wxGetApp().irc->CurrentHostname.Upper() || fenster_name.Upper() == wxGetApp().irc->CurrentNick.Upper())
+    if(wxGetApp().anzahl_offene_fenster() == 1)
     {
-        if(wxGetApp().anzahl_offene_fenster() == 1)
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
-        }
-        else
-        {
-            wxGetApp().fensterzerstoeren(fenster_name);
-        }
+        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
     }
     else
     {
-        if(wxGetApp().anzahl_offene_fenster() == 1)
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
-        }
-        else
+        if(fenster_name.Upper() != wxGetApp().irc->CurrentHostname.Upper() && fenster_name.Upper() != wxGetApp().irc->CurrentNick.Upper())
         {
             wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
-            wxGetApp().fensterzerstoeren(fenster_name);
         }
+
+        wxGetApp().fensterzerstoeren(fenster_name);
     }
 }
 
