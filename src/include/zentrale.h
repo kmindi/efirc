@@ -24,6 +24,7 @@
 #include <wx/string.h>
 #include <wx/sizer.h>
 #include <wx/textdlg.h> // fuer textdialog zur eingabe eines einzeiligen textes
+#include <wx/panel.h>
 
 //fuer Reiter (Tab) basierende Anzeige der Fenster
 #include <wx/aui/aui.h>

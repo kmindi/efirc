@@ -553,17 +553,13 @@ void Zentrale::EingabeVerarbeiten(wxString fenstername, wxString eingabe)
 
 void Zentrale::zeige_ueber()
 {
-    wxFrame* dlg_ueber;
+    wxPanel* dlg_ueber;
 
     // Neues Fenster erzeugen
-        dlg_ueber = new wxFrame(NULL, wxID_ANY, _T("info@efirc"), wxDefaultPosition, wxSize(600,400), wxCAPTION | wxCLOSE_BOX | wxSTAY_ON_TOP | wxSYSTEM_MENU /*| wxRESIZE_BORDER*/, _T("AboutDialog"));
-
-    // Fenster anpassen
-        dlg_ueber->Center(); // In der Mitte anzeigen
-        dlg_ueber->SetIcon(wxIcon(icon)); // Icon setzen
+    dlg_ueber = new wxPanel (notebook, wxID_ANY, wxPoint(0,0), wxSize(720, 412), 0, _T("AboutDialog"));
 
     // Informationen in einem nicht veraenderbaren Textfeld anzeigen
-        wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxBORDER_NONE | wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
+    wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
 
     // Textfeld anpassen
         // Schriftdarstellung aendern
@@ -572,9 +568,17 @@ void Zentrale::zeige_ueber()
         st_infotext->SetBackgroundColour( _T("#510000") );
         st_infotext->SetForegroundColour( _T("#000000") );
 
+    // Groessenaenderung anpassen
+    wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+    sizer->Add(st_infotext, 1, wxEXPAND | wxALL, 3);
+    dlg_ueber->SetSizer(sizer);
+    
+    
     // Fenster anzeigen
     dlg_ueber->Show();
-
+    notebook->AddPage(dlg_ueber, _T("efirc Info"), true);
+    
+    // Infotext setzten
     wxString info = _T("");
 
     info.Append(_T("         _____.__                 \n"));
@@ -604,25 +608,10 @@ void Zentrale::zeige_ueber()
     info.Append(_T("\n"));
     info.Append(_T("http://efirc.sf.net/"));
 
-    wxString tmp_text = _T("");
-    wxString prefix = _T("\n<efirc> ");
-
-    // maximale Zeilenlaenge ist gleich Breite des Textfelds durch groesse eines Zeichens minus groesse eines Zeichens
-    unsigned int zeilenlaenge = (st_infotext->GetSize().x / st_infotext->GetCharWidth()) ;
-
     while(info != _T(""))
     {
-        tmp_text = info.BeforeFirst(_T('\n')); // Alles vor dem ersten Zeilenumbruch steht jetzt in tmp_text
-
-        // solange tmp_text und prefix zusammen laenger als die zeilenlaenge sind
-        while(tmp_text.Len() + prefix.Len() > zeilenlaenge)
-        {
-            st_infotext->AppendText(prefix + tmp_text.Left(zeilenlaenge - prefix.Len())); // prefix + den linken Teil von tmp_text bis zur Position (maximale Zeilenlaenge - prefix Laenge)
-            tmp_text = tmp_text.Mid(zeilenlaenge - prefix.Len()); // In tmp_text steht jetzt nicht mehr der Text der schon angezeigt wurde
-        }
-        st_infotext->AppendText(prefix + tmp_text);
-
-        info = info.AfterFirst(_T('\n')); // Alles nach dem ersten Zeilenumbruch steht jetzt in tmp_text
+        st_infotext->AppendText(_T("<efirc> ") + info.BeforeFirst(_T('\n')) + _T('\n'));
+        info = info.AfterFirst(_T('\n')); // Alles nach dem ersten Zeilenumbruch entfernen
     }
 }
 
