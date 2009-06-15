@@ -25,6 +25,7 @@
 #include <wx/sizer.h>
 #include <wx/textdlg.h> // fuer textdialog zur eingabe eines einzeiligen textes
 #include <wx/panel.h>
+#include <wx/frame.h> 
 
 //fuer Reiter (Tab) basierende Anzeige der Fenster
 #include <wx/aui/aui.h>
@@ -42,6 +43,17 @@ class Zentrale; //Thread muss wissen, dass Zentrale eine Klasse ist
 
 #include <icon.xpm>
 
+// Klasse fuer das Hauptfenster
+// Eigene Klasse wird benoetigt um diesem Fenster Ereignisse zuordnen zu koennen
+class Hauptfenster : public wxFrame
+{
+    public:
+        Hauptfenster(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=wxDEFAULT_FRAME_STYLE, const wxString &name=wxFrameNameStr) : wxFrame(parent, id, title, pos, size, style, name) { }
+        DECLARE_EVENT_TABLE();
+    private:
+        void BeiFensterSchliessen(wxAuiNotebookEvent& );
+};
+
 void irc_allgemein(const irc_msg_data *msg_data, void *cp);
 
 class Zentrale : public wxApp
@@ -54,10 +66,10 @@ class Zentrale : public wxApp
 
         wxString efirc_version_string;
 
-        friend class Thread;
-        friend class Ereignisverwalter;
-        // muss ein Freund sein, damit die erstellten Threads
-        // auf die privaten Thread Funktionen zugreifen koennen
+        // Freunde damit sie auf die Zentrale zugreifen koennen
+        friend class Thread; 
+        friend class Ereignisverwalter; 
+        friend class Hauptfenster; 
 
         IRC *irc;
         Ereignisverwalter *Ereignisvw; // Zeiger auf einen eigenen Ereignisverwalter

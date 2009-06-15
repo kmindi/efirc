@@ -611,7 +611,8 @@ void Zentrale::irc_leave(const IRC_NACHRICHT *msg_data)
     if(benutzer.Upper() == irc->CurrentNick.Upper())
     // wenn man selber den Raum verlaesst
     {
-        fensterzerstoeren(empfaenger);
+        //fenster(empfaenger)->NachrichtAnhaengen(_T("BL_PART"), benutzer, nachricht);
+        // immer anzeigen?
     }
     else
     {

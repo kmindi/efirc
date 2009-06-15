@@ -13,6 +13,10 @@
 
 #include <zentrale.h>
 
+BEGIN_EVENT_TABLE(Hauptfenster, wxFrame)
+    EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, Hauptfenster::BeiFensterSchliessen)
+END_EVENT_TABLE()
+
 // main funkition erstellen, Instanz der Klasse Zentrale erstellen
 // mit DECLARE_APP(Zentrale/) und wxGetApp() kann auf Funktionen dieser Klasse zugegrifffen werden
 IMPLEMENT_APP(Zentrale) // erstellt main funktion
@@ -41,7 +45,7 @@ bool Zentrale::OnInit()
     zufallstext(8));
 
     // Reiteranzeige
-        reiterframe = new wxFrame(NULL, wxID_ANY, _T("REITERFRAME"), wxDefaultPosition, wxSize(724, 416), wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER, _T("reiterframe"));
+        reiterframe = new Hauptfenster(NULL, wxID_ANY, _T("REITERFRAME"), wxDefaultPosition, wxSize(724, 416), wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER, _T("reiterframe"));
         wxGetApp().m_mgr.SetManagedWindow(reiterframe); // Das gerade erstellte Fenster dem AUI Verwalter zuweisen
         
         TitelSetzen(); // Titel anpassen
@@ -68,6 +72,35 @@ bool Zentrale::OnInit()
         
     return TRUE;
 }
+
+
+// Wenn der Schliessen-Knopf eines Reiters gedrueckt wurde oder dieses Fenster geschlossen werden soll
+void Hauptfenster::BeiFensterSchliessen(wxAuiNotebookEvent& evt)
+{
+    wxAuiNotebook* ctrl = (wxAuiNotebook*)evt.GetEventObject();
+    
+    // Name des Fensters herausfinden (nicht fenster_name, weil es auch andere Fenster als Fensterklassenobjekte sein koennen)
+    wxString namedesfensters = (ctrl->GetPageText(evt.GetSelection()));
+    
+    if(wxGetApp().zgr_fenster.find(namedesfensters.Upper()) != wxGetApp().zgr_fenster.end())
+    {
+        if(wxGetApp().anzahl_offene_fenster() == 1)
+        {
+            wxGetApp().EingabeVerarbeiten(namedesfensters, _T("/quit"));
+        }
+        else
+        {
+            if(namedesfensters.Upper() != wxGetApp().irc->CurrentHostname.Upper() && namedesfensters.Upper() != wxGetApp().irc->CurrentNick.Upper())
+            {
+                wxGetApp().EingabeVerarbeiten(namedesfensters, _T("/part"));
+            }
+        }
+        // Zeiger entfernen
+        wxGetApp().zgr_fenster.erase(namedesfensters.Upper());
+    }
+    
+}
+
 
 // Titel des Hauptfensters setzen
 void Zentrale::TitelSetzen(wxString titel, wxString nick)
@@ -329,17 +362,8 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
 
         irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
-
-        // Alle Fenster zerstoeren
-        while(!zgr_fenster.empty())
-        {
-            if(!(wxGetApp().zgr_fenster[zgr_fenster.begin()->first]==NULL))
-            // nicht in nicht vorhandenen Fenstern
-            {
-                fensterzerstoeren(zgr_fenster.begin()->first);
-            }
-        }
         
+        // Hauptfenster zerstoeren
         reiterframe->Destroy();
         
     }

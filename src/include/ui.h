@@ -62,7 +62,7 @@ class Fenster : public wxPanel
     public:
         wxString fenster_name;
         Fenster(const wxString& title, const wxPoint& pos, const wxSize& size);
-        ~Fenster();
+        ~Fenster() { }
 
         void TitelSetzen(wxString titel);
         void NachrichtAnhaengen(wxString local, wxString param1 = _T(""), wxString param2 = _T(""), wxString param3 = _T(""), wxString param4 = _T(""));

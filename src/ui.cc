@@ -70,24 +70,6 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size) 
     geschichte_position = 0;
 }
 
-// Destruktor
-Fenster::~Fenster()
-{
-    if(wxGetApp().anzahl_offene_fenster() == 1)
-    {
-        wxGetApp().EingabeVerarbeiten(fenster_name,_T("/quit"));
-    }
-    else
-    {
-        if(fenster_name.Upper() != wxGetApp().irc->CurrentHostname.Upper() && fenster_name.Upper() != wxGetApp().irc->CurrentNick.Upper())
-        {
-            wxGetApp().EingabeVerarbeiten(fenster_name,_T("/part"));
-        }
-
-        wxGetApp().fensterzerstoeren(fenster_name);
-    }
-}
-
 // Farben aus der Konfiguration lesen und bei allen Objekten anpassen
 void Fenster::ObjekteAnpassen()
 {
