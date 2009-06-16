@@ -88,7 +88,6 @@ class Zentrale : public wxApp
 
     private:
         wxFrame* reiterframe;
-        wxAuiManager m_mgr;
     
         map<wxString, Fenster*> zgr_fenster;
         Fenster* neuesFenster(wxString); // erstellt neue Instanz fuer uebergebenen Raum

@@ -46,7 +46,6 @@ bool Zentrale::OnInit()
 
     // Reiteranzeige
         reiterframe = new Hauptfenster(NULL, wxID_ANY, _T("REITERFRAME"), wxDefaultPosition, wxSize(724, 416), wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER, _T("reiterframe"));
-        wxGetApp().m_mgr.SetManagedWindow(reiterframe); // Das gerade erstellte Fenster dem AUI Verwalter zuweisen
         
         TitelSetzen(); // Titel anpassen
         
@@ -362,6 +361,7 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
 
         irc->irc_disconnect_server(quitmessage.mb_str()); // Verbindung zum Server mit gegebener Nachricht trennen
+        
         
         // Hauptfenster zerstoeren
         reiterframe->Destroy();
