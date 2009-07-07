@@ -31,7 +31,6 @@
     <File Name="ui.cc"/>
     <File Name="zentrale.cc"/>
   </VirtualDirectory>
-  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;$(shell wx-config --cxxflags --unicode=yes --debug=yes)" Required="yes">
@@ -82,7 +81,9 @@
       <PreBuild>
         <Command Enabled="yes">SubWCRev.exe . include\version.in include\version.h</Command>
       </PreBuild>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">strip --strip-all $(IntermediateDirectory)/efirc.exe</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <CleanCommand></CleanCommand>
         <BuildCommand></BuildCommand>
@@ -109,4 +110,5 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
   </Settings>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
