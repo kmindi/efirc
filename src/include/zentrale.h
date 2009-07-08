@@ -26,6 +26,7 @@
 #include <wx/textdlg.h> // fuer textdialog zur eingabe eines einzeiligen textes
 #include <wx/panel.h>
 #include <wx/frame.h> 
+#include <wx/cmdline.h> // um uebergebene Kommandozeilenparameter verarbeiten zu koennen
 
 //fuer Reiter (Tab) basierende Anzeige der Fenster
 #include <wx/aui/aui.h>
@@ -63,8 +64,9 @@ class Zentrale : public wxApp
         ~Zentrale() {}
 
         virtual bool OnInit();
-
+        
         wxString efirc_version_string;
+        wxString raeume;
 
         // Freunde damit sie auf die Zentrale zugreifen koennen
         friend class Thread; 
@@ -95,6 +97,8 @@ class Zentrale : public wxApp
         wxTextEntryDialog* nickdialog; // Nickname aendern - Dialog
 
         int OnExit();
+        
+        wxCmdLineParser* parser;
 
         void zeige_ueber();
 
@@ -150,5 +154,22 @@ class Zentrale : public wxApp
         void irc_fehler(const IRC_NACHRICHT *msg_data);
         void irc_unbekannt(const IRC_NACHRICHT *msg_data);
 };
+
+static const wxCmdLineEntryDesc befehlszeilenparameterliste [] =
+{
+     {
+        wxCMD_LINE_SWITCH, "h", "help", "displays help on the command line parameters", 
+        wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP 
+     },
+     { wxCMD_LINE_OPTION, "c", "config", "test switch", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "n", "nick", "nickname", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "s", "server", "IP or Hostname of the IRC-Server", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "ch", "channel", "Channel(s) to join (comma seperated list)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "p", "port", "Port", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL  },
+ 
+     { wxCMD_LINE_NONE }
+};
+
+
 
 #endif

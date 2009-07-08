@@ -561,7 +561,7 @@ void Zentrale::irc_motd(const IRC_NACHRICHT *msg_data)
 void Zentrale::irc_endofmotd(const IRC_NACHRICHT *msg_data)
 {
     // den in der Konfigurationsdatei genannten Kanal betreten
-    irc->irc_send_join(config->parsecfgvalue(_T("irc_channel")).mb_str());
+    irc->irc_send_join(raeume.mb_str());
 }
 
 // Benutzerliste einlesen

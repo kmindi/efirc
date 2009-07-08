@@ -27,22 +27,47 @@ bool Zentrale::OnInit()
 
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
 
+
+    // KommandozeilenParser initialisieren
+    parser = new wxCmdLineParser();
+    parser->SetSwitchChars(_T("-"));
+    parser->SetDesc(befehlszeilenparameterliste);
+    parser->SetCmdLine(argc, argv);
+    parser->Parse();
+    
+    if(parser->Found(_T("h")))
+    this->Exit();
+    
     wxString standardkonfiguration_text = standardkonfiguration();
-    config = new Konfiguration(_T("efirc.cfg"), standardkonfiguration_text);
+    
+    // Ueberpruefen ob auf der Kommandozeile er Pfad der Konfigurationsdatei angegeben wurde
+    if(!parser->Found(_T("c")))
+        config = new Konfiguration(_T("efirc.cfg"), standardkonfiguration_text);
+    else
+    {
+        wxString pfad = _T("");
+        parser->Found(_T("c"), &pfad);
+        config = new Konfiguration(pfad, standardkonfiguration_text);
+    }
+        
 
     // Laufzeitkonfiguration anpassen
     Konfiguration_anpassen();
+    
+    // Befehlszeilenoptionen fuer IRC Verbindungsdaten beachten:
+    wxString tmp_port,tmp_server,tmp_nick;
+    if(!parser->Found(_T("p"), &tmp_port)) tmp_port = config->parsecfgvalue(_T("irc_port"));
+    if(!parser->Found(_T("s"), &tmp_server)) tmp_server = config->parsecfgvalue(_T("irc_server"));
+    if(!parser->Found(_T("n"), &tmp_nick)) tmp_nick = config->parsecfgvalue(_T("irc_nickname"));
 
-    // irc zeigt auf die IRC-Instanz
-    //irc = new IRC(_T("6667"),_T("irc.freenode.net"),_T("efirc_test"),_T("efirc_test"),_T("efirc_test"),_T("PASS"));
-
-    irc = new IRC(
-    config->parsecfgvalue(_T("irc_port")),
-    config->parsecfgvalue(_T("irc_server")),
-    config->parsecfgvalue(_T("irc_nickname")),
+    irc = new IRC(tmp_port, tmp_server, tmp_nick,
     config->parsecfgvalue(_T("irc_username")),
     config->parsecfgvalue(_T("irc_realname")),
     zufallstext(8));
+    
+    // Befehlszeilenoptionen fuer Raeume beachten
+    if(!parser->Found(_T("ch"), &raeume)) raeume = config->parsecfgvalue(_T("irc_channel"));
+
 
     // Reiteranzeige
         reiterframe = new Hauptfenster(NULL, wxID_ANY, _T("REITERFRAME"), wxDefaultPosition, wxSize(724, 416), wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxCLOSE_BOX | wxRESIZE_BORDER, _T("reiterframe"));
