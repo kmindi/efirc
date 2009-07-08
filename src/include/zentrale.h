@@ -161,8 +161,8 @@ static const wxCmdLineEntryDesc befehlszeilenparameterliste [] =
         wxCMD_LINE_SWITCH, "h", "help", "displays help on the command line parameters", 
         wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP 
      },
-     { wxCMD_LINE_OPTION, "c", "config", "test switch", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
-     { wxCMD_LINE_OPTION, "n", "nick", "nickname", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "c", "config", "Path to different configuration file than the default efirc.cfg", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "n", "nick", "Nickname", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
      { wxCMD_LINE_OPTION, "s", "server", "IP or Hostname of the IRC-Server", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
      { wxCMD_LINE_OPTION, "ch", "channel", "Channel(s) to join (comma seperated list)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
      { wxCMD_LINE_OPTION, "p", "port", "Port", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL  },
