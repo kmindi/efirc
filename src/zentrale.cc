@@ -36,7 +36,7 @@ bool Zentrale::OnInit()
     parser->Parse();
     
     if(parser->Found(_T("h")))
-    this->Exit();
+    return false;
     
     wxString standardkonfiguration_text = standardkonfiguration();
     
