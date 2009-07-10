@@ -155,6 +155,93 @@ class Zentrale : public wxApp
         void irc_unbekannt(const IRC_NACHRICHT *msg_data);
 };
 
+static const wxString standardkonfiguration_text =
+
+    // Verbindungsinformationen
+    _T("irc_server = irc.freenode.net\n")
+    _T("irc_port = 6667\n")
+    _T("irc_channel = #efirc\n")
+    _T("irc_username = efirc\n")
+    _T("irc_realname = %real_name\n")
+    _T("irc_nickname = user_%random_string\n")
+
+    _T("max_DONT_SHOW_USERLIST_CHANGES = 25\n")
+    _T("bool_automatic_nickchange_if_in_use = 1\n")
+
+    // Farben
+    _T("colour_background = #510000\n")
+    _T("colour_topic_background = #EEEEEE\n")
+    _T("colour_topic_foreground = #000000\n")
+    _T("colour_output_messages_background = #EEEEEE\n")
+    _T("colour_output_messages_foreground = #000000\n")
+    _T("colour_input_messages_background = #EEEEEE\n")
+    _T("colour_input_messages_foreground = #000000\n")
+    _T("colour_channel_users_background = #EEEEEE\n")
+    _T("colour_channel_users_foreground = #000000\n")
+    _T("colour_button_background = #EEEEEE\n")
+    _T("colour_button_foreground = #640C0C\n")
+    _T("colour_error = #FF0000\n")
+
+    // Texte
+    _T("text_title = %param4 [%param1@%param2:%param3] - \n")
+
+    // Schriftarten
+    _T("font_topic = \n")
+    _T("font_output_messages = \n")
+    _T("font_input_messages = \n")
+    _T("font_channel_users = \n")
+    _T("font_button = \n")
+
+    // Standardtexte
+    // S =s elber, fuer Nachrichten die man selber geschrieben hat
+    // P = privat, fuer Nachrichten die nicht an einen Raum, sondern an einen selber geschrieben wurden.
+    // BL = Benutzerliste
+    _T("local_P_PRIVMSG = -%param1- %param2\n")
+    _T("local_S_P_PRIVMSG = >%param1< %param2\n")
+    _T("local_PRIVMSG = <%param1> %param2\n")
+    _T("local_PRIVMSG_NOSENDER = %param2\n")
+    _T("local_ACTION = *%param1 [italic]%param2[/italic]\n")
+    _T("local_P_ACTION = *%param1 [italic]%param2[/italic]\n")
+    _T("local_CHANNEL_URL = The channel url is: %param1\n")
+    _T("local_TOPIC = The topic is: %param1\n")
+    _T("local_TOPICWHOTIME = Topic was set by %param1 at %param2\n")
+    _T("local_TOPIC_CHANGE = %param2 changed the topic to %param1\n")
+    _T("local_BL_JOIN = %param1 joined the channel\n")
+    _T("local_BL_PART = %param1 has left the channel (%param2)\n")
+    _T("local_BL_QUIT = %param1 has left the network (%param2)\n")
+    _T("local_INVITE = %param1 invited you to %param2\n")
+    _T("local_BL_NICK = %param1 changed his nickname to %param2\n")
+    _T("local_CTCP = -%param1@CTCP- %param2\n")
+    _T("local_S_CTCP = >%param1@CTCP< %param2\n")
+    _T("local_MODE = %param1 set mode %param2\n")
+    _T("local_AWAY = You have been marked as being away (%param1)\n")
+    _T("local_RPL_UNAWAY = You are not longer marked as being away\n")
+    _T("local_RPL_NOWAWAY = You have been marked as being away\n")
+    _T("local_WHOIS_USER = WHOIS: %param1 (%param2@%param3 - %param4)\n")
+    _T("local_WHOIS_AWAY = WHOIS: %param1 is away %param2\n")
+    _T("local_WHOIS_CHANNEL = WHOIS: %param1 is in %param2\n")
+    _T("local_WHOIS_IDLE = WHOIS: %param1 is idle since %param2 seconds\n")
+    _T("local_WHOIS_SERVERMSG = WHOIS: %param1 %param2 %param3\n")
+    _T("local_WHOIS_SPECIAL = WHOIS: %param1 %param2\n")
+    _T("local_WHOIS_ACTUALLY = WHOIS: %param1 is actually using host %param2\n")
+    _T("local_KICK = %param1 has kicked %param2 (%param3)\n")
+    _T("local_KICK_SELF = You were kicked by %param1 (%param2)\n")
+    _T("local_quit_message = efirc sagt tschuess\n")
+
+    _T("local_label_button = Send\n")
+    _T("local_label_input = Put your message here and press Enter\n")
+
+    // Fehler (werden in konfigurierter Farbe dargestellt)
+    _T("local_ERR_IRC = (!) %param1\n") // case 2
+    _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n") // case 4
+    _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n") // case 5
+    _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n") // case 5
+
+    // Anzeige bestimmter Dialog oder anderer nicht irc spezifischer Nachrichten
+    _T("local_DLG_NEWNICK_NICKINUSE_TEXT = The Nickname you try to use is already in use. You have to choose a new one:\n") // case 5
+    _T("local_DLG_NEWNICK_CAPTION = Change your Nickname\n") // case 5
+    ;
+
 static const wxCmdLineEntryDesc befehlszeilenparameterliste [] =
 {
      {
