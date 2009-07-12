@@ -18,31 +18,53 @@ Konfiguration::Konfiguration(wxString dateipfad, wxString standardkonfiguration)
 
 void Konfiguration::opencfg(wxString dateipfad)
 {
-    wxTextFile file;
-    bool datei_ist_nicht_vorhanden = file.Create(dateipfad); // Create liefert false wenn die Datei schon vorhanden ist
-    wxString zeile;
-    konfiguration_text = _T("");
-
-    if(!datei_ist_nicht_vorhanden)
+    if(dateipfad.Left(7) == _T("http://") || dateipfad.Left(6) == _T("ftp://"))
     {
-        file.Open(dateipfad, wxConvLocal);
-        for ( unsigned int i = 0; i < file.GetLineCount(); i++ )
+        wxURL url(dateipfad);
+        
+        if(url.GetError() == wxURL_NOERR)   
         {
-            konfiguration_text += file.GetLine(i) + _T("\n");
+            wxInputStream *in = url.GetInputStream();
+
+            if(in && in->IsOk()) 
+            {
+                wxStringOutputStream html_stream(&konfiguration_text);
+                in->Read(html_stream);
+            }
+            delete in;
         }
     }
     else
     {
-        file.Open(dateipfad, wxConvLocal);
+        wxTextFile file;
+        bool datei_ist_nicht_vorhanden = file.Create(dateipfad); // Create liefert false wenn die Datei schon vorhanden ist
+        wxString zeile;
+        konfiguration_text = _T("");
 
-        wxString tmp_standardkonfiguration_text = standardkonfiguration_text;
-        while(tmp_standardkonfiguration_text != _T(""))
+        if(!datei_ist_nicht_vorhanden)
         {
-            file.AddLine(tmp_standardkonfiguration_text.BeforeFirst(_T('\n')));
-            tmp_standardkonfiguration_text = tmp_standardkonfiguration_text.AfterFirst(_T('\n'));
+            file.Open(dateipfad, wxConvLocal);
+            for ( unsigned int i = 0; i < file.GetLineCount(); i++ )
+            {
+                konfiguration_text += file.GetLine(i) + _T("\n");
+            }
         }
-        file.Write(); // Aenderungen anwenden
+        else
+        {
+            file.Open(dateipfad, wxConvLocal);
+
+            wxString tmp_standardkonfiguration_text = standardkonfiguration_text;
+            while(tmp_standardkonfiguration_text != _T(""))
+            {
+                file.AddLine(tmp_standardkonfiguration_text.BeforeFirst(_T('\n')));
+                tmp_standardkonfiguration_text = tmp_standardkonfiguration_text.AfterFirst(_T('\n'));
+            }
+            file.Write(); // Aenderungen anwenden
+        }
     }
+    
+    
+    
 }
 
 wxString Konfiguration::parsecfgvalue(wxString searchstring)

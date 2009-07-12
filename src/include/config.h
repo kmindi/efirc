@@ -13,6 +13,8 @@
 
 #include <wx/textfile.h>
 #include <wx/string.h>
+#include <wx/sstream.h>
+#include <wx/url.h>
 
 class Konfiguration
 {
