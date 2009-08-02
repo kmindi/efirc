@@ -511,6 +511,8 @@ void Zentrale::zeige_ueber()
 
     // Neues Fenster erzeugen
     dlg_ueber = new wxPanel (notebook, wxID_ANY, wxPoint(0,0), wxSize(720, 412), 0, _T("AboutDialog"));
+    
+    dlg_ueber->SetBackgroundColour( config->parsecfgvalue(_T("colour_background")) );
 
     // Informationen in einem nicht veraenderbaren Textfeld anzeigen
     wxTextCtrl *st_infotext = new wxTextCtrl(dlg_ueber, -1, _T(""), wxPoint(5,5), dlg_ueber->GetSize(), wxTE_MULTILINE | wxTE_READONLY , wxDefaultValidator, _T("st_infotext"));
@@ -519,8 +521,8 @@ void Zentrale::zeige_ueber()
         // Schriftdarstellung aendern
         st_infotext->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE));
         // Textfarbe aendern
-        st_infotext->SetBackgroundColour( _T("#510000") );
-        st_infotext->SetForegroundColour( _T("#000000") );
+        st_infotext->SetBackgroundColour( config->parsecfgvalue(_T("colour_output_messages_background")) );
+        st_infotext->SetForegroundColour( config->parsecfgvalue(_T("colour_output_messages_foreground")) );
 
     // Groessenaenderung anpassen
     wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
