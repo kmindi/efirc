@@ -28,12 +28,16 @@ class IRC_NACHRICHT
     public:
         IRC_NACHRICHT(const irc_msg_data *msg_data)
         {
-            sender = wxString(msg_data->sender, wxConvUTF8);
-            cmd = wxString(msg_data->cmd, wxConvUTF8);
-            params = wxString(msg_data->params, wxConvUTF8);
-            host = wxString(msg_data->host, wxConvUTF8);
-            nick = wxString(msg_data->nick, wxConvUTF8);
-            user = wxString(msg_data->user, wxConvUTF8);
+            // wenn etwas nicht umgewandelt werden kann, wird eine leere Zeichenkette zurueckgegeben
+            // um trotzdem den Inhalt der Variablen umzuwandeln wird eine Alternative Methode verwendet
+            // ("wxConvCurrent, points to the conversion object that the user interface is supposed to use")
+            
+            sender = wxString(msg_data->sender, wxConvUTF8); if(sender == _T("")) sender = wxString(msg_data->sender, *wxConvCurrent);
+            cmd = wxString(msg_data->cmd, wxConvUTF8); if(cmd == _T("")) cmd = wxString(msg_data->cmd, *wxConvCurrent);
+            params = wxString(msg_data->params, wxConvUTF8); if(params == _T("")) params = wxString(msg_data->params, *wxConvCurrent);
+            host = wxString(msg_data->host, wxConvUTF8); if(host == _T("")) host = wxString(msg_data->host, *wxConvCurrent);
+            nick = wxString(msg_data->nick, wxConvUTF8); if(nick == _T("")) nick = wxString(msg_data->nick, *wxConvCurrent);
+            user = wxString(msg_data->user, wxConvUTF8); if(user == _T("")) user = wxString(msg_data->user, *wxConvCurrent);
             params_i = msg_data->params_i;
 
             params_a = new wxString[params_i];
@@ -41,6 +45,7 @@ class IRC_NACHRICHT
             for(int i = 0; i < params_i; i++)
             {
                 params_a[i] = wxString(msg_data->params_a[i], wxConvUTF8);
+                if(params_a[i] == _T("")) params_a[i] = wxString(msg_data->params_a[i], *wxConvCurrent);
             }
         }
 
