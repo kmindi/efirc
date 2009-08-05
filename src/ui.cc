@@ -236,49 +236,141 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param2"),param2);
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
+    
+    // Farben temporaer noch herausfiltern
+    wxRegEx("[\x0003][0-9]{1,2}[,]{1,1}[0-9]{1,2}").Replace(&nachricht, "");
+    wxRegEx("[\x0003][0-9]{1,2}").Replace(&nachricht, ""); // 2 Farbige
+   
 
-    // Besondere Textformatierungen beachten und anwenden
-
-        if(local.Left(3) == _T("ERR"))
-        // Wenn es ein Fehler ist nur Farbe anpassen
-        {
-            // Bisheriges Aussehen speichern
-            wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-            // Aussehen aendern
-            WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
-            // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-            WxEdit_ausgabefeld->AppendText(prefix + nachricht);
-            // ...voreingestelltes Aussehen wiederherstellen
-            WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-            // Funktion verlassen
-            return;
-        }
-        else if(nachricht.Contains(_T("[italic]")) && nachricht.Contains(_T("[/italic]")))
-        // Wenn [italic] gefunden wurde:
-        {
-            int pos = nachricht.Find(_T("[italic]"));
-            //alles vor italic ausgeben
-                WxEdit_ausgabefeld->AppendText(prefix + nachricht.Left(pos));
-            //alles kursiv formatiert ausgeben
-                wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-
-                wxTextAttr textattr = WxEdit_ausgabefeld->GetDefaultStyle(); // bisherige Schriftformatierung speichern
-                textattr.SetFontStyle(wxFONTSTYLE_ITALIC); // kursiv setzen
-                WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-
-                WxEdit_ausgabefeld->AppendText(nachricht.Mid(pos + 8, nachricht.Find(_T("[/italic]")) - pos - 8));
-
-                WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-            //alles nach italic ausgeben
-                WxEdit_ausgabefeld->AppendText(nachricht.Mid(nachricht.Find(_T("[/italic]")) + 9));
-            // Funktion verlassen
-                return;
-        }
-     
+    if(local.Left(3) == _T("ERR"))
+    // Wenn es ein Fehler ist nur Farbe anpassen
+    {
+        // Bisheriges Aussehen speichern
+        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+        // Aussehen aendern
+        WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
+        // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
+        WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+        // ...voreingestelltes Aussehen wiederherstellen
+        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+        // Funktion verlassen
+        return;
+    }
+        
     // Nachricht nicht anzeigen wenn es eine Benutzerlistenaenderung ist und die Begrenzung erreicht ist
     if(local.Left(3) != _T("BL_") || (local.Left(3) == _T("BL_") && !AnzeigeBegrenzungErreicht()))
     {
-        WxEdit_ausgabefeld->AppendText(prefix + nachricht);
+        wxString text = prefix + nachricht;
+        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
+        wxTextAttr textattr = defaultstyle;
+        bool fett, unterstrichen, kursiv = false;
+        
+        unsigned long pos = 0;
+        // Jedes Zeichen der Nachricht auf Steuerzeichen ueberpruefen
+        while(pos <= text.Len() && text != _T(""))
+        {
+            switch(text.GetChar(pos).GetValue())
+            {
+                // Text bis zum Formatierungszeichen ausgeben
+                // Den Ausgegebenen Text inklusive dem aktuellen Steuerzeichen entfernen (++pos)
+                // und pos auf 0 setzen.
+                
+                case 0x0002: // CTRL B (STX) Fett
+                    
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    if(!fett)
+                    {
+                        textattr.SetFontWeight(wxFONTWEIGHT_BOLD); 
+                        WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
+                        fett = true;
+                    }
+                    else
+                    {
+                        textattr.SetFontWeight(wxFONTWEIGHT_NORMAL); 
+                        WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
+                        fett = false;
+                    }
+                    
+                    break;
+                    
+                case 0x0003: // CTRL C (ETX) Farbig
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    
+                    // Je nach dem ob einstellig, zweistellig oder mit Komma (Vorder und Hintergrundfarbe)
+                    // mehr Zeichen nach rechts gehen
+                    // oder Nachträglich mit wxRegEx ersetzen
+                    
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    // Farben auslesen und Farbzahlen entfernen
+                    
+                    break;
+                    
+                case 0x001F: // CTRL U? (US) Unterstrichen
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    if(!unterstrichen) unterstrichen = true;
+                    else unterstrichen = false;
+                    
+                    textattr.SetFontUnderlined(unterstrichen); 
+                    WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
+                    
+                    
+                    break;
+                    
+                case 0x0012: // CTRL R Umgetauscht
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    // NOCH EINBAUEN
+                    
+                    break;
+                    
+                case 0x0009: // CTRL I Kursiv
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    if(!kursiv)
+                    {
+                        textattr.SetFontStyle(wxFONTSTYLE_ITALIC); // kursiv setzen
+                        WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                        kursiv = true;
+                    }
+                    else
+                    {
+                        textattr.SetFontStyle(wxFONTSTYLE_NORMAL); // kursiv setzen
+                        WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                        kursiv = false;
+                    }
+                    
+                    break;
+                    
+                case 0x000F: // CTRL O Normal
+                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                    text = text.Mid(++pos);
+                    pos = 0;
+                    
+                    WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+                    
+                    break;
+                
+                default:
+                    pos++;
+            }
+        }
+        // Normale Formatierung wiederherstellen
+        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
+        
+        // Rest vom text Anhaengen
+        WxEdit_ausgabefeld->AppendText(text);
     }
     
     // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen, ausser es ist eine Benutzerlistenaenderung

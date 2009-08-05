@@ -23,6 +23,7 @@
 #include <wx/colour.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/regex.h>
 
 class Fenster : public wxPanel
 {
