@@ -166,6 +166,8 @@ void Zentrale::Konfiguration_anpassen()
         config->edit_cfg_replace(_T("%random_string"), zufallstext(4));
         config->edit_cfg_replace(_T("%real_name"), wxGetUserId());
         config->edit_cfg_replace(_T("%italic"), _T("\x0009"));
+        config->edit_cfg_replace(_T("%bold"), _T("\x0002"));
+        config->edit_cfg_replace(_T("%underlined"), _T("\x001F"));
 }
 
 // Funktionen die auf die Fenster-Klasse zugreifen bzw. auf Instanzen eben dieser
