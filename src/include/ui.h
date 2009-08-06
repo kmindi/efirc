@@ -81,4 +81,24 @@ class Fenster : public wxPanel
         bool AnzeigeBegrenzungErreicht();
 };
 
+static const wxString IRC_Farben [] = // beim Benutzen immer um 1 verringern 
+{
+    _T("#000000"),  // Black
+    _T("#000080"),  // Navy Blue
+    _T("#008000"),  // Green
+    _T("#FF0000"),  // Red
+    _T("#804040"),  // Brown
+    _T("#8000FF"),  // Purple
+    _T("#808000"),  // Olive
+    _T("#FFFF00"),  // Yellow
+    _T("#00FF00"),  // Lime Green
+    _T("#008080"), // Teal
+    _T("#00FFFF"), // Aqua Light
+    _T("#0000FF"), // Royal Blue
+    _T("#FF00FF"), // Hot Pink
+    _T("#808080"), // Dark Gray
+    _T("#C0C0C0"), // Light Gray
+    _T("#000000")  // White
+};
+
 #endif

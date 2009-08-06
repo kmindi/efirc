@@ -236,11 +236,6 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param2"),param2);
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
-    
-    // Farben temporaer noch herausfiltern
-    wxRegEx("[\x0003][0-9]{1,2}[,]{1,1}[0-9]{1,2}").Replace(&nachricht, "");
-    wxRegEx("[\x0003][0-9]{1,2}").Replace(&nachricht, ""); // 2 Farbige
-   
 
     if(local.Left(3) == _T("ERR"))
     // Wenn es ein Fehler ist nur Farbe anpassen
@@ -269,6 +264,8 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
         // Jedes Zeichen der Nachricht auf Steuerzeichen ueberpruefen
         while(pos <= text.Len() && text != _T(""))
         {
+            textattr = WxEdit_ausgabefeld->GetDefaultStyle();
+            
             switch(text.GetChar(pos).GetValue())
             {
                 // Text bis zum Formatierungszeichen ausgeben
@@ -297,17 +294,46 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                     break;
                     
                 case 0x0003: // CTRL C (ETX) Farbig
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    
-                    // Je nach dem ob einstellig, zweistellig oder mit Komma (Vorder und Hintergrundfarbe)
-                    // mehr Zeichen nach rechts gehen
-                    // oder Nachträglich mit wxRegEx ersetzen
-                    
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    // Farben auslesen und Farbzahlen entfernen
-                    
+                    {
+                        wxString farbangaben = _T("");
+                        wxRegEx mitkomma(_T("[\x0003][0-9]{1,2}[,]{1,1}[0-9]{1,2}"));
+                        wxRegEx ohnekomma(_T("[\x0003][0-9]{1,2}"));
+                        
+                        WxEdit_ausgabefeld->AppendText(text.Left(pos));
+                        text = text.Mid(pos); // inklusive Steuerzeichen (CTRL+C)
+                        pos = 0;
+                        
+                        // Wenn CTRL+C[n,nn],[m,mm] gefunden wurde
+                        if(mitkomma.Matches(text))
+                        {
+                            long unsigned int n,m = 0;
+                            farbangaben = mitkomma.GetMatch(text);
+                            farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
+                            farbangaben.BeforeFirst(_T(',')).ToULong(&n);
+                            farbangaben.AfterFirst(_T(',')).ToULong(&m);
+                            mitkomma.Replace(&text, "",1); // Farbangaben entfernen
+                            if(n == 0) n = 1;
+                            if(m == 0) m = 1;
+                            
+                            textattr.SetTextColour(wxColour(IRC_Farben[n-1]));
+                            textattr.SetBackgroundColour(wxColour(IRC_Farben[m-1]));
+                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                        }
+                        
+                        // Wenn CTRL+C[n,nn] gefunden wurde
+                        else if(ohnekomma.Matches(text))
+                        {
+                            long unsigned int n = 0;
+                            farbangaben = ohnekomma.GetMatch(text);
+                            farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
+                            farbangaben.ToULong(&n);
+                            ohnekomma.Replace(&text, "",1); // Farbangaben entfernen
+                            if(n == 0) n = 1;
+                            
+                            textattr.SetTextColour(wxColour(IRC_Farben[n-1]));
+                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                        }
+                    }
                     break;
                     
                 case 0x001F: // CTRL U? (US) Unterstrichen
