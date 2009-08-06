@@ -652,7 +652,27 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
     wxString alter_nick = irc->CurrentNick;
     wxString benutzer = msg_data->nick;
     wxString neuername = msg_data->params_a[0];
-
+    bool neuanfangen = false;
+    
+    
+    // Wenn man selber seinen Namen aendert muss das Fenster das den eigenen Namen traegt bearbeitet werden
+    if(benutzer.Upper() == alter_nick.Upper() || benutzer.Upper() == irc->WantedNick.Upper())
+    {
+        // Aber nur wenn das Fenster auch da ist
+        if(zgr_fenster.find(alter_nick.Upper()) != zgr_fenster.end())
+        {
+            map< wxString, Fenster* >::iterator i = zgr_fenster.find(alter_nick.Upper());
+            
+            zgr_fenster[i->first]->fenster_name = neuername;
+            
+            // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+            Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
+            zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
+            zgr_fenster.erase(i); // Alten Eintrag loeschen
+        }
+    }
+    
+    
     for(map< wxString, Fenster* >::iterator i = zgr_fenster.begin(); i != zgr_fenster.end(); i++)
     {
         if(!(zgr_fenster[i->first]==NULL))
@@ -661,24 +681,13 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
             if(benutzer.Upper() == alter_nick.Upper() || benutzer.Upper() == irc->WantedNick.Upper())
             // Wenn man selber der Benutzer ist, dann muss der eigene Nick geaendert werden
             {
-                if(i == zgr_fenster.find(alter_nick.Upper()))
-                // falls gerade das Fenster geändert wird, das als Namen den eigenen Nickname hat
-                // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
-                {
-                    zgr_fenster[i->first]->fenster_name = neuername;
+                if(i == zgr_fenster.find(neuername.Upper()))
                     zgr_fenster[i->first]->TitelSetzen(neuername);
-                    TitelSetzen(_T(""), neuername);
-                    // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
-                    Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
-                    zgr_fenster.erase(i); // Eintrag loeschen
-                    zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
-                }
                 else
-                {
                     zgr_fenster[i->first]->BenutzerAendern(benutzer,neuername);
-                    TitelSetzen(_T(""), neuername);
-                    zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_NICK"), benutzer, neuername);
-                }
+                
+                TitelSetzen(_T(""), neuername);
+                zgr_fenster[i->first]->NachrichtAnhaengen(_T("BL_NICK"), benutzer, neuername);
 
                 irc->CurrentNick = neuername;
             }
