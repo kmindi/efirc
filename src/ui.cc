@@ -312,11 +312,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                             farbangaben.BeforeFirst(_T(',')).ToULong(&n);
                             farbangaben.AfterFirst(_T(',')).ToULong(&m);
                             mitkomma.Replace(&text, "",1); // Farbangaben entfernen
-                            if(n == 0) n = 1;
-                            if(m == 0) m = 1;
                             
-                            textattr.SetTextColour(wxColour(IRC_Farben[n-1]));
-                            textattr.SetBackgroundColour(wxColour(IRC_Farben[m-1]));
+                            textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
+                            textattr.SetBackgroundColour(wxColour(IRC_Farben[m%15]));
                             WxEdit_ausgabefeld->SetDefaultStyle(textattr);
                         }
                         
@@ -328,10 +326,18 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
                             farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
                             farbangaben.ToULong(&n);
                             ohnekomma.Replace(&text, "",1); // Farbangaben entfernen
-                            if(n == 0) n = 1;
                             
-                            textattr.SetTextColour(wxColour(IRC_Farben[n-1]));
+                            textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
                             WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                        }
+                        
+                        else // Wenn keine Nummer hinter dem Steuerzeichen steht soll die Farbe wieder aufgehoben werden
+                        {
+                            textattr.SetTextColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_foreground"))));
+                            textattr.SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))));
+                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
+                            
+                            text.Replace(_T("\x0003"), _T("")); // Steuerzeichen entfernen, pos nicht erhoehen
                         }
                     }
                     break;
