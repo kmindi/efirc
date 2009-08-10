@@ -81,24 +81,26 @@ class Fenster : public wxPanel
         bool AnzeigeBegrenzungErreicht();
 };
 
-static const wxString IRC_Farben [] = // beim Benutzen immer um 1 verringern 
-{
+static const wxString IRC_Farben [] =
+{    
+    // siehe: http://www.mirc.com/help/color.txt
+    
+    _T("#FFFFFF"),  // white
     _T("#000000"),  // Black
     _T("#000080"),  // Navy Blue
     _T("#008000"),  // Green
-    _T("#FF0000"),  // Red
-    _T("#804040"),  // Brown
-    _T("#8000FF"),  // Purple
-    _T("#808000"),  // Olive
-    _T("#FFFF00"),  // Yellow
-    _T("#00FF00"),  // Lime Green
-    _T("#008080"), // Teal
-    _T("#00FFFF"), // Aqua Light
-    _T("#0000FF"), // Royal Blue
-    _T("#FF00FF"), // Hot Pink
-    _T("#808080"), // Dark Gray
-    _T("#C0C0C0"), // Light Gray
-    _T("#000000")  // White
+    _T("#ff0000"),  // Red
+    _T("#800000"),  // Maroon Brown
+    _T("#800080"),  // purple
+    _T("#ffa500"),  // Orange
+    _T("#ffff00"),  // Yellow
+    _T("#00ff00"), // LIme
+    _T("#00ffff"), // Cyan
+    _T("#e0ffff"), // light cyan
+    _T("#add8e6"), // light blue
+    _T("#ffc0cb"), // pink
+    _T("#808080"), // Gray
+    _T("#c0c0c0")  // Silver
 };
 
 #endif
