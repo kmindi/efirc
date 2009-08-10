@@ -59,6 +59,8 @@ class Fenster : public wxPanel
         DECLARE_EVENT_TABLE()
         void WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event);
         void WxEdit_eingabefeldFokus(wxKeyEvent&);
+        
+        static void FormatiertAnzeigen(wxTextCtrl *textfeld, wxString text);
 
     public:
         wxString fenster_name;

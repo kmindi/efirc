@@ -29,7 +29,7 @@ Fenster::Fenster(const wxString& title, const wxPoint& pos, const wxSize& size) 
     WxList_benutzerliste = new wxListCtrl(this, ID_WxList_benutzerliste, wxPoint(606,3), wxSize(111,383), wxHSCROLL | wxLC_REPORT | wxLC_ALIGN_LEFT | wxLC_NO_HEADER);
     WxList_benutzerliste->InsertColumn(0, _T("Benutzerliste"), wxLIST_FORMAT_LEFT, -1);
 
-    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(3,3), wxSize(600,20), wxTE_READONLY, wxDefaultValidator, _T("WxEdit_thema"));
+    WxEdit_thema = new wxTextCtrl(this, ID_WxEdit_thema, _T(""), wxPoint(3,3), wxSize(600,20), wxTE_READONLY | wxTE_RICH, wxDefaultValidator, _T("WxEdit_thema"));
     WxEdit_eingabefeld = new wxTextCtrl(this, ID_WxEdit_eingabefeld, wxGetApp().config->parsecfgvalue(_T("local_label_input")), wxPoint(3,389), wxSize(600,20), 0, wxDefaultValidator, _T("WxEdit_eingabefeld"));
     WxButton_senden = new wxButton(this, ID_WxButton_senden, wxGetApp().config->parsecfgvalue(_T("local_label_button")), wxPoint(606,389), wxSize(111,20), 0, wxDefaultValidator, _T("WxButton_senden"));
     WxEdit_ausgabefeld = new wxTextCtrl(this, ID_WxEdit_ausgabefeld, _T(""), wxPoint(3,26), wxSize(600,360), wxTE_READONLY | wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, _T("WxEdit_ausgabefeld"));
@@ -87,12 +87,21 @@ void Fenster::ObjekteAnpassen()
     WxButton_senden->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_background"))));
     WxButton_senden->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_foreground"))));
 
-    WxEdit_thema->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_topic"))));
     WxEdit_eingabefeld->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_input_messages"))));
     WxList_benutzerliste->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_channel_users"))));
     WxButton_senden->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_button"))));
 
-    // Ausgabefeld wird extra behandelt, weil die Fehler-Funktion Farbe verwendet und danach den Default Style wieder herstellen muss
+    // Ausgabe- und Themafeld wird extra behandelt, weil die Fehler-Funktion Farbe verwendet und danach den Default Style wieder herstellen muss
+    WxEdit_thema->SetDefaultStyle
+    (
+        wxTextAttr
+        (
+            wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_foreground"))),
+            wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_background"))),
+            wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_topic")))
+        )
+    );
+    
     WxEdit_ausgabefeld->SetDefaultStyle
     (
         wxTextAttr
@@ -256,153 +265,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     if(local.Left(3) != _T("BL_") || (local.Left(3) == _T("BL_") && !AnzeigeBegrenzungErreicht()))
     {
         wxString text = prefix + nachricht;
-        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-        wxTextAttr textattr = defaultstyle;
-        bool fett, unterstrichen, kursiv = false;
-        
-        unsigned long pos = 0;
-        // Jedes Zeichen der Nachricht auf Steuerzeichen ueberpruefen
-        while(pos <= text.Len() && text != _T(""))
-        {
-            textattr = WxEdit_ausgabefeld->GetDefaultStyle();
-            
-            switch(text.GetChar(pos).GetValue())
-            {
-                // Text bis zum Formatierungszeichen ausgeben
-                // Den Ausgegebenen Text inklusive dem aktuellen Steuerzeichen entfernen (++pos)
-                // und pos auf 0 setzen.
-                
-                case 0x0002: // CTRL B (STX) Fett
-                    
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    if(!fett)
-                    {
-                        textattr.SetFontWeight(wxFONTWEIGHT_BOLD); 
-                        WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
-                        fett = true;
-                    }
-                    else
-                    {
-                        textattr.SetFontWeight(wxFONTWEIGHT_NORMAL); 
-                        WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
-                        fett = false;
-                    }
-                    
-                    break;
-                    
-                case 0x0003: // CTRL C (ETX) Farbig
-                    {
-                        wxString farbangaben = _T("");
-                        wxRegEx mitkomma(_T("[\x0003][0-9]{1,2}[,]{1,1}[0-9]{1,2}"));
-                        wxRegEx ohnekomma(_T("[\x0003][0-9]{1,2}"));
-                        
-                        WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                        text = text.Mid(pos); // inklusive Steuerzeichen (CTRL+C)
-                        pos = 0;
-                        
-                        // Wenn CTRL+C[n,nn],[m,mm] gefunden wurde
-                        if(mitkomma.Matches(text))
-                        {
-                            long unsigned int n,m = 0;
-                            farbangaben = mitkomma.GetMatch(text);
-                            farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
-                            farbangaben.BeforeFirst(_T(',')).ToULong(&n);
-                            farbangaben.AfterFirst(_T(',')).ToULong(&m);
-                            mitkomma.Replace(&text, "",1); // Farbangaben entfernen
-                            
-                            textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
-                            textattr.SetBackgroundColour(wxColour(IRC_Farben[m%15]));
-                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-                        }
-                        
-                        // Wenn CTRL+C[n,nn] gefunden wurde
-                        else if(ohnekomma.Matches(text))
-                        {
-                            long unsigned int n = 0;
-                            farbangaben = ohnekomma.GetMatch(text);
-                            farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
-                            farbangaben.ToULong(&n);
-                            ohnekomma.Replace(&text, "",1); // Farbangaben entfernen
-                            
-                            textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
-                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-                        }
-                        
-                        else // Wenn keine Nummer hinter dem Steuerzeichen steht soll die Farbe wieder aufgehoben werden
-                        {
-                            textattr.SetTextColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_foreground"))));
-                            textattr.SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))));
-                            WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-                            
-                            text.Replace(_T("\x0003"), _T("")); // Steuerzeichen entfernen, pos nicht erhoehen
-                        }
-                    }
-                    break;
-                    
-                case 0x001F: // CTRL U? (US) Unterstrichen
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    if(!unterstrichen) unterstrichen = true;
-                    else unterstrichen = false;
-                    
-                    textattr.SetFontUnderlined(unterstrichen); 
-                    WxEdit_ausgabefeld->SetDefaultStyle(textattr); // Fett setzen
-                    
-                    
-                    break;
-                    
-                case 0x0012: // CTRL R Umgetauscht
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    // NOCH EINBAUEN
-                    
-                    break;
-                    
-                case 0x0009: // CTRL I Kursiv
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    if(!kursiv)
-                    {
-                        textattr.SetFontStyle(wxFONTSTYLE_ITALIC); // kursiv setzen
-                        WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-                        kursiv = true;
-                    }
-                    else
-                    {
-                        textattr.SetFontStyle(wxFONTSTYLE_NORMAL); // kursiv setzen
-                        WxEdit_ausgabefeld->SetDefaultStyle(textattr);
-                        kursiv = false;
-                    }
-                    
-                    break;
-                    
-                case 0x000F: // CTRL O Normal
-                    WxEdit_ausgabefeld->AppendText(text.Left(pos));
-                    text = text.Mid(++pos);
-                    pos = 0;
-                    
-                    WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-                    
-                    break;
-                
-                default:
-                    pos++;
-            }
-        }
-        // Normale Formatierung wiederherstellen
-        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-        
-        // Rest vom text Anhaengen
-        WxEdit_ausgabefeld->AppendText(text);
+        FormatiertAnzeigen(WxEdit_ausgabefeld, text);
     }
     
     // Wenn eine Nachricht in einem nicht aktiven Fenster angezeigt wird, dieses blinken lassen, ausser es ist eine Benutzerlistenaenderung
@@ -412,7 +275,9 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
 {
-    WxEdit_thema->SetValue(thema);
+    //WxEdit_thema->SetValue(thema);
+    FormatiertAnzeigen(WxEdit_thema, thema);
+    
     if(benutzer == _T(""))
     {
         NachrichtAnhaengen(_T("TOPIC"),thema,benutzer);
@@ -574,5 +439,157 @@ bool Fenster::AnzeigeBegrenzungErreicht()
         return true;
     else
         return false;
+}
+
+
+void Fenster::FormatiertAnzeigen(wxTextCtrl *textfeld, wxString text)
+{
+    wxTextAttr defaultstyle = textfeld->GetDefaultStyle(); // Voreingestellte Formatierungen speichern um sie nachher wiederherstellen zu koennen
+    wxTextAttr textattr = defaultstyle; // Voreingestellte Formatierung als Ausgangswerte benutzen
+    bool fett, unterstrichen, kursiv = false;
+    
+    unsigned long pos = 0;
+    // Jedes Zeichen der Nachricht auf Steuerzeichen ueberpruefen
+    while(pos <= text.Len() && text != _T(""))
+    {
+        textattr = textfeld->GetDefaultStyle();
+        
+        switch(text.GetChar(pos).GetValue())
+        {
+            // Text bis zum Formatierungszeichen ausgeben
+            // Den Ausgegebenen Text inklusive dem aktuellen Steuerzeichen entfernen (++pos)
+            // und pos auf 0 setzen.
+            
+            case 0x0002: // CTRL B (STX) Fett
+                
+                textfeld->AppendText(text.Left(pos));
+                text = text.Mid(++pos);
+                pos = 0;
+                
+                if(!fett)
+                {
+                    textattr.SetFontWeight(wxFONTWEIGHT_BOLD); 
+                    textfeld->SetDefaultStyle(textattr); // Fett setzen
+                    fett = true;
+                }
+                else
+                {
+                    textattr.SetFontWeight(wxFONTWEIGHT_NORMAL); 
+                    textfeld->SetDefaultStyle(textattr); // Fett setzen
+                    fett = false;
+                }
+                
+                break;
+                
+            case 0x0003: // CTRL C (ETX) Farbig
+                {
+                    wxString farbangaben = _T("");
+                    wxRegEx mitkomma(_T("[\x0003][0-9]{1,2}[,]{1,1}[0-9]{1,2}"));
+                    wxRegEx ohnekomma(_T("[\x0003][0-9]{1,2}"));
+                    
+                    textfeld->AppendText(text.Left(pos));
+                    text = text.Mid(pos); // inklusive Steuerzeichen (CTRL+C)
+                    pos = 0;
+                    
+                    // Wenn CTRL+C[n,nn],[m,mm] gefunden wurde
+                    if(mitkomma.Matches(text))
+                    {
+                        long unsigned int n,m = 0;
+                        farbangaben = mitkomma.GetMatch(text);
+                        farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
+                        farbangaben.BeforeFirst(_T(',')).ToULong(&n);
+                        farbangaben.AfterFirst(_T(',')).ToULong(&m);
+                        mitkomma.Replace(&text, "",1); // Farbangaben entfernen
+                        
+                        textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
+                        textattr.SetBackgroundColour(wxColour(IRC_Farben[m%15]));
+                        textfeld->SetDefaultStyle(textattr);
+                    }
+                    
+                    // Wenn CTRL+C[n,nn] gefunden wurde
+                    else if(ohnekomma.Matches(text))
+                    {
+                        long unsigned int n = 0;
+                        farbangaben = ohnekomma.GetMatch(text);
+                        farbangaben = farbangaben.Mid(1); // Steuerzeichen entfernen
+                        farbangaben.ToULong(&n);
+                        ohnekomma.Replace(&text, "",1); // Farbangaben entfernen
+                        
+                        textattr.SetTextColour(wxColour(IRC_Farben[n%15]));
+                        textfeld->SetDefaultStyle(textattr);
+                    }
+                    
+                    else // Wenn keine Nummer hinter dem Steuerzeichen steht soll die Farbe wieder aufgehoben werden
+                    {
+                        textattr.SetTextColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_foreground"))));
+                        textattr.SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))));
+                        textfeld->SetDefaultStyle(textattr);
+                        
+                        text.Replace(_T("\x0003"), _T("")); // Steuerzeichen entfernen, pos nicht erhoehen
+                    }
+                }
+                break;
+                
+            case 0x001F: // CTRL U? (US) Unterstrichen
+                textfeld->AppendText(text.Left(pos));
+                text = text.Mid(++pos);
+                pos = 0;
+                
+                if(!unterstrichen) unterstrichen = true;
+                else unterstrichen = false;
+                
+                textattr.SetFontUnderlined(unterstrichen); 
+                textfeld->SetDefaultStyle(textattr); // Fett setzen
+                
+                
+                break;
+                
+            case 0x0012: // CTRL R Umgetauscht
+                textfeld->AppendText(text.Left(pos));
+                text = text.Mid(++pos);
+                pos = 0;
+                
+                // NOCH EINBAUEN
+                
+                break;
+                
+            case 0x0009: // CTRL I Kursiv
+                textfeld->AppendText(text.Left(pos));
+                text = text.Mid(++pos);
+                pos = 0;
+                
+                if(!kursiv)
+                {
+                    textattr.SetFontStyle(wxFONTSTYLE_ITALIC); // kursiv setzen
+                    textfeld->SetDefaultStyle(textattr);
+                    kursiv = true;
+                }
+                else
+                {
+                    textattr.SetFontStyle(wxFONTSTYLE_NORMAL); // kursiv setzen
+                    textfeld->SetDefaultStyle(textattr);
+                    kursiv = false;
+                }
+                
+                break;
+                
+            case 0x000F: // CTRL O Normal
+                textfeld->AppendText(text.Left(pos));
+                text = text.Mid(++pos);
+                pos = 0;
+                
+                textfeld->SetDefaultStyle(defaultstyle);
+                
+                break;
+            
+            default:
+                pos++;
+        }
+    }
+    // Normale Formatierung wiederherstellen
+    textfeld->SetDefaultStyle(defaultstyle);
+    
+    // Rest vom text Anhaengen
+    textfeld->AppendText(text);
 }
 
