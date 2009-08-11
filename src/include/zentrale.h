@@ -252,7 +252,7 @@ static const wxCmdLineEntryDesc befehlszeilenparameterliste [] =
      { wxCMD_LINE_OPTION, "n", "nick", "Nickname", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
      { wxCMD_LINE_OPTION, "s", "server", "IP or Hostname of the IRC-Server", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
      { wxCMD_LINE_OPTION, "ch", "channel", "Channel(s) to join (comma seperated list)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
-     { wxCMD_LINE_OPTION, "p", "port", "Port", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL  },
+     { wxCMD_LINE_OPTION, "p", "port", "Port", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL  },
  
      { wxCMD_LINE_NONE }
 };
