@@ -275,7 +275,7 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
 
 void Fenster::ThemaAendern(wxString thema, wxString benutzer)
 {
-    //WxEdit_thema->SetValue(thema);
+    WxEdit_thema->Clear();
     FormatiertAnzeigen(WxEdit_thema, thema);
     
     if(benutzer == _T(""))
