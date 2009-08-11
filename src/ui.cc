@@ -586,10 +586,10 @@ void Fenster::FormatiertAnzeigen(wxTextCtrl *textfeld, wxString text)
                 pos++;
         }
     }
-    // Normale Formatierung wiederherstellen
-    textfeld->SetDefaultStyle(defaultstyle);
-    
     // Rest vom text Anhaengen
     textfeld->AppendText(text);
+    
+    // Normale Formatierung wiederherstellen
+    textfeld->SetDefaultStyle(defaultstyle);
 }
 
