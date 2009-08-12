@@ -87,9 +87,9 @@ void Fenster::ObjekteAnpassen()
     WxButton_senden->SetBackgroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_background"))));
     WxButton_senden->SetForegroundColour(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_button_foreground"))));
 
-    WxEdit_eingabefeld->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_input_messages"))));
-    WxList_benutzerliste->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_channel_users"))));
-    WxButton_senden->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_button"))));
+    WxEdit_eingabefeld->SetFont(wxFont(8, wxFONTFAMILY_TELETYPE, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_input_messages"))));
+    WxList_benutzerliste->SetFont(wxFont(8, wxFONTFAMILY_TELETYPE, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_channel_users"))));
+    WxButton_senden->SetFont(wxFont(8, wxFONTFAMILY_TELETYPE, wxNORMAL,wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_button"))));
 
     // Ausgabe- und Themafeld wird extra behandelt, weil die Fehler-Funktion Farbe verwendet und danach den Default Style wieder herstellen muss
     WxEdit_thema->SetDefaultStyle
@@ -98,7 +98,7 @@ void Fenster::ObjekteAnpassen()
         (
             wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_foreground"))),
             wxColour(wxGetApp().config->parsecfgvalue(_T("colour_topic_background"))),
-            wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_topic")))
+            wxFont(8, wxFONTFAMILY_TELETYPE, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_topic")))
         )
     );
     
@@ -108,7 +108,7 @@ void Fenster::ObjekteAnpassen()
         (
             wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_foreground"))),
             wxColour(wxGetApp().config->parsecfgvalue(_T("colour_output_messages_background"))),
-            wxFont(8, wxFONTFAMILY_MODERN, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_output_messages")))
+            wxFont(8, wxFONTFAMILY_TELETYPE, wxNORMAL, wxNORMAL, FALSE, wxGetApp().config->parsecfgvalue(_T("font_output_messages")))
         )
     );
     // Hintergrund an dem kein Text steht muss seperat eingestellt werden
