@@ -257,3 +257,15 @@ IRCInterface::irc_send_mode(const char *target_name, const char *mode_string,
 	    parameters);
 }
 
+/* LIST */
+void
+IRCInterface::irc_send_list(void)
+{
+	irc_send_message_f("LIST");
+}
+
+void
+IRCInterface::irc_send_list(const char *filter)
+{
+	irc_send_message_f("LIST %s", filter);
+}
