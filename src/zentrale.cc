@@ -25,6 +25,8 @@ bool Zentrale::OnInit()
 {
     efirc_version_string = _T("0.3-"__SVNREVISION__);
 
+    srand(time(NULL));
+    
     Ereignisvw = new Ereignisverwalter; // einen Ereignisverwalter erzeugen
 
 
@@ -148,7 +150,6 @@ wxString Zentrale::zufallstext(int anzahl_zeichen)
 {
     wxString rndstring;
     // Zufallsgenerator initialisieren
-    srand(time(NULL));
 
     for(int i = 1; i <= anzahl_zeichen; i++)
     {
