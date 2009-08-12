@@ -149,6 +149,7 @@ class IRCInterface
 		void irc_send_mode(const char *, const char *, const char *);
         void irc_send_list(void);
         void irc_send_list(const char *);
+        void irc_send_who(const char *);
 
 	private:
 		int sock;

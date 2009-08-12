@@ -269,3 +269,10 @@ IRCInterface::irc_send_list(const char *filter)
 {
 	irc_send_message_f("LIST %s", filter);
 }
+
+/* WHO */
+void
+IRCInterface::irc_send_who(const char *channel)
+{
+	irc_send_message_f("WHO %s", channel);
+}
