@@ -362,6 +362,15 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             irc->irc_send_list(befehl_parameter.mb_str());
         }
     }
+    
+    else if(befehl_name == _T("WHO"))
+    {
+        if(parameter_vorhanden)
+        {
+            irc->irc_send_who(befehl_parameter.mb_str());
+        }
+        else parameter_erwartet = true;
+    }
 
     else if(befehl_name == _T("JOIN"))
     {
