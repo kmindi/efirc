@@ -246,21 +246,6 @@ void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param
     nachricht.Replace(_T("%param3"),param3);
     nachricht.Replace(_T("%param4"),param4);
 
-    if(local.Left(3) == _T("ERR"))
-    // Wenn es ein Fehler ist nur Farbe anpassen
-    {
-        // Bisheriges Aussehen speichern
-        wxTextAttr defaultstyle = WxEdit_ausgabefeld->GetDefaultStyle();
-        // Aussehen aendern
-        WxEdit_ausgabefeld->SetDefaultStyle(wxTextAttr(wxColour(wxGetApp().config->parsecfgvalue(_T("colour_error")))));
-        // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-        WxEdit_ausgabefeld->AppendText(prefix + nachricht);
-        // ...voreingestelltes Aussehen wiederherstellen
-        WxEdit_ausgabefeld->SetDefaultStyle(defaultstyle);
-        // Funktion verlassen
-        return;
-    }
-        
     // Nachricht nicht anzeigen wenn es eine Benutzerlistenaenderung ist und die Begrenzung erreicht ist
     if(local.Left(3) != _T("BL_") || (local.Left(3) == _T("BL_") && !AnzeigeBegrenzungErreicht()))
     {

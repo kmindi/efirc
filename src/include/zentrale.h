@@ -232,10 +232,10 @@ static const wxString standardkonfiguration_text =
     _T("local_label_input = Put your message here and press Enter\n")
 
     // Fehler (werden in konfigurierter Farbe dargestellt)
-    _T("local_ERR_IRC = (!) %param1\n") // case 2
-    _T("local_ERR_COMMAND_UNKNOWN = (!) Unknown command (%param1)\n") // case 4
-    _T("local_ERR_IRC_COMMAND_UNKNOWN = (!) Unknown IRC command (%param1)\n") // case 5
-    _T("local_ERR_COMMAND_MISSING_PARAMETER = (!) Missing parameter for \"%param1\"\n") // case 5
+    _T("local_ERR_IRC = %colour04(!) %param1\n") // case 2
+    _T("local_ERR_COMMAND_UNKNOWN = %colour04(!) Unknown command (%param1)\n") // case 4
+    _T("local_ERR_IRC_COMMAND_UNKNOWN = %colour04(!) Unknown IRC command (%param1)\n") // case 5
+    _T("local_ERR_COMMAND_MISSING_PARAMETER = %colour04(!) Missing parameter for \"%param1\"\n") // case 5
 
     // Anzeige bestimmter Dialog oder anderer nicht irc spezifischer Nachrichten
     _T("local_DLG_NEWNICK_NICKINUSE_TEXT = The Nickname you try to use is already in use. You have to choose a new one:\n") // case 5
