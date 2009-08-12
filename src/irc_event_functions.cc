@@ -166,6 +166,9 @@ void Ereignisverwalter::BeiNeueIRCNachricht(wxCommandEvent& event)
             case 255: // 255 RPL_LUSERME
             case 265: // 265 RPL_LOCALUSERS
             case 266: // 266 RPL_GLOBALUSERS
+            case 321: // 321 LIST BEGINNING
+            case 322: // 322 LIST
+            case 323: // 323 LIST END
             case 372: // 372 RPL_MOTD
             case 375: // 375 RPL_MOTDSTART
                 wxGetApp().irc_einfach(msg_data);

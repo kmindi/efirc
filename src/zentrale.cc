@@ -350,6 +350,18 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
             zgr_fenster[fenstername.Upper()]->NachrichtAnhaengen(_T("AWAY"), befehl_parameter);
         }
     }
+    
+    else if(befehl_name == _T("LIST"))
+    {
+        if(!parameter_vorhanden)
+        {
+            irc->irc_send_list();
+        }
+        else
+        {
+            irc->irc_send_list(befehl_parameter.mb_str());
+        }
+    }
 
     else if(befehl_name == _T("JOIN"))
     {
