@@ -307,27 +307,32 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
             }
             else
             {
-                while(id<WxList_benutzerliste->GetItemCount() && erstellt == false )
-                // Solange man noch nicht am Ende der Liste ist und der Benutzer noch nicht hinzugefuegt wurde
-                // --- ja das hier rockt oder? Viel besser als diese SetItemData mit long und dem Kack ;) ---
+                // binaere Suche verwenden
+                long L = 0; // Linke Grenze
+                long R = WxList_benutzerliste->GetItemCount() - 1; // Rechte Grenze
+                long M = (R + L) / 2; // Mitte
+                
+                while(L <= R )
                 {
-                    Benutzer_Vergleich = WxList_benutzerliste->GetItemText(id); // Benutzer an aktueller Position zum Vergleichen auslesen
-                    if(Benutzer.CmpNoCase(Benutzer_Vergleich) <1)
-                    // Wenn der neue Benutzer "kleiner" ist, wird er an der aktuellen Position eingetragen, dabei werden die anderen Eintraege nach unten geschoben
+                    // M jedes mal neuberechnen, weil sich die Grenezen geaendert haben
+                    M = (R + L) / 2;
+                    // Benutzer in der Mitte mit dem verglichen wird
+                    Benutzer_Vergleich = WxList_benutzerliste->GetItemText(M);
+                    // Gleichen Benutzer kann es nicht geben nach Vorrausseztung der anderen if Abfrage
+                    // Wenn der neue Benutzer "kleiner" ist
+                    if(Benutzer.CmpNoCase(Benutzer_Vergleich) < 1)
                     {
-                        WxList_benutzerliste->InsertItem(id,Benutzer);
-                        erstellt = true; // Schleife verlassen
+                        R = M - 1;
                     }
                     else
-                    // Andernfalls wird mit dem naechsten Benutzer verglichen ...
                     {
-                        id++;
-                        if(id == WxList_benutzerliste->GetItemCount())
-                        // oder falls schon der letzte Eintrag erreicht wurde Benuzter hinzufuegen
-                        {
-                            WxList_benutzerliste->InsertItem(id,Benutzer);
-                            erstellt = true; // Schleife verlassen
-                        }
+                        L = M + 1;
+                    }
+                    
+                    // Folgender Fall tritt auf jeden Fall ein, L > R = R < L
+                    if (L > R)
+                    {
+                        WxList_benutzerliste->InsertItem(L, Benutzer);
                     }
                 }
             }
