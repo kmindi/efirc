@@ -296,14 +296,11 @@ void Fenster::BenutzerHinzufuegen(wxString benutzerliste)
         // wenn der Benutzer noch nicht vorhanden ist
         if(WxList_benutzerliste->FindItem(-1,Benutzer) == -1)
         {
-            long id = 0;
-            bool erstellt = false;
-
             // Stelle in der Liste finden an dem der Eintrag sortiert eingetragen werden muss
             if(WxList_benutzerliste->GetItemCount() == 0)
             // Wenn noch kein Benutzer in der Liste ist braucht man nicht sortieren
             {
-                WxList_benutzerliste->InsertItem(id,Benutzer);
+                WxList_benutzerliste->InsertItem(0, Benutzer);
             }
             else
             {
