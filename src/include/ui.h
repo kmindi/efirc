@@ -28,7 +28,7 @@
 class Fenster : public wxPanel
 {
     private:
-        // Zeiger für die zu erstellenden Objekte erzeugen
+        // Zeiger fuer die zu erstellenden Objekte erzeugen
         wxListCtrl *WxList_benutzerliste;
         wxButton   *WxButton_senden;
         wxTextCtrl *WxEdit_thema;
