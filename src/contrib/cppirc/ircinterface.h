@@ -2,7 +2,7 @@
 #define	_IRCSOCKET_H_
 
 #ifdef WIN32
-#include <Winsock2.h>
+#include <winsock2.h>
 #else
 #include <string.h>
 #include <unistd.h>
