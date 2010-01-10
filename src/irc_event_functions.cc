@@ -320,7 +320,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
 
             if(ctcp_text == ctcp || ctcp_text == _T(""))
             {
-                // Fenster auswählen
+                // Fenster auswaehlen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString version = _T("efirc:") + efirc_version_string + _T(" (") + wxString(wxVERSION_STRING,wxConvUTF8) + _T("):") + wxGetOsDescription();
                 irc->irc_send_ctcp_version(user.mb_str(), version.mb_str());
@@ -349,7 +349,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
         {
             if(ctcp_text == ctcp || ctcp_text == _T(""))
             {
-                // Fenster auswählen
+                // Fenster auswaehlen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString quelle = _T("http://efirc.sourceforge.net/");
                 irc->irc_send_ctcp_source(user.mb_str(), quelle.mb_str());
@@ -378,7 +378,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
         {
             if(ctcp_text == ctcp || ctcp_text == _T(""))
             {
-                // Fenster auswählen
+                // Fenster auswaehlen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
                 wxString antwort = _T("VERSION FINGER SOURCE USERINFO CLIENTINFO PING TIME");
                 irc->irc_send_ctcp_clientinfo(user.mb_str(), antwort.mb_str());
@@ -403,7 +403,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
         {
             if(ctcp_text == ctcp || ctcp_text == _T(""))
             {
-                // Fenster auswählen
+                // Fenster auswaehlen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
 
                 char timestamp[30];
@@ -437,7 +437,7 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
     wxString alter_nick = irc->CurrentNick;
     wxString empfaenger = msg_data->params_a[0];
     if(irc->CurrentNick != empfaenger)
-    // wenn der gesendete Nick nicht der gleiche wie der gespeicherte ist, dann überall anpassen, denn dann wurde er vom server geaendert
+    // wenn der gesendete Nick nicht der gleiche wie der gespeicherte ist, dann ueberall anpassen, denn dann wurde er vom server geaendert
     {
         irc->CurrentNick = empfaenger; // neuen nickname setzen
 
@@ -448,12 +448,12 @@ void Zentrale::irc_welcome(const IRC_NACHRICHT *msg_data)
             // nicht in nicht vorhandenen Fenstern
             {
                 if(i == zgr_fenster.find(alter_nick.Upper()))
-                // falls gerade das Fenster geändert wird, das als Namen den eigenen Nickname hat
+                // falls gerade das Fenster geaendert wird, das als Namen den eigenen Nickname hat
                 // Nickname aenderungen anpassen so das Nachrichten wieder korrekt in das Fenster kommen
                 {
                     zgr_fenster[i->first]->fenster_name = empfaenger;
                     zgr_fenster[i->first]->TitelSetzen(empfaenger);
-                    // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+                    // Map-Eintrag loeschen und neu erstellen, weil der Schluessel nicht geaendert werden kann.
                     TitelSetzen(_T(""), empfaenger);
                     Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
                     zgr_fenster.erase(i); // Eintrag loeschen
@@ -670,7 +670,7 @@ void Zentrale::irc_nick(const IRC_NACHRICHT *msg_data)
             
             zgr_fenster[i->first]->fenster_name = neuername;
             
-            // Map-Eintrag loeschen und neu erstellen, weil der Schlüssel nicht geaendert werden kann.
+            // Map-Eintrag loeschen und neu erstellen, weil der Schluessel nicht geaendert werden kann.
             Fenster* zgr = zgr_fenster[i->first]; // Adresse speichern
             zgr_fenster.insert(make_pair(neuername.Upper(), zgr)); // neuen Eintrag mit neuem Schluessel erstellen
             zgr_fenster.erase(i); // Alten Eintrag loeschen
