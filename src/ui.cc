@@ -19,7 +19,7 @@ DECLARE_APP(Zentrale) // braucht man fuer wxGetApp() um damit auf die funktionen
 BEGIN_EVENT_TABLE(Fenster, wxPanel)
     EVT_BUTTON     (ID_WxButton_senden,
                     Fenster::WxButton_sendenClick)
-    EVT_TEXT_URL (wxID_ANY, Fenster::BeiMausAufURL)
+    //EVT_TEXT_URL (wxID_ANY, Fenster::BeiMausAufURL)
 END_EVENT_TABLE()
 
 //Konstruktor der Fenster-Klasse
@@ -170,7 +170,6 @@ void Fenster::WxEdit_eingabefeldTasteGedrueckt(wxKeyEvent& event)
 // Bei Fokuserhalt Standardtext loeschen
 void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
 {
-    // VERBINDUNG ZUR KONFIGURATION
     if (WxEdit_eingabefeld->GetValue() == wxGetApp().config->parsecfgvalue(_T("local_label_input")))
     {
         WxEdit_eingabefeld->Clear();
@@ -180,16 +179,16 @@ void Fenster::WxEdit_eingabefeldFokus(wxKeyEvent& event)
 }
 
 // Mausklick auf hervorgehobene URL
-void Fenster::BeiMausAufURL(wxTextUrlEvent& event)
-{
-    const wxMouseEvent& mausereignis = event.GetMouseEvent();
-    if(mausereignis.LeftDown())
-    {
-        wxString adresse = WxEdit_ausgabefeld->GetRange(event.GetURLStart(), event.GetURLEnd());
-        wxLaunchDefaultBrowser(adresse);
-    }
-    event.Skip();
-}
+//void Fenster::BeiMausAufURL(wxTextUrlEvent& event)
+//{
+//    const wxMouseEvent& mausereignis = event.GetMouseEvent();
+//    if(mausereignis.LeftDown())
+//    {
+//        wxString adresse = WxEdit_ausgabefeld->GetRange(event.GetURLStart(), event.GetURLEnd());
+//        wxLaunchDefaultBrowser(adresse);
+//    }
+//    event.Skip();
+//}
 
 
 void Fenster::NachrichtSenden()
@@ -199,12 +198,7 @@ void Fenster::NachrichtSenden()
     {
         WxEdit_eingabefeld->Clear(); // Eingabefeld leeren
         wxGetApp().EingabeVerarbeiten(fenster_name, eingabe); // an Zentrale uebergeben
-    }
-
-    // In Eingabegeschichte speichern
-    if(eingabe != _T(""))
-    {
-        geschichte_texte.Add(eingabe);
+        geschichte_texte.Add(eingabe); // In Eingabegeschichte speichern
     }
 
     geschichte_position = geschichte_texte.GetCount();
@@ -226,16 +220,10 @@ void Fenster::TitelSetzen(wxString titel)
 void Fenster::NachrichtAnhaengen(wxString local, wxString param1, wxString param2, wxString param3, wxString param4)
 {
     // Zeitstempel erzeugen
-    char timestamp[12];
-    time_t raw_time;
-    tm *local_time;
-    time(&raw_time);
-    local_time = localtime(&raw_time);
-    strftime(timestamp, 12, "[%H:%M:%S]", local_time);
-    wxString prefix(timestamp, wxConvUTF8);
+    wxDateTime zeit = wxDateTime::Now();
 
     // Bei jedem Aufruf einen Zeilenumbruch erzeugen und prefix voranstellen
-    prefix = _T("\n") + prefix + _T(" ");
+    wxString prefix = _T("\n") + zeit.Format("[%H:%M:%S]") + _T(" ");
 
     // Aus Konfiguration Nachrichtformat auslesen
     wxString nachricht = wxGetApp().config->parsecfgvalue(_T("local_") + local);

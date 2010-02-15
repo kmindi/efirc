@@ -47,7 +47,7 @@ class Fenster : public wxPanel
         };
 
         void WxButton_sendenClick(wxCommandEvent&);
-        void BeiMausAufURL(wxTextUrlEvent& event);
+        //void BeiMausAufURL(wxTextUrlEvent& event);
 
         void NachrichtSenden();
 
