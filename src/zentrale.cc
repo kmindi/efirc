@@ -226,42 +226,27 @@ void Zentrale::fensterzerstoeren(wxString namedesfensters)
 Fenster* Zentrale::fenstersuchen(wxString name)
 {
     map<wxString, Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
-
-    if(iter != zgr_fenster.end())
+    
     // Wenn das Fenster gefunden wurde
-    {
-        return zgr_fenster[name.Upper()];
-    }
-    else
-    {
-        if(name.Upper() == irc->CurrentNick.Upper())
-        // Wenn nicht, ist es entweder eine Nachricht an einen selber...
-        {
-            return fenster(name);
-        }
-        else
-        // ...oder eine andere Nachricht die im Serverfenster angezeigt werden soll
-        {
-            return fenster(irc->CurrentHostname);
-        }
-    }
+    if(iter != zgr_fenster.end()) return zgr_fenster[name.Upper()];
+    
+    // Wenn nicht, ist es entweder eine Nachricht an einen selber...
+    if(name.Upper() == irc->CurrentNick.Upper()) return fenster(name);
+    
+    // ...oder eine andere Nachricht die im Serverfenster angezeigt werden soll
+    return fenster(irc->CurrentHostname);
 }
 
 // Gibt  IMMER einen Zeiger auf ein Fenster zurueck
 Fenster* Zentrale::fenster(wxString name)
 {
     map<wxString,Fenster*>::iterator iter = zgr_fenster.find(name.Upper());
-
-    if(iter != zgr_fenster.end())
+    
     // Wenn das Fenster gefunden wurde
-    {
-        return zgr_fenster[name.Upper()];
-    }
-    else
+    if(iter != zgr_fenster.end()) return zgr_fenster[name.Upper()];
+    
     // Wenn nicht ein neues erstellen
-    {
-        return neuesFenster(name);
-    }
+    return neuesFenster(name);
 }
 
 void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
