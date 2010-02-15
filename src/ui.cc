@@ -408,12 +408,8 @@ bool Fenster::AnzeigeBegrenzungErreicht()
     long configwert = 0;
     (wxGetApp().config->parsecfgvalue(_T("max_DONT_SHOW_USERLIST_CHANGES"))).ToLong(&configwert, 10);
 
-    if(configwert == 0) return false;
-    
-    if(WxList_benutzerliste->GetItemCount() >= configwert)
-        return true;
-    else
-        return false;
+    if(WxList_benutzerliste->GetItemCount() >= configwert && configwert != 0) return true;
+    return false;
 }
 
 
