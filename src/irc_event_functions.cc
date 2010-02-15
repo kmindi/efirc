@@ -405,18 +405,10 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
             {
                 // Fenster auswaehlen
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("CTCP"),user,ctcp_befehl);
-
-                char timestamp[30];
-                time_t raw_time;
-                tm *local_time;
-
-                time(&raw_time);
-                local_time = localtime(&raw_time);
-
-                strftime(timestamp, 30, "%d.%m.%Y %H:%M:%S", local_time);
-
-                wxString timewxString(timestamp, wxConvUTF8);
-                wxString antwort = timewxString;
+                
+                // Zeitstempel erzeugen
+                wxDateTime zeit = wxDateTime::Now();
+                wxString antwort = zeit.Format("%d.%m.%Y %H:%M:%S");
 
                 irc->irc_send_ctcp_time(user.mb_str(), antwort.mb_str());
                 fenstersuchen(empfaenger)->NachrichtAnhaengen(_T("S_CTCP"), user, ctcp_befehl + _T(" ") + antwort);
