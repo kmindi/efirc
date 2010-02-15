@@ -758,15 +758,10 @@ void Zentrale::irc_topicwhotime(const IRC_NACHRICHT *msg_data)
     // Zeitstempel erzeugen
     long unsigned int raw_time_long;
     msg_data->params_a[3].ToULong(&raw_time_long,10);
-
-    char timestamp[50];
-    time_t raw_time;
-    raw_time = raw_time_long;
-
-    tm *local_time;
-    local_time = localtime(&raw_time);
-    strftime(timestamp, 50, "%d.%m.%Y %X", local_time);
-    wxString zeit(timestamp, wxConvUTF8);
+    
+    // Zeitstempel erzeugen
+    wxDateTime dt_zeit((time_t)raw_time_long);
+    wxString zeit = dt_zeit.Format("%d.%m.%Y %H:%M:%S");
 
     fenster(empfaenger)->NachrichtAnhaengen(_T("TOPICWHOTIME"), msg_data->params_a[2], zeit);
 }
