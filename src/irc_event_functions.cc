@@ -297,7 +297,7 @@ void Zentrale::irc_pmsg(const IRC_NACHRICHT *msg_data)
     {
         // Text aufteilen
         wxString ctcp(text.Mid(1,text.Len()-2)); // \001 vorne und hinten abschneiden
-        wxString ctcp_befehl(ctcp.BeforeFirst(leerzeichen));
+        wxString ctcp_befehl((ctcp.BeforeFirst(leerzeichen)).Upper());
         wxString ctcp_text(ctcp.AfterFirst(leerzeichen));
 
         //Befehle abfragen
