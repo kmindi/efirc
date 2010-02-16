@@ -300,47 +300,47 @@ void Zentrale::BefehlVerarbeiten(wxString fenstername, wxString befehl)
         }
     }
 
-	else if(befehl_name == _T("CLOSE"))
+    else if(befehl_name == _T("CLOSE"))
     {
         
-		
-		
-		if(!parameter_vorhanden)
+        
+        
+        if(!parameter_vorhanden)
         {
-			if(anzahl_offene_fenster() == 1)
-			{
-				EingabeVerarbeiten(fenstername, _T("/quit"));
-			}
-			else
-			{
-				if(fenstername.Upper() != irc->CurrentHostname.Upper() && fenstername.Upper() != irc->CurrentNick.Upper())
-				{
-					EingabeVerarbeiten(fenstername, _T("/part"));
-				}
-			}
-			
-			// Dieses Fenster schliessen und den Raum verlassen
-			fensterzerstoeren(fenstername);
+            if(anzahl_offene_fenster() == 1)
+            {
+                EingabeVerarbeiten(fenstername, _T("/quit"));
+            }
+            else
+            {
+                if(fenstername.Upper() != irc->CurrentHostname.Upper() && fenstername.Upper() != irc->CurrentNick.Upper())
+                {
+                    EingabeVerarbeiten(fenstername, _T("/part"));
+                }
+            }
+            
+            // Dieses Fenster schliessen und den Raum verlassen
+            fensterzerstoeren(fenstername);
         }
         else
         {
-			if(anzahl_offene_fenster() == 1)
-			{
-				EingabeVerarbeiten(befehl_parameter, _T("/quit"));
-			}
-			else
-			{
-				if(befehl_parameter.Upper() != irc->CurrentHostname.Upper() && befehl_parameter.Upper() != irc->CurrentNick.Upper())
-				{
-					EingabeVerarbeiten(befehl_parameter, _T("/part"));
-				}
-			}
-			
-			// Das Fenster schliessen dessen Name uebergeben wurde und den Raum verlassen
-			fensterzerstoeren(befehl_parameter);
+            if(anzahl_offene_fenster() == 1)
+            {
+                EingabeVerarbeiten(befehl_parameter, _T("/quit"));
+            }
+            else
+            {
+                if(befehl_parameter.Upper() != irc->CurrentHostname.Upper() && befehl_parameter.Upper() != irc->CurrentNick.Upper())
+                {
+                    EingabeVerarbeiten(befehl_parameter, _T("/part"));
+                }
+            }
+            
+            // Das Fenster schliessen dessen Name uebergeben wurde und den Raum verlassen
+            fensterzerstoeren(befehl_parameter);
         }
     }
-	
+    
     else if(befehl_name == _T("TOPIC"))
     {
         if(!parameter_vorhanden)
