@@ -6,11 +6,15 @@ It was a hobby project during my school time. I don't think I will ever work on 
 efirc is an easy, small and fast IRC (Internet Relay Chat) client. 
 efirc is intended to be configured by you (owner of an irc channel) to fit the clients design yours and to preset the irc data for your customers/friends/clients.
 
+http://efirc.sourceforge.net/
+
 # Example Configuration
 
 TODO
 
 # Online Configuration Builder
+
+http://efirc.sourceforge.net/make_configuration.php
 
 TODO create github.io page for old homepage
 
